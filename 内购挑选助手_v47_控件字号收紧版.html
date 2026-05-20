@@ -1,0 +1,4890 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>内购挑选助手</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+:root{
+  --bg:#f6f8fc;
+  --panel:rgba(255,255,255,.96);
+  --line:#e5e7eb;
+  --text:#0f172a;
+  --muted:#64748b;
+  --blue:#2563eb;
+  --blue-soft:#dbeafe;
+  --green:#16a34a;
+  --green-soft:#dcfce7;
+  --yellow:#ca8a04;
+  --yellow-soft:#fef9c3;
+  --red:#dc2626;
+  --red-soft:#fee2e2;
+  --shadow:0 12px 34px rgba(15,23,42,.08);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  color:var(--text);
+  background:linear-gradient(180deg,#f8fafc,#eef2ff);
+}
+button,input,select,textarea{font:inherit}
+.app{
+  max-width:1800px;
+  margin:0 auto;
+  display:grid;
+  grid-template-columns:320px 1fr 320px;
+  gap:18px;
+  padding:18px;
+}
+.app > *{min-width:0}
+.sidebar,.main,.rightbar,.block,.price-filter-box,.price-histogram-scroll{min-width:0;max-width:100%;}
+.sidebar,.main,.rightbar{overflow-x:hidden;}
+.panel{
+  background:var(--panel);
+  border:1px solid rgba(229,231,235,.95);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px);
+}
+.sidebar,.rightbar{
+  min-width:0;
+  position:sticky;
+  top:18px;
+  height:calc(100vh - 36px);
+  overflow:auto;
+  padding:18px;
+}
+.main{
+  min-width:0;
+  min-height:calc(100vh - 36px);
+  padding:18px;
+  overflow:hidden;
+}
+h1{margin:0 0 6px;font-size:26px;line-height:1.2}
+h2{margin:0 0 12px;font-size:16px}
+label{display:block;font-size:13px;margin-bottom:6px;color:#334155}
+.desc,.tiny,.muted{color:var(--muted)}
+.desc{font-size:14px;line-height:1.6}
+.tiny{font-size:12px;line-height:1.5}
+.block{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#fff;
+  padding:14px;
+  margin-bottom:14px;
+}
+.row{display:flex;gap:10px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grid2,.grid3{display:grid;gap:10px}
+.grid2{grid-template-columns:1fr 1fr}
+.grid3{grid-template-columns:repeat(3,1fr)}
+.settings-panel{background:linear-gradient(180deg,#fffdfd 0%,#fff8fb 100%);border:1px solid #f1d9df;box-shadow:0 10px 24px rgba(244,114,182,.08)}
+.settings-panel h2{margin-bottom:14px;color:#1f2937}
+.settings-subgrid{display:grid;grid-template-columns:1fr;gap:10px}
+.settings-card{border:1px solid #eddde3;border-radius:16px;background:linear-gradient(180deg,#fffefe 0%,#fffafc 100%);padding:12px;box-shadow:0 6px 14px rgba(15,23,42,.03)}
+.settings-card.compact{padding:10px 12px}
+.settings-card .tiny{font-size:11px}
+.settings-checks{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+.settings-checks .check-item{padding:0;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #eddde3;border-radius:14px;padding:8px 10px;box-shadow:0 4px 10px rgba(244,114,182,.04)}
+.settings-checks .check-item:hover{background:#f8fbff}
+.sidebar .settings-subgrid .full-span{grid-column:1 / -1}
+.sidebar .settings-subgrid,.sidebar .settings-subgrid.grid2{grid-template-columns:1fr}
+.sidebar .settings-panel label{font-size:12px;color:#475569}
+.sidebar .settings-panel input[type="text"],.sidebar .settings-panel input[type="number"],.sidebar .settings-panel select{padding:9px 11px;border-radius:13px;background:#fff;border-color:#e8dce3}
+.sidebar .settings-panel .price-summary-title{font-size:13px}
+.sidebar .settings-panel .price-summary-note{font-size:10px}
+.sidebar .settings-panel .price-filter-summary{padding:10px 11px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px}
+.sidebar .settings-panel .price-range-pill{font-size:11px;padding:4px 8px;max-width:100%;min-width:0}
+.sidebar .settings-panel .price-summary-left{min-width:0}
+.sidebar .settings-panel .price-summary-right{min-width:0;max-width:100%;display:flex;align-items:center;justify-content:flex-end;gap:6px;overflow:hidden}
+.sidebar .settings-panel .price-filter-summary .price-range-pill{display:inline-flex;min-width:0;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto}
+.sidebar .settings-panel .price-summary-arrow{flex:0 0 auto}
+.sidebar .settings-panel .price-summary-note{display:none}
+.sidebar .settings-panel .price-summary-title{font-size:13px;line-height:1.2}
+.sidebar .settings-panel .tiny{color:#8b7280}
+.sidebar .settings-panel label{font-weight:700;color:#6b4f5f}
+.sidebar .settings-panel .price-filter-section{border-color:#eddde3;background:#fffdfd}
+.sidebar .settings-panel .price-filter-section .price-filter-box{border-top-color:#f1e5ea}
+input[type="text"],input[type="number"],select,textarea{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid #dbe1ea;
+  border-radius:12px;
+  background:#fff;
+  outline:none;
+}
+textarea{min-height:120px;resize:vertical;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.5}
+input:focus,select:focus,textarea:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(37,99,235,.08)}
+.btn{
+  appearance:none;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;
+  font-weight:700;transition:.16s ease; white-space:nowrap;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.secondary{background:#f8fafc;color:#334155;border:1px solid var(--line)}
+.btn.success{background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+.btn.warn{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.btn.danger{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.btn.small{padding:8px 10px;font-size:12px;border-radius:10px}
+.btn{box-shadow:0 4px 10px rgba(15,23,42,.03)}
+.btn.secondary{background:#fff;border-color:#e9dce4}
+.btn.danger{background:#fff5f7;border-color:#fecdd3;color:#be123c}
+.chip{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;
+  background:#f8fafc;border:1px solid var(--line);font-size:12px;font-weight:700;color:#334155;
+}
+.status{
+  margin-top:12px;padding:12px 14px;border-radius:14px;font-size:14px;line-height:1.55;border:1px solid transparent;
+}
+.status.ok{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+.status.good{background:#ecfdf5;border-color:#a7f3d0;color:#047857}
+.status.warn{background:#fff7ed;border-color:#fdba74;color:#c2410c}
+.status.bad{background:#fef2f2;border-color:#fecaca;color:#b91c1c}
+.filters-list{
+  max-height:180px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:8px;background:#fcfcfd;
+}
+.check-item{display:flex;gap:8px;align-items:flex-start;padding:6px 4px;font-size:13px;border-radius:8px}
+.check-item:hover{background:#f8fafc}
+.quick-toggle{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;border:1px solid var(--line);background:#f8fafc;opacity:.42;transition:.16s ease;flex:0 0 auto}
+.quick-toggle:hover{opacity:.82;background:#eef2ff;border-color:#c7d2fe}
+.quick-toggle input{margin:0;width:14px;height:14px;cursor:pointer;accent-color:#2563eb}
+.card.selected .quick-toggle{opacity:.9;background:#eff6ff;border-color:#93c5fd}
+
+.full-span{grid-column:1 / -1}
+.price-filter-box{
+  width:100%;max-width:100%;min-width:0;
+  border:1px solid var(--line);border-radius:14px;background:#fff;padding:8px 8px 6px;overflow:hidden;box-sizing:border-box;
+}
+.price-filter-head{
+  display:flex;justify-content:space-between;gap:6px;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;min-width:0;
+}
+.price-range-pill{
+  display:inline-flex;align-items:center;justify-content:center;padding:4px 9px;border-radius:999px;
+  background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:12px;font-weight:800;max-width:100%;white-space:nowrap;overflow:auto;
+}
+.price-histogram-scroll{
+  width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;box-sizing:border-box;overscroll-behavior-x:contain;
+  border:1px dashed #dbe1ea;border-radius:12px;background:linear-gradient(180deg,#fcfdff,#f8fafc);scrollbar-gutter:stable both-edges;
+}
+.price-histogram-scroll::-webkit-scrollbar{height:8px}
+.price-histogram-scroll::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:999px}
+.price-histogram{
+  display:grid;gap:5px;align-items:end;
+  min-height:66px;padding:6px 7px 5px;box-sizing:border-box;width:max-content;min-width:max-content;
+}
+.price-bin{
+  display:grid;grid-template-rows:auto 1fr auto;gap:3px;align-items:end;min-width:50px;background:none;border:none;padding:0;cursor:pointer;
+}
+.price-bin-count{
+  font-size:10px;line-height:1;text-align:center;color:#64748b;font-weight:800;
+}
+.price-bin-bar{
+  position:relative;min-height:8px;border-radius:8px 8px 4px 4px;background:#e2e8f0;border:1px solid #d7dee8;
+  transition:.16s ease;
+}
+.price-bin.selected .price-bin-bar{background:#60a5fa;border-color:#3b82f6;box-shadow:0 5px 12px rgba(59,130,246,.16)}
+.price-bin.dim .price-bin-bar{background:#eef2f7;border-color:#e2e8f0}
+.price-bin-label{
+  font-size:10px;line-height:1.1;text-align:center;color:#64748b;word-break:keep-all;white-space:nowrap;font-weight:700;
+}
+.price-bin.selected .price-bin-label,.price-bin.selected .price-bin-count{color:#1d4ed8}
+.price-filter-tip{margin-top:3px;font-size:10px;color:#94a3b8}
+.price-bin-grid{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:6px;max-width:100%;min-width:0}
+.price-chip{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px;padding:8px 9px;border-radius:12px;border:1px solid #dbe1ea;background:#fff;cursor:pointer;min-width:0;box-sizing:border-box;transition:.16s ease}
+.price-chip:hover{border-color:#bfdbfe;background:#f8fbff}
+.price-chip.selected{border-color:#93c5fd;background:#eff6ff;box-shadow:0 4px 10px rgba(59,130,246,.12)}
+.price-chip.dim{opacity:.55}
+.price-chip-label{font-size:11px;font-weight:800;color:#334155;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.price-chip-count{font-size:11px;font-weight:800;color:#64748b;background:#f8fafc;border:1px solid #e2e8f0;border-radius:999px;padding:1px 6px;line-height:1.5;flex:0 0 auto}
+.price-chip.selected .price-chip-label,.price-chip.selected .price-chip-count{color:#1d4ed8}
+.price-chip.selected .price-chip-count{background:#dbeafe;border-color:#bfdbfe}
+.price-chip-bar{grid-column:1 / -1;height:4px;border-radius:999px;background:#e2e8f0;overflow:hidden}
+.price-chip-bar span{display:block;height:100%;border-radius:999px;background:#60a5fa;width:0%}
+.price-filter-section{border:1px solid var(--line);border-radius:16px;background:#fff;overflow:hidden;max-width:100%;min-width:0}
+.price-filter-summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;cursor:pointer;user-select:none;max-width:100%;box-sizing:border-box}
+.price-filter-summary::-webkit-details-marker{display:none}
+.price-summary-left{display:flex;flex-direction:column;gap:2px;min-width:0}
+.price-summary-title{font-size:14px;font-weight:800;color:#0f172a}
+.price-summary-note{font-size:11px;color:#94a3b8}
+.price-summary-right{display:flex;align-items:center;gap:8px;min-width:0;max-width:55%}
+.price-filter-summary .price-range-pill{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.price-summary-arrow{flex:0 0 auto;font-size:14px;color:#64748b;transition:transform .18s ease}
+.price-filter-section[open] .price-summary-arrow{transform:rotate(180deg)}
+.price-filter-section .price-filter-box{border:0;border-top:1px dashed #e2e8f0;border-radius:0;padding-top:10px}
+.price-filter-section:not([open]) .price-filter-box{display:none}
+
+.main-search-row{
+  margin-bottom:14px;
+}
+.main-search-box{
+  border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px 14px;box-shadow:0 8px 24px rgba(15,23,42,.04);
+}
+.main-search-box label{margin-bottom:8px}
+.toolbar{
+  display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:12px
+}
+.toolbar-left,.toolbar-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.summary{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:12px;margin-bottom:16px
+}
+.summary .item{
+  background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 8px 24px rgba(15,23,42,.04)
+}
+.summary .k{font-size:12px;color:var(--muted);margin-bottom:6px}
+.summary .v{font-size:24px;font-weight:900}
+.summary .v.sm{font-size:18px}
+.cards{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+  gap:16px;
+  min-height:320px;
+  transition:min-height .18s ease;
+}
+.cards.is-soft-updating::after{
+  content:"";
+  position:absolute;inset:0;pointer-events:none;border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,0),rgba(248,250,252,.18),rgba(255,255,255,0));
+  animation:softSweep .28s ease;
+}
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  box-shadow:0 8px 24px rgba(15,23,42,.06);transition:.18s ease;cursor:pointer;
+  content-visibility:auto;contain-intrinsic-size:360px 520px;
+}
+.card.just-updated{
+  animation:cardPulse .42s ease;
+}
+.flash-pop{
+  animation:flashPop .34s ease;
+}
+@keyframes softSweep{
+  0%{opacity:0}
+  30%{opacity:1}
+  100%{opacity:0}
+}
+@keyframes cardPulse{
+  0%{transform:translateY(0) scale(1);box-shadow:0 8px 24px rgba(15,23,42,.06)}
+  45%{transform:translateY(-2px) scale(1.012);box-shadow:0 16px 34px rgba(37,99,235,.14)}
+  100%{transform:translateY(0) scale(1);box-shadow:0 8px 24px rgba(15,23,42,.06)}
+}
+@keyframes flashPop{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.035);color:var(--blue)}
+  100%{transform:scale(1)}
+}
+.card:hover{transform:translateY(-2px)}
+.card.selected{outline:2px solid #93c5fd;box-shadow:0 12px 28px rgba(37,99,235,.12)}
+.card.candidate{border-color:#c4b5fd;box-shadow:0 10px 24px rgba(139,92,246,.10)}
+.card.over-budget{border-color:#fca5a5;box-shadow:0 8px 24px rgba(220,38,38,.08)}
+.card.over-budget .card-top img,.card.over-budget .no-image{filter:grayscale(1);opacity:.36}
+.card-top{
+  position:relative;aspect-ratio:1/1;background:linear-gradient(180deg,#f8fafc,#eef2ff);
+  display:flex;align-items:center;justify-content:center;overflow:hidden
+}
+.card-top img{width:100%;height:100%;object-fit:contain;background:#fff}
+.no-image{
+  width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#f8fafc,#eef2ff);color:#94a3b8;font-size:14px
+}
+.preview-btn{
+  position:absolute;right:10px;bottom:10px;z-index:6;
+  width:36px;height:36px;border:0;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(15,23,42,.72);color:#fff;cursor:pointer;
+  box-shadow:0 8px 18px rgba(15,23,42,.18);font-size:16px;font-weight:900;
+}
+.preview-btn:hover{background:rgba(15,23,42,.86)}
+.preview-btn:active{transform:scale(.97)}
+.badge-row{
+  position:absolute;top:10px;left:10px;right:10px;display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;pointer-events:none
+}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:11px;font-weight:800;
+  backdrop-filter:blur(8px);background:rgba(255,255,255,.85);color:#1e293b;border:1px solid rgba(255,255,255,.75);box-shadow:0 4px 12px rgba(15,23,42,.08)
+}
+.badge.stock0{background:rgba(254,242,242,.9);color:#b91c1c}
+.badge.stockok{background:rgba(236,253,245,.9);color:#047857}
+.badge.candidate-badge{background:rgba(245,243,255,.95);color:#6d28d9}
+.budget-mask{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:14px;
+  background:rgba(15,23,42,.18);color:#fff;font-size:13px;font-weight:800;backdrop-filter:blur(1px)
+}
+.card-body{padding:14px}
+.title{font-size:14px;line-height:1.5;min-height:44px;font-weight:800}
+.meta{margin-top:10px;display:grid;gap:6px}
+.meta-line{font-size:12px;color:#475569;word-break:break-word}
+.meta-line b{color:#0f172a}
+.filter-heading-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.brand-filter-item{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:6px}
+.brand-filter-item.pinned{background:#fff7ed;border:1px solid #fed7aa;padding:6px 8px}
+.filter-check-label{display:flex;gap:8px;align-items:flex-start;min-width:0;cursor:pointer}
+.filter-check-label span{word-break:break-word}
+.pin-brand-btn{
+  width:24px;height:24px;border:1px solid #ead9c4;border-radius:999px;background:#fffaf0;color:#b7791f;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;line-height:1;flex:0 0 auto
+}
+.pin-brand-btn:hover{background:#fff3d6}
+html[data-density="compact"] .cards{grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:12px}
+html[data-density="compact"] .card{border-radius:15px;contain-intrinsic-size:300px 420px}
+html[data-density="compact"] .card-top{aspect-ratio:4/3}
+html[data-density="compact"] .card-body{padding:10px}
+html[data-density="compact"] .title{font-size:13px;line-height:1.4;min-height:36px}
+html[data-density="compact"] .meta{margin-top:7px;gap:4px}
+html[data-density="compact"] .meta-line{font-size:11px}
+html[data-density="compact"] .actions{margin-top:9px;gap:8px}
+html[data-density="compact"] .badge{font-size:10px;padding:5px 8px}
+html[data-density="compact"] .preview-btn{width:32px;height:32px}
+html[data-density="large"] .cards{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+html[data-density="large"] .card-body{padding:16px}
+html[data-density="large"] .title{font-size:15px;min-height:50px}
+.actions{
+  margin-top:12px;display:grid;gap:10px
+}
+.action-row{display:flex;gap:8px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.qty-wrap{
+  display:flex;align-items:center;gap:6px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:4px;
+}
+.qty-wrap input{
+  width:54px;text-align:center;padding:6px 4px;border:0;background:transparent;box-shadow:none;
+}
+.price-big{font-size:18px;font-weight:900;color:#0f172a}
+.empty{border:1px dashed #cbd5e1;background:#fff;padding:24px;border-radius:18px;text-align:center;color:#64748b}
+.mapping-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.output-box{margin-top:14px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:14px}
+.count-badge{font-size:12px;color:var(--muted)}
+details.mapping-box{border:1px solid var(--line);border-radius:14px;background:#fff;overflow:hidden}
+details.mapping-box summary{
+  list-style:none;cursor:pointer;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;color:#334155;background:#f8fafc;user-select:none
+}
+details.mapping-box summary::-webkit-details-marker{display:none}
+details.mapping-box summary::after{content:"展开";font-size:12px;font-weight:600;color:var(--muted)}
+details.mapping-box[open] summary::after{content:"收起"}
+.mapping-inner{padding:12px 0 0}
+.mapping-note{margin:0 0 10px;font-size:12px;line-height:1.5;color:var(--muted)}
+
+.cart-panel,.cand-panel{
+  border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px;margin-bottom:14px
+}
+.panel-head{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.panel-title{font-size:16px;font-weight:900}
+.mini-stat{font-size:12px;color:var(--muted)}
+.side-list{display:grid;gap:10px;max-height:46vh;overflow:auto}
+.side-item{
+  display:grid;grid-template-columns:54px 1fr auto;gap:10px;align-items:center;
+  padding:8px;border:1px solid var(--line);border-radius:14px;background:#fcfcfd;
+}
+.side-thumb{width:54px;height:54px;border-radius:10px;background:#f8fafc;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.side-thumb img{width:100%;height:100%;object-fit:contain;background:#fff}
+.side-name{font-size:13px;font-weight:700;line-height:1.4}
+.side-meta{font-size:12px;color:var(--muted);line-height:1.4}
+.side-actions{display:grid;gap:6px;justify-items:end}
+.side-empty{padding:18px 10px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed #cbd5e1;border-radius:14px;background:#fff}
+.rightbar .btn-group{display:flex;gap:8px;flex-wrap:wrap}
+.cart-total-box{
+  border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#f8fafc;display:grid;gap:6px
+}
+.cart-total-box .big{font-size:22px;font-weight:900}
+
+.budget-float{
+  position:fixed;right:20px;bottom:20px;z-index:999;width:min(300px,calc(100vw - 32px));
+  border-radius:18px;box-shadow:0 16px 40px rgba(15,23,42,.18);padding:14px 14px 12px;backdrop-filter:blur(10px);display:block
+}
+.budget-float.good{background:rgba(236,253,245,.97);border:1px solid #86efac}
+.budget-float.warn{background:rgba(255,251,235,.97);border:1px solid #fcd34d}
+.budget-float.bad{background:rgba(254,242,242,.97);border:1px solid #fca5a5}
+.budget-float .bf-head{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none
+}
+.budget-float.dragging{box-shadow:0 22px 48px rgba(15,23,42,.24)}
+.budget-float.dragging .bf-head{cursor:grabbing}
+.budget-float .bf-title{font-size:13px;font-weight:900}
+.budget-float.good .bf-title{color:#047857}
+.budget-float.warn .bf-title{color:#a16207}
+.budget-float.bad .bf-title{color:#b91c1c}
+.budget-float .chip{background:rgba(255,255,255,.78)}
+.budget-float .bf-money{font-size:30px;font-weight:900;line-height:1;color:#0f172a}
+.budget-float .bf-tip{font-size:13px;line-height:1.45;color:#475569;margin-top:8px}
+.budget-float .bf-mini{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.budget-float .bf-mini .mini{background:rgba(255,255,255,.72);border:1px solid #e5e7eb;border-radius:12px;padding:9px 10px}
+.budget-float .bf-mini .k{font-size:11px;color:#64748b;margin-bottom:4px}
+.budget-float .bf-mini .v{font-size:14px;font-weight:800;color:#0f172a}
+.bf-head-actions{display:flex;align-items:center;gap:8px}
+.budget-float .bf-head-actions .chip{display:none}
+.bf-toggle{display:none;border:none;background:rgba(255,255,255,.84);border:1px solid #e5e7eb;color:#334155;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;cursor:pointer}
+.bf-bubble{display:none;align-items:center;justify-content:center;width:100%;height:100%;border:none;background:transparent;color:#0f172a;border-radius:inherit;font-weight:900;cursor:pointer}
+.bf-bubble-money{font-size:15px;line-height:1;letter-spacing:-.2px}
+.budget-float.good .bf-bubble{background:linear-gradient(180deg,rgba(220,252,231,.98),rgba(187,247,208,.96));color:#047857}
+.budget-float.warn .bf-bubble{background:linear-gradient(180deg,rgba(254,249,195,.98),rgba(253,230,138,.96));color:#a16207}
+.budget-float.bad .bf-bubble{background:linear-gradient(180deg,rgba(254,226,226,.98),rgba(252,165,165,.96));color:#b91c1c}
+
+.lightbox{
+  position:fixed;inset:0;background:rgba(15,23,42,.76);z-index:1200;display:none;align-items:center;justify-content:center;padding:18px
+}
+.lightbox.open{display:flex}
+.lightbox-inner{
+  position:relative;width:min(1200px,100%);height:min(88vh,900px);display:grid;grid-template-columns:1.3fr .9fr;gap:16px;
+  background:#fff;border-radius:24px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.25)
+}
+.lightbox-image{
+  border:1px solid var(--line);border-radius:18px;background:#f8fafc;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative
+}
+.lightbox-image img{max-width:100%;max-height:100%;object-fit:contain;background:#fff}
+.lightbox-image .fallback{color:#94a3b8}
+.lightbox-side{display:grid;grid-template-rows:auto 1fr auto;gap:12px;min-height:0}
+.lb-title{font-size:20px;font-weight:900;line-height:1.45}
+.lb-meta{display:grid;gap:8px;overflow:auto;border:1px solid var(--line);border-radius:16px;padding:12px;background:#fcfcfd}
+.lb-footer{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between}
+.lb-nav{display:flex;gap:8px;align-items:center}
+.lb-close{position:absolute;right:16px;top:16px}
+.kv{font-size:13px;color:#475569}
+.kv b{color:#0f172a}
+
+.mobile-actions{
+  display:none;
+  position:fixed;left:50%;transform:translateX(-50%);bottom:12px;z-index:1000;
+  gap:10px;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:999px;padding:8px 10px;box-shadow:var(--shadow);backdrop-filter:blur(10px)
+}
+.fab{border:0;border-radius:999px;padding:10px 14px;font-weight:800;background:#eff6ff;color:#1d4ed8;white-space:nowrap}
+.drawer{
+  position:fixed;inset:auto 0 0 0;z-index:1100;background:#fff;border-radius:20px 20px 0 0;box-shadow:0 -10px 30px rgba(15,23,42,.16);
+  max-height:78vh;transform:translateY(105%);transition:.22s ease;padding:14px 14px 18px;display:none
+}
+.drawer.open{transform:translateY(0)}
+.drawer-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.drawer-list{max-height:58vh;overflow:auto}
+.drawer-backdrop{
+  position:fixed;inset:0;background:rgba(15,23,42,.28);z-index:1090;display:none
+}
+.drawer-backdrop.show{display:block}
+.site-footer{
+  padding:18px 24px 28px;color:var(--muted)
+}
+.site-footer .footer-inner{
+  max-width:1800px;margin:0 auto;border-top:1px solid rgba(203,213,225,.9);padding-top:16px;text-align:center;font-size:12px;line-height:1.8
+}
+.site-footer .brand{font-size:13px;font-weight:900;color:#334155;letter-spacing:.2px}
+.hidden{display:none !important}
+
+@media (max-width:1380px){
+  .app{grid-template-columns:300px 1fr}
+  .rightbar{display:none}
+  .mobile-actions,.drawer{display:flex}
+  .drawer{flex-direction:column}
+}
+@media (max-width:1100px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto}
+  .summary{grid-template-columns:repeat(3,minmax(100px,1fr))}
+}
+@media (max-width:760px){
+  .main{padding:14px}
+  .sidebar{padding:14px}
+  .summary{grid-template-columns:1fr 1fr}
+  .mapping-grid,.grid2,.grid3{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .toolbar-right{width:100%}
+  .mobile-actions{left:10px;right:10px;transform:none;bottom:10px;width:auto;gap:6px;padding:6px 8px;border-radius:20px;justify-content:space-between}
+  .fab{flex:1 1 0;min-width:0;padding:10px 6px;font-size:13px;line-height:1.1;border-radius:14px}
+  .budget-float{right:10px;bottom:74px;width:min(220px,calc(100vw - 20px));padding:10px 10px 9px;border-radius:16px;transition:width .18s ease,height .18s ease,padding .18s ease,border-radius .18s ease,box-shadow .18s ease,transform .18s ease}
+  .budget-float .bf-title{font-size:12px}
+  .budget-float .bf-money{font-size:24px}
+  .budget-float .bf-tip{font-size:12px;margin-top:6px}
+  .budget-float .bf-mini{gap:6px}
+  .budget-float .bf-mini .mini{padding:7px 8px}
+  .budget-float .bf-toggle{display:inline-flex;align-items:center;justify-content:center}
+  .budget-float.mobile-collapsed{width:64px;height:64px;padding:0;border-radius:999px;display:flex;align-items:center;justify-content:center;right:12px;bottom:82px;overflow:hidden}
+  .budget-float.mobile-collapsed .bf-panel{display:none}
+  .budget-float.mobile-collapsed .bf-bubble{display:flex}
+}
+@media (max-width:620px){
+  .app{padding:10px}
+  .cards{grid-template-columns:1fr}
+  .lightbox{padding:10px}
+  .lightbox-inner{grid-template-columns:1fr;height:auto;max-height:92vh;overflow:auto;padding:12px;gap:12px}
+  .lb-close{position:sticky;top:0;right:auto;left:auto;justify-self:end;align-self:start;margin-left:auto;z-index:5}
+  .lightbox-image{max-height:min(48vh,420px);border-radius:16px}
+  .lightbox-side{gap:10px}
+  .lb-title{font-size:18px}
+  .lb-footer{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .lb-nav{grid-column:1 / -1;justify-content:space-between}
+  .budget-float{right:10px;bottom:72px;width:min(184px,48vw);padding:9px 9px 8px}
+  .budget-float .bf-money{font-size:22px}
+  .budget-float .bf-mini{grid-template-columns:1fr}
+  .budget-float .bf-mini .mini{padding:6px 8px}
+  .budget-float.mobile-collapsed{width:58px;height:58px;bottom:78px;right:10px}
+  .bf-bubble-money{font-size:13px}
+}
+
+.compare-chip{background:#f5f3ff;border-color:#ddd6fe;color:#6d28d9}
+.card.compared{outline:2px solid #c4b5fd;box-shadow:0 12px 28px rgba(139,92,246,.14)}
+.recommend-panel,.compare-panel{
+  border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px;margin-bottom:14px
+}
+.recommend-list,.compare-list{display:grid;gap:10px}
+.rec-item,.compare-item{
+  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  padding:10px;border:1px solid var(--line);border-radius:14px;background:#fcfcfd;
+}
+.rec-name,.compare-name{font-size:13px;font-weight:800;line-height:1.45}
+.rec-meta,.compare-meta{font-size:12px;color:var(--muted);line-height:1.5}
+.compare-actions{display:flex;gap:8px;flex-wrap:wrap}
+.compare-empty{padding:14px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed #cbd5e1;border-radius:14px;background:#fff}
+.compare-modal{
+  position:fixed;inset:0;background:rgba(15,23,42,.72);z-index:1250;display:none;align-items:center;justify-content:center;padding:18px
+}
+.compare-modal.open{display:flex}
+.compare-modal-inner{
+  width:min(1280px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:24px;
+  padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.25)
+}
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:16px}
+.compare-card{
+  border:1px solid var(--line);border-radius:18px;background:#fff;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto
+}
+.compare-cover{aspect-ratio:1/1;background:#f8fafc;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.compare-cover img{width:100%;height:100%;object-fit:contain;background:#fff}
+.compare-body{padding:14px;display:grid;gap:8px}
+.compare-title{font-size:15px;font-weight:900;line-height:1.45}
+.compare-close{position:sticky;top:0;float:right;z-index:2}
+.compare-tag{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#f8fafc;border:1px solid var(--line);font-size:12px;font-weight:700}
+.share-card{
+  position:fixed;left:-99999px;top:0;width:1120px;background:linear-gradient(180deg,#fff7f5 0%,#ffffff 26%,#fffaf7 100%);color:#0f172a;padding:34px;border-radius:28px;
+  border:1px solid #f1d6cc;box-shadow:0 10px 30px rgba(15,23,42,.12)
+}
+.share-shell{background:#fff;border:1px solid #f3e5df;border-radius:24px;padding:26px 26px 18px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
+.share-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:18px}
+.share-title{font-size:34px;font-weight:900}
+.share-sub{font-size:14px;color:#64748b}
+.share-total{font-size:20px;font-weight:900;text-align:right}
+.share-summary{margin-top:4px;font-size:12px;color:#64748b;font-weight:700}
+.share-grid{display:grid;gap:16px}
+.share-item{border:1px solid #e5e7eb;border-radius:18px;overflow:hidden;background:#fff;display:grid;grid-template-rows:auto 1fr}
+.share-item-cover{position:relative;background:#f8fafc;border-bottom:1px solid #eef2f7}
+.share-item-cover::before{content:"";display:block;padding-top:100%}
+.share-item-cover-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;padding:12px}
+.share-item-cover img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;background:#fff}
+.share-item-body{padding:12px;display:grid;gap:6px}
+.share-item-title{font-size:14px;font-weight:900;line-height:1.45}
+.share-item-meta{font-size:12px;color:#64748b;line-height:1.5}
+.share-foot{margin-top:18px;border-top:1px solid #e5e7eb;padding-top:12px;text-align:right;color:#64748b;font-size:12px}
+.mobile-filter-grid{display:grid;gap:10px}
+.mobile-filter-grid .grid2{grid-template-columns:1fr 1fr}
+.mobile-filter-title{font-size:15px;font-weight:900;margin-bottom:8px}
+@media (max-width:760px){
+  .quick-toggle{width:24px;height:24px}
+  .card-body{padding:12px}
+  .price-big{font-size:17px}
+  .qty-wrap .btn.small{padding:10px 12px;font-size:14px}
+  .qty-wrap input{width:48px;font-size:15px}
+  .price-histogram{gap:3px;min-height:54px;padding:3px 2px 2px;min-width:max-content}
+  .price-bin{width:42px;min-width:42px;max-width:42px}
+  .price-bin-bar{max-width:36px}
+  .price-bin-count{font-size:9px}
+  .price-bin-label{font-size:8px}
+  .price-filter-box{padding:6px 6px 4px;overflow:hidden}
+  .price-filter-head{margin-bottom:4px}
+  .price-histogram-scroll{display:none}
+  .price-bin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:4px}
+  .price-chip{padding:8px 8px}
+  .price-chip-label{font-size:11px}
+  .price-chip-count{font-size:10px;padding:1px 5px}
+  .price-range-pill{font-size:11px;padding:4px 8px;white-space:normal;line-height:1.35}
+  .price-filter-tip{font-size:9px}
+  .price-filter-summary{padding:10px 12px;gap:10px}
+  .price-summary-title{font-size:13px}
+  .price-summary-note{font-size:10px}
+  .price-summary-right{max-width:58%;gap:6px}
+  .price-summary-arrow{font-size:13px}
+}
+
+
+/* v30 unified cute theme */
+:root{
+  --bg:#fbfaf6;
+  --panel:rgba(255,255,255,.95);
+  --line:#ebe5da;
+  --text:#1f2937;
+  --muted:#6b7280;
+  --blue:#5c7cfa;
+  --blue-soft:#e9efff;
+  --green:#2f9e78;
+  --green-soft:#e8f8f2;
+  --yellow:#d28b26;
+  --yellow-soft:#fff4dc;
+  --red:#d95c5c;
+  --red-soft:#ffe6e6;
+  --shadow:0 12px 30px rgba(93,108,145,.08);
+  --radius:20px;
+}
+body{background:linear-gradient(180deg,#fbfaf6 0%,#f5f8ff 100%)}
+.panel{border:1px solid #ece6dc;box-shadow:0 12px 30px rgba(93,108,145,.08)}
+.block{border-color:#ece6dc;background:linear-gradient(180deg,#fffdfa 0%,#ffffff 100%);box-shadow:0 8px 22px rgba(93,108,145,.04)}
+h1{letter-spacing:.2px}
+h2{font-weight:900}
+.desc{color:#667085}
+label{color:#4b5563}
+input[type="text"],input[type="number"],select,textarea{border-color:#e8e3da;background:#fffefb}
+input:focus,select:focus,textarea:focus{border-color:#9db2ff;box-shadow:0 0 0 4px rgba(92,124,250,.10)}
+.btn{border-radius:14px}
+.btn.primary{background:linear-gradient(180deg,#6d8cff 0%,#5c7cfa 100%);color:#fff;box-shadow:0 10px 18px rgba(92,124,250,.18)}
+.btn.secondary{background:#fffdf8;color:#475569;border:1px solid #e8e3d8}
+.btn.success{background:#eefaf5;color:#24785c;border:1px solid #b9e8d7}
+.btn.warn{background:#fff7eb;color:#c06a1f;border:1px solid #f5d3a7}
+.btn.danger{background:#fff4f4;color:#c34d57;border:1px solid #f2c8cd}
+.chip{background:#fffdf8;border-color:#ece6dc;color:#475569}
+.main-search-box,.summary .item,.side-item,.side-empty,.lightbox-inner,.drawer{border-color:#ece6dc;background:linear-gradient(180deg,#fffdfa 0%,#ffffff 100%);box-shadow:0 10px 24px rgba(93,108,145,.05)}
+.summary .item{border-radius:18px}
+.card{background:linear-gradient(180deg,#fffefb 0%,#ffffff 100%);border-color:#ece6dc;box-shadow:0 10px 24px rgba(93,108,145,.06)}
+.card.selected{outline:2px solid #a8bcff;box-shadow:0 12px 28px rgba(92,124,250,.14)}
+.card.candidate{border-color:#c8b8ff;box-shadow:0 10px 24px rgba(140,114,255,.10)}
+.card-top{background:linear-gradient(180deg,#fff6ec 0%,#f3f7ff 100%)}
+.no-image{background:linear-gradient(180deg,#fff6ec 0%,#f3f7ff 100%)}
+.preview-btn{background:rgba(88,100,145,.78)}
+.preview-btn:hover{background:rgba(88,100,145,.92)}
+.badge{background:rgba(255,255,255,.92);border:1px solid rgba(236,230,220,.9);color:#334155}
+.badge.stockok{background:rgba(232,248,242,.95);color:#24785c}
+.badge.stock0{background:rgba(255,244,244,.96);color:#bf404f}
+.badge.candidate-badge{background:rgba(244,240,255,.95);color:#6d48d8}
+.settings-panel{background:linear-gradient(180deg,#fffefb 0%,#f7fbff 100%);border:1px solid #e8e3da;box-shadow:0 10px 26px rgba(93,108,145,.06)}
+.settings-card{border:1px solid #ece6dc;border-radius:16px;background:linear-gradient(180deg,#fffefd 0%,#ffffff 100%);box-shadow:0 6px 16px rgba(93,108,145,.04)}
+.settings-checks .check-item{border:1px solid #ece6dc;background:#fffdf9;box-shadow:none}
+.sidebar .settings-panel input[type="text"],.sidebar .settings-panel input[type="number"],.sidebar .settings-panel select{border-color:#e8e3da;background:#fffefb}
+.sidebar .settings-panel label{font-weight:700;color:#5b6472}
+.sidebar .settings-panel .tiny{color:#7b8190}
+.sidebar .settings-panel .price-filter-section{border-color:#ece6dc;background:#fffefb}
+.sidebar .settings-panel .price-filter-section .price-filter-box{border-top-color:#efe9df}
+.price-filter-box,.price-filter-section,.filters-list{border-color:#ece6dc;background:#fffefb}
+.price-histogram-scroll{border-color:#e7e3db;background:linear-gradient(180deg,#fffefd,#fafcff)}
+.price-range-pill{background:#edf2ff;color:#4567e8;border-color:#cedbff}
+.price-chip{border-color:#e7e3db;background:#fffefb}
+.price-chip:hover{border-color:#c7d5ff;background:#f8fbff}
+.price-chip.selected{border-color:#a8bcff;background:#edf2ff;box-shadow:0 4px 10px rgba(92,124,250,.12)}
+.fab{background:linear-gradient(180deg,#edf3ff 0%,#e7f0ff 100%);color:#3e63dd;border:1px solid #d7e3ff;box-shadow:0 10px 18px rgba(92,124,250,.10)}
+.side-empty{background:#fffefb;border-color:#ddd6c9}
+.status.ok{background:#eef3ff;border-color:#cddbff;color:#4567e8}
+.status.good{background:#eefaf5;border-color:#b9e8d7;color:#24785c}
+.status.warn{background:#fff7eb;border-color:#f5d3a7;color:#c06a1f}
+.status.bad{background:#fff4f4;border-color:#f2c8cd;color:#c34d57}
+.panel-title{color:#334155}
+
+
+/* v33: 桌面端三栏独立滚动 + 左侧价位筛选窄栏优化 */
+@media (min-width:1101px){
+  html, body{
+    height:100%;
+    overflow:hidden;
+  }
+  body{
+    min-height:100vh;
+  }
+  .app{
+    height:100vh;
+    max-height:100vh;
+    overflow:hidden;
+    align-items:stretch;
+  }
+  .sidebar, .main, .rightbar{
+    min-height:0;
+    height:calc(100vh - 36px);
+    max-height:calc(100vh - 36px);
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-gutter:stable;
+  }
+  .sidebar, .rightbar{
+    position:relative !important;
+    top:auto !important;
+  }
+  .main{
+    position:relative;
+    min-height:0 !important;
+  }
+
+  /* 左侧窄栏：价位筛选改为按钮网格，不再用横向柱状图 */
+  .sidebar .price-histogram-scroll{
+    display:none !important;
+  }
+  .sidebar .price-bin-grid{
+    display:grid !important;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+    margin-top:8px;
+  }
+  .sidebar .price-filter-box,
+  .sidebar .price-filter-section,
+  .sidebar .filters-list{
+    max-width:100%;
+    overflow:hidden;
+  }
+  .sidebar .price-filter-head{
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+  }
+  .sidebar .price-filter-head .tiny{
+    flex:1 1 auto;
+    min-width:0;
+    font-size:11px;
+    line-height:1.45;
+  }
+  .sidebar .price-range-pill{
+    flex:0 0 auto;
+    max-width:92px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .sidebar .price-filter-tip{
+    margin-top:6px;
+    font-size:10px;
+  }
+}
+
+
+/* v34: 更统一的奶油感配色 */
+:root{
+  --bg:#f8f2e8;
+  --panel:rgba(255,252,247,.97);
+  --line:#eadfce;
+  --text:#3b342f;
+  --muted:#8a7f75;
+
+  --blue:#b88b5b;
+  --blue-soft:#f4e4cf;
+
+  --green:#7d9b76;
+  --green-soft:#edf4e8;
+
+  --yellow:#caa15f;
+  --yellow-soft:#fbf1dd;
+
+  --red:#d08a7d;
+  --red-soft:#faebe7;
+
+  --shadow:0 12px 28px rgba(120,101,80,.08);
+  --radius:20px;
+}
+
+body{
+  background:linear-gradient(180deg,#fbf7f1 0%, #f6eee3 100%);
+}
+
+.panel{
+  border:1px solid #ece2d3;
+  box-shadow:0 12px 28px rgba(120,101,80,.08);
+}
+
+.block,
+.main-search-box,
+.summary .item,
+.side-item,
+.side-empty,
+.lightbox-inner,
+.drawer,
+.recommend-panel,
+.compare-panel,
+.cart-panel,
+.cand-panel,
+.output-box{
+  border-color:#ece2d3;
+  background:linear-gradient(180deg,#fffdf9 0%, #fffaf4 100%);
+  box-shadow:0 8px 20px rgba(120,101,80,.05);
+}
+
+.chip,
+.compare-tag{
+  background:#fffaf3;
+  border-color:#e9dfd0;
+  color:#6e6155;
+}
+
+label{ color:#62564c; }
+.desc{ color:#7f746a; }
+.tiny,.muted,.mini-stat,.summary .k,.count-badge{ color:#938679; }
+
+input[type="text"],input[type="number"],select,textarea{
+  border-color:#e7dccb;
+  background:#fffdfa;
+  color:#3b342f;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#d6b28a;
+  box-shadow:0 0 0 4px rgba(184,139,91,.10);
+}
+
+.btn{
+  border-radius:14px;
+}
+.btn.primary{
+  background:linear-gradient(180deg,#cfa16b 0%, #b88b5b 100%);
+  color:#fffdf9;
+  box-shadow:0 10px 18px rgba(184,139,91,.18);
+}
+.btn.secondary{
+  background:#fffaf3;
+  color:#5f544a;
+  border:1px solid #e8ddcd;
+}
+.btn.success{
+  background:#eef5ea;
+  color:#5b7655;
+  border:1px solid #d6e3d0;
+}
+.btn.warn{
+  background:#fcf3e3;
+  color:#a57a36;
+  border:1px solid #efd9ad;
+}
+.btn.danger{
+  background:#fdf0ed;
+  color:#b86f63;
+  border:1px solid #efcfc8;
+}
+
+.card{
+  background:linear-gradient(180deg,#fffdf9 0%, #fffaf4 100%);
+  border-color:#ece2d3;
+  box-shadow:0 10px 22px rgba(120,101,80,.06);
+}
+.card.selected{
+  outline:2px solid #dfc2a2;
+  box-shadow:0 12px 26px rgba(184,139,91,.14);
+}
+.card.candidate{
+  border-color:#e8d8c5;
+  box-shadow:0 10px 22px rgba(176,136,93,.10);
+}
+.card-top,
+.no-image,
+.compare-cover{
+  background:linear-gradient(180deg,#fbf4ea 0%, #f7efe3 100%);
+}
+.preview-btn{
+  background:rgba(119,96,72,.78);
+}
+.preview-btn:hover{
+  background:rgba(119,96,72,.92);
+}
+
+.badge{
+  background:rgba(255,251,245,.92);
+  border:1px solid rgba(236,226,211,.95);
+  color:#5a4f45;
+}
+.badge.stockok{
+  background:rgba(238,245,234,.95);
+  color:#5b7655;
+}
+.badge.stock0{
+  background:rgba(253,240,237,.96);
+  color:#b86f63;
+}
+.badge.candidate-badge,
+.compare-chip{
+  background:rgba(248,241,232,.95);
+  border-color:#eadcc9;
+  color:#8a6c4d;
+}
+
+.filters-list,
+.price-filter-box,
+.price-filter-section{
+  border-color:#ece2d3;
+  background:#fffbf6;
+}
+.price-histogram-scroll{
+  border-color:#e8dece;
+  background:linear-gradient(180deg,#fffdf9,#fbf6ef);
+}
+.price-range-pill{
+  background:#f6eadb;
+  color:#9a7043;
+  border-color:#ead7be;
+}
+.price-bin-bar{
+  background:#efe4d6;
+  border-color:#e6d8c6;
+}
+.price-bin.selected .price-bin-bar{
+  background:#cfa16b;
+  border-color:#b88b5b;
+  box-shadow:0 5px 12px rgba(184,139,91,.15);
+}
+.price-bin.selected .price-bin-label,
+.price-bin.selected .price-bin-count{
+  color:#9a7043;
+}
+.price-chip{
+  border-color:#e9dece;
+  background:#fffcf8;
+}
+.price-chip:hover{
+  border-color:#e2c6a7;
+  background:#fff8ef;
+}
+.price-chip.selected{
+  border-color:#dfc2a2;
+  background:#f8eee2;
+  box-shadow:0 4px 10px rgba(184,139,91,.12);
+}
+.price-chip.selected .price-chip-label,
+.price-chip.selected .price-chip-count{
+  color:#9a7043;
+}
+.price-chip.selected .price-chip-count{
+  background:#f6eadb;
+  border-color:#ead7be;
+}
+.price-chip-bar{
+  background:#efe4d6;
+}
+.price-chip-bar span{
+  background:#cfa16b;
+}
+
+.quick-toggle:hover{
+  background:#fbf3e8;
+  border-color:#e6c9a6;
+}
+.card.selected .quick-toggle{
+  background:#f8eee2;
+  border-color:#dfc2a2;
+}
+
+/* 三色预算框改成更奶油、更柔和 */
+.budget-float.good{
+  background:rgba(239,245,234,.97);
+  border:1px solid #cfdcc8;
+}
+.budget-float.warn{
+  background:rgba(252,243,227,.97);
+  border:1px solid #ecd9b6;
+}
+.budget-float.bad{
+  background:rgba(253,239,237,.97);
+  border:1px solid #efcbc4;
+}
+.budget-float.good .bf-title,
+.budget-float.good .bf-bubble{
+  color:#5b7655;
+}
+.budget-float.warn .bf-title,
+.budget-float.warn .bf-bubble{
+  color:#a57a36;
+}
+.budget-float.bad .bf-title,
+.budget-float.bad .bf-bubble{
+  color:#b86f63;
+}
+.budget-float .bf-money{
+  color:#3b342f;
+}
+.budget-float .bf-tip{
+  color:#6f6257;
+}
+.budget-float .bf-mini .mini{
+  background:rgba(255,251,245,.78);
+  border:1px solid #e9dfd0;
+}
+.budget-float.good .bf-bubble{
+  background:linear-gradient(180deg,rgba(239,245,234,.98),rgba(223,234,214,.96));
+}
+.budget-float.warn .bf-bubble{
+  background:linear-gradient(180deg,rgba(252,243,227,.98),rgba(245,227,186,.96));
+}
+.budget-float.bad .bf-bubble{
+  background:linear-gradient(180deg,rgba(253,239,237,.98),rgba(243,215,209,.96));
+}
+
+.site-footer .footer-inner{
+  border-top-color:#e8dece;
+}
+.site-footer .brand{
+  color:#6b5d52;
+}
+
+
+/* v35: 恢复筛选滚动条 + 整体提亮 */
+:root{
+  --bg:#faf5ec;
+  --panel:rgba(255,252,248,.98);
+  --line:#ede3d6;
+  --text:#433a33;
+  --muted:#93867a;
+  --blue:#c59660;
+  --blue-soft:#f7ead8;
+  --green:#87a581;
+  --green-soft:#f2f8ef;
+  --yellow:#d7ab67;
+  --yellow-soft:#fdf5e6;
+  --red:#d79a8e;
+  --red-soft:#fdf0ed;
+  --shadow:0 12px 28px rgba(140,119,96,.06);
+}
+body{background:linear-gradient(180deg,#fcf9f4 0%, #f9f3ea 100%)}
+.panel{border-color:#efe5d9; box-shadow:0 12px 28px rgba(140,119,96,.06)}
+.block,.main-search-box,.summary .item,.side-item,.side-empty,.lightbox-inner,.drawer,.recommend-panel,.compare-panel,.cart-panel,.cand-panel,.output-box{
+  border-color:#efe5d9;
+  background:linear-gradient(180deg,#fffefa 0%, #fffbf6 100%);
+  box-shadow:0 8px 18px rgba(140,119,96,.04);
+}
+.chip,.compare-tag{background:#fffbf6;border-color:#ece3d7;color:#76685b}
+label{color:#6b5f53}
+.desc{color:#8a7d70}
+.tiny,.muted,.mini-stat,.summary .k,.count-badge{color:#9a8d80}
+input[type="text"],input[type="number"],select,textarea{border-color:#eadfce;background:#fffefa;color:#433a33}
+input:focus,select:focus,textarea:focus{border-color:#dbb78c;box-shadow:0 0 0 4px rgba(197,150,96,.10)}
+.btn.primary{background:linear-gradient(180deg,#d7aa75 0%, #c59660 100%);box-shadow:0 10px 16px rgba(197,150,96,.15)}
+.btn.secondary{background:#fffbf6;color:#695d50;border:1px solid #eadfce}
+.btn.success{background:#f3f8f1;color:#698262;border:1px solid #d9e6d5}
+.btn.warn{background:#fdf6e8;color:#b1833d;border:1px solid #f2ddb5}
+.btn.danger{background:#fef3f0;color:#bf7a6d;border:1px solid #f0d3cc}
+.card{background:linear-gradient(180deg,#fffefa 0%, #fffbf6 100%);border-color:#efe5d9;box-shadow:0 10px 20px rgba(140,119,96,.05)}
+.card.selected{outline:2px solid #e4c8a8;box-shadow:0 12px 24px rgba(197,150,96,.12)}
+.card-top,.no-image,.compare-cover{background:linear-gradient(180deg,#fdf7ef 0%, #f8f1e6 100%)}
+.preview-btn{background:rgba(126,104,79,.74)}
+.preview-btn:hover{background:rgba(126,104,79,.88)}
+.badge{background:rgba(255,252,246,.94);border-color:rgba(239,229,217,.96);color:#685a4e}
+.badge.stockok{background:rgba(243,248,241,.96);color:#698262}
+.badge.stock0{background:rgba(254,243,240,.96);color:#bf7a6d}
+.filters-list,.price-filter-box,.price-filter-section{border-color:#efe5d9;background:#fffdf9}
+.price-histogram-scroll{border-color:#ece2d5;background:linear-gradient(180deg,#fffefa,#fcf8f1)}
+.price-range-pill{background:#f8ecde;color:#a47643;border-color:#ecd9c0}
+.price-bin-bar,.price-chip-bar{background:#f1e6d8;border-color:#e9dbc8}
+.price-bin.selected .price-bin-bar,.price-chip-bar span{background:#d7aa75;border-color:#c59660;box-shadow:0 5px 10px rgba(197,150,96,.10)}
+.price-chip{border-color:#ece2d6;background:#fffef9}
+.price-chip:hover{border-color:#e6c9a6;background:#fff9f0}
+.price-chip.selected{border-color:#e4c8a8;background:#f8efe3;box-shadow:0 4px 9px rgba(197,150,96,.10)}
+.quick-toggle:hover{background:#fcf4ea;border-color:#e6c9a6}
+.card.selected .quick-toggle{background:#f8efe3;border-color:#e4c8a8}
+.budget-float.good{background:rgba(243,248,241,.98);border-color:#d5e2d1}
+.budget-float.warn{background:rgba(253,246,232,.98);border-color:#f0dfba}
+.budget-float.bad{background:rgba(254,243,240,.98);border-color:#efd3cc}
+.budget-float.good .bf-title,.budget-float.good .bf-bubble{color:#698262}
+.budget-float.warn .bf-title,.budget-float.warn .bf-bubble{color:#b1833d}
+.budget-float.bad .bf-title,.budget-float.bad .bf-bubble{color:#bf7a6d}
+.budget-float .bf-tip{color:#7a6d61}
+.budget-float .bf-mini .mini{background:rgba(255,252,246,.82);border-color:#ece3d7}
+.budget-float.good .bf-bubble{background:linear-gradient(180deg,rgba(243,248,241,.98),rgba(229,240,224,.96))}
+.budget-float.warn .bf-bubble{background:linear-gradient(180deg,rgba(253,246,232,.98),rgba(248,233,198,.96))}
+.budget-float.bad .bf-bubble{background:linear-gradient(180deg,rgba(254,243,240,.98),rgba(246,223,217,.96))}
+.site-footer .footer-inner{border-top-color:#ebe1d4}
+.site-footer .brand{color:#756759}
+/* restore visible scrollbars for filter boxes */
+.filters-list{
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-gutter:stable;
+  scrollbar-width:auto;
+  scrollbar-color:#ccb79a #f7f0e6;
+}
+.filters-list::-webkit-scrollbar{width:12px}
+.filters-list::-webkit-scrollbar-track{background:#f7f0e6;border-radius:999px}
+.filters-list::-webkit-scrollbar-thumb{background:#ccb79a;border-radius:999px;border:2px solid #f7f0e6}
+.filters-list::-webkit-scrollbar-thumb:hover{background:#bea27d}
+
+
+/* v36：桌面端筛选滚动条修复 + 更亮一点的奶油配色 + 可爱文案 */
+:root{
+  --bg:#fcf7f0;
+  --panel:rgba(255,253,249,.98);
+  --line:#eee3d4;
+  --text:#433a33;
+  --muted:#94867a;
+
+  --blue:#c79b69;
+  --blue-soft:#faeddc;
+
+  --green:#89a782;
+  --green-soft:#f2f8ef;
+
+  --yellow:#d6ae66;
+  --yellow-soft:#fdf4e4;
+
+  --red:#d99a8f;
+  --red-soft:#fcf0ec;
+
+  --shadow:0 12px 28px rgba(138,116,90,.06);
+  --radius:20px;
+}
+
+body{
+  background:linear-gradient(180deg,#fffaf4 0%, #faf3e8 100%);
+}
+
+.panel{
+  border-color:#efe5d8;
+  box-shadow:0 12px 28px rgba(138,116,90,.06);
+}
+
+.block,
+.main-search-box,
+.summary .item,
+.side-item,
+.side-empty,
+.lightbox-inner,
+.drawer,
+.recommend-panel,
+.compare-panel,
+.cart-panel,
+.cand-panel,
+.output-box{
+  border-color:#efe5d8;
+  background:linear-gradient(180deg,#fffefd 0%, #fffaf6 100%);
+  box-shadow:0 8px 18px rgba(138,116,90,.04);
+}
+
+.chip,.compare-tag{
+  background:#fffbf6;
+  border-color:#ede2d4;
+  color:#77695d;
+}
+label{ color:#6b5d52; }
+.desc{ color:#8f8174; }
+.tiny,.muted,.mini-stat,.summary .k,.count-badge{ color:#9a8c7f; }
+
+input[type="text"],input[type="number"],select,textarea{
+  border-color:#eadfce;
+  background:#fffefa;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#dfbb94;
+  box-shadow:0 0 0 4px rgba(199,155,105,.10);
+}
+
+.btn.primary{
+  background:linear-gradient(180deg,#d8ae7a 0%, #c79b69 100%);
+  box-shadow:0 10px 18px rgba(199,155,105,.16);
+}
+.btn.secondary{
+  background:#fffbf6;
+  border-color:#eadfce;
+}
+.btn.success{
+  background:#f3f8f1;
+  color:#647f5d;
+  border-color:#dbe8d5;
+}
+.btn.warn{
+  background:#fdf5e8;
+  color:#b1833d;
+  border-color:#f2ddb6;
+}
+.btn.danger{
+  background:#fdf2ef;
+  color:#c07b71;
+  border-color:#f0d3cd;
+}
+
+.card{
+  background:linear-gradient(180deg,#fffefd 0%, #fffaf6 100%);
+  border-color:#efe5d8;
+  box-shadow:0 10px 20px rgba(138,116,90,.05);
+}
+.card.selected{
+  outline:2px solid #e5c9a5;
+  box-shadow:0 12px 24px rgba(199,155,105,.12);
+}
+.card-top,
+.no-image,
+.compare-cover{
+  background:linear-gradient(180deg,#fcf7ef 0%, #f9f2e7 100%);
+}
+
+.badge{
+  background:rgba(255,252,247,.94);
+  border-color:#eee3d4;
+  color:#67594d;
+}
+.badge.stockok{background:rgba(243,248,241,.96);color:#647f5d}
+.badge.stock0{background:rgba(253,242,239,.96);color:#c07b71}
+
+.filters-list,.price-filter-box,.price-filter-section{
+  border-color:#efe5d8;
+  background:#fffdfa;
+}
+.price-range-pill{
+  background:#fbefdf;
+  color:#a97b46;
+  border-color:#eed9bd;
+}
+.price-bin-bar,.price-chip-bar{
+  background:#f4eadf;
+}
+.price-bin.selected .price-bin-bar,.price-chip-bar span{
+  background:#ddb27a;
+  border-color:#cb9a62;
+  box-shadow:0 4px 10px rgba(203,154,98,.10);
+}
+.price-chip{
+  border-color:#eee3d6;
+  background:#fffefb;
+}
+.price-chip:hover{
+  border-color:#e8caa6;
+  background:#fff9f1;
+}
+.price-chip.selected{
+  border-color:#e5c9a5;
+  background:#faf1e5;
+  box-shadow:0 4px 9px rgba(203,154,98,.10);
+}
+
+/* 预算浮窗配色同步提亮 */
+.budget-float.good{
+  background:rgba(243,248,241,.97);
+  border-color:#d7e5d2;
+}
+.budget-float.warn{
+  background:rgba(253,245,232,.97);
+  border-color:#f0ddb8;
+}
+.budget-float.bad{
+  background:rgba(253,242,239,.97);
+  border-color:#f0d3cd;
+}
+.budget-float .bf-money{color:#433a33}
+.budget-float .bf-tip{color:#77695d}
+.budget-float.good .bf-title,.budget-float.good .bf-bubble{color:#647f5d}
+.budget-float.warn .bf-title,.budget-float.warn .bf-bubble{color:#b1833d}
+.budget-float.bad .bf-title,.budget-float.bad .bf-bubble{color:#c07b71}
+.budget-float.good .bf-bubble{background:linear-gradient(180deg,rgba(243,248,241,.98),rgba(232,242,228,.96))}
+.budget-float.warn .bf-bubble{background:linear-gradient(180deg,rgba(253,245,232,.98),rgba(248,234,202,.96))}
+.budget-float.bad .bf-bubble{background:linear-gradient(180deg,rgba(253,242,239,.98),rgba(247,227,223,.96))}
+
+/* 桌面端：品牌/类型筛选框滚动条明确显示且可拖动 */
+.filters-list{
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  scrollbar-gutter:stable both-edges;
+  scrollbar-width:auto;
+  scrollbar-color:#ccb08c #fbf4ea;
+}
+.filters-list::-webkit-scrollbar{
+  width:14px;
+}
+.filters-list::-webkit-scrollbar-track{
+  background:#fbf4ea;
+  border-radius:999px;
+}
+.filters-list::-webkit-scrollbar-thumb{
+  background:#ccb08c;
+  border-radius:999px;
+  border:3px solid #fbf4ea;
+}
+.filters-list::-webkit-scrollbar-thumb:hover{
+  background:#bf9d70;
+}
+
+@media (min-width:1101px){
+  .sidebar .filters-list{
+    max-height:170px !important;
+    min-height:170px !important;
+    overflow-y:scroll !important;
+    overflow-x:hidden !important;
+    padding-right:6px;
+  }
+  .sidebar .filters-list > *{
+    position:relative;
+    z-index:1;
+  }
+  .sidebar .filters-list label,
+  .sidebar .filters-list input,
+  .sidebar .filters-list .check-item{
+    pointer-events:auto;
+  }
+}
+
+
+/* v37: 电脑端版权信息挪到右侧栏底部 */
+.desktop-copyright{
+  display:none;
+}
+.desktop-copyright .copyright-inner{
+  margin-top:14px;
+  padding:14px 12px 6px;
+  border-top:1px dashed var(--line);
+  text-align:center;
+  color:var(--muted);
+}
+.desktop-copyright .brand{
+  font-size:13px;
+  font-weight:900;
+  color:#6b5d52;
+  letter-spacing:.2px;
+}
+.desktop-copyright .legal{
+  margin-top:4px;
+  font-size:12px;
+  line-height:1.6;
+}
+.desktop-copyright .tiny{
+  margin-top:4px;
+}
+@media (min-width:1101px){
+  .desktop-copyright{
+    display:block;
+  }
+  .site-footer{
+    display:none;
+  }
+}
+
+
+/* v47: 进一步压缩按钮、表单和统计字号 */
+:root{
+  --bg:#fff8f1;
+  --panel:rgba(255,254,250,.98);
+  --line:#f1ded3;
+  --text:#4c403a;
+  --muted:#9b8179;
+  --blue:#e7a4b5;
+  --blue-soft:#fff0f4;
+  --green:#8fb889;
+  --green-soft:#f1f8ee;
+  --yellow:#e4b66d;
+  --yellow-soft:#fff6df;
+  --red:#d98982;
+  --red-soft:#fff0ee;
+  --shadow:0 16px 34px rgba(151,105,91,.08);
+  --radius:22px;
+}
+body{
+  background:
+    linear-gradient(180deg,#fffaf5 0%,#fff4ed 46%,#fbf3eb 100%);
+  color:var(--text);
+}
+.app{gap:16px}
+.panel{
+  background:linear-gradient(180deg,rgba(255,254,250,.98) 0%,rgba(255,248,243,.98) 100%);
+  border-color:#f1ded3;
+  box-shadow:var(--shadow);
+}
+h1{
+  color:#6b4d4d;
+  font-weight:950;
+  letter-spacing:0;
+}
+h1::after{
+  content:"";
+  display:block;
+  width:82px;
+  height:6px;
+  margin-top:9px;
+  border-radius:999px;
+  background:linear-gradient(90deg,#ffd3dc 0%,#ffe0bd 48%,#dcefd4 100%);
+}
+h2,.panel-title{
+  color:#57413f;
+  letter-spacing:0;
+}
+.desc{
+  color:#9a8179;
+}
+.block,
+.main-search-box,
+.summary .item,
+.side-item,
+.side-empty,
+.lightbox-inner,
+.drawer,
+.recommend-panel,
+.compare-panel,
+.cart-panel,
+.cand-panel,
+.output-box,
+.settings-card,
+.compare-card,
+.rec-item{
+  background:linear-gradient(180deg,#fffefa 0%,#fff8f3 100%);
+  border-color:#f1ded3;
+  box-shadow:0 10px 24px rgba(151,105,91,.055);
+}
+.settings-panel{
+  background:linear-gradient(180deg,#fff8fb 0%,#fff7ef 100%);
+  border-color:#f3d8da;
+}
+.settings-card{
+  background:linear-gradient(180deg,#fffefd 0%,#fff8f4 100%);
+}
+label{color:#735d58}
+.tiny,.muted,.mini-stat,.summary .k,.count-badge{color:#a28a80}
+.chip,.compare-tag{
+  background:#fff8f1;
+  border-color:#eedccf;
+  color:#7c625b;
+}
+input[type="text"],
+input[type="number"],
+select,
+textarea{
+  background:#fffefa;
+  border-color:#ead7cc;
+  color:#4c403a;
+}
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#e8aebc;
+  box-shadow:0 0 0 4px rgba(231,164,181,.16);
+}
+.btn{
+  border-radius:16px;
+}
+.btn.primary{
+  background:linear-gradient(180deg,#f1b6c4 0%,#e59cae 100%);
+  color:#fff;
+  box-shadow:0 10px 18px rgba(229,156,174,.20);
+}
+.btn.secondary{
+  background:#fff9f2;
+  color:#705b55;
+  border-color:#ead8cd;
+}
+.btn.success{
+  background:#f0f8ec;
+  color:#66865f;
+  border-color:#d8e9d1;
+}
+.btn.warn{
+  background:#fff6df;
+  color:#a87435;
+  border-color:#f1d9a6;
+}
+.btn.danger{
+  background:#fff1ef;
+  color:#bd6d67;
+  border-color:#efcbc8;
+}
+.btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 20px rgba(151,105,91,.08);
+}
+.status{
+  border-color:#d9dcff;
+  background:linear-gradient(180deg,#f5f7ff 0%,#fff8fb 100%);
+  color:#5f6ec8;
+}
+.status.good{
+  background:linear-gradient(180deg,#f0faef 0%,#fffaf3 100%);
+  border-color:#cfe7c8;
+  color:#5f8359;
+}
+.status.warn{
+  background:linear-gradient(180deg,#fff8e5 0%,#fffaf3 100%);
+  border-color:#efd9a8;
+  color:#a87435;
+}
+.status.bad{
+  background:linear-gradient(180deg,#fff1ef 0%,#fff8f5 100%);
+  border-color:#efcbc8;
+  color:#bd6d67;
+}
+.summary .item{
+  position:relative;
+  overflow:hidden;
+  border-radius:18px;
+}
+.summary .item::before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:5px;
+  background:linear-gradient(90deg,#ffd3dc,#ffe2bd);
+}
+.summary .item:nth-child(2)::before{background:linear-gradient(90deg,#ffe2bd,#e2f0d8)}
+.summary .item:nth-child(3)::before{background:linear-gradient(90deg,#e2f0d8,#dce9ff)}
+.summary .item:nth-child(4)::before{background:linear-gradient(90deg,#dce9ff,#ffd3dc)}
+.summary .item:nth-child(5)::before{background:linear-gradient(90deg,#fff0b8,#ffd3dc)}
+.summary .item:nth-child(6)::before{background:linear-gradient(90deg,#dcefd4,#fff0b8)}
+.summary .v{
+  color:#4b3d39;
+}
+.card{
+  background:linear-gradient(180deg,#fffefa 0%,#fff8f3 100%);
+  border-color:#f1ded3;
+  border-radius:18px;
+  box-shadow:0 12px 24px rgba(151,105,91,.07);
+}
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 16px 28px rgba(151,105,91,.10);
+}
+.card.selected{
+  outline:2px solid #f0b3c1;
+  box-shadow:0 16px 30px rgba(231,164,181,.20);
+}
+.card.candidate{
+  border-color:#e8d1f0;
+  box-shadow:0 14px 26px rgba(184,149,199,.13);
+}
+.card-top,
+.no-image,
+.compare-cover{
+  background:linear-gradient(180deg,#fff7f0 0%,#f8f2e8 100%);
+}
+.preview-btn{
+  background:rgba(112,82,78,.76);
+}
+.preview-btn:hover{
+  background:rgba(112,82,78,.9);
+}
+.badge{
+  background:rgba(255,252,247,.94);
+  border-color:#f0dfd3;
+  color:#755f58;
+}
+.badge.stockok{
+  background:rgba(241,248,238,.96);
+  color:#66865f;
+}
+.badge.stock0{
+  background:rgba(255,241,239,.96);
+  color:#bd6d67;
+}
+.badge.candidate-badge,
+.compare-chip{
+  background:rgba(249,239,255,.94);
+  border-color:#ead5f0;
+  color:#856092;
+}
+.filters-list,
+.price-filter-box,
+.price-filter-section{
+  background:#fffefa;
+  border-color:#f1ded3;
+}
+.price-range-pill{
+  background:#fff1f5;
+  color:#c26e84;
+  border-color:#f0cbd5;
+}
+.price-chip{
+  background:#fffefa;
+  border-color:#eedccf;
+}
+.price-chip:hover{
+  border-color:#f0b3c1;
+  background:#fff7f8;
+}
+.price-chip.selected{
+  border-color:#f0b3c1;
+  background:#fff0f4;
+  box-shadow:0 4px 10px rgba(231,164,181,.13);
+}
+.price-bin.selected .price-bin-bar,
+.price-chip-bar span{
+  background:#f1a7b9;
+  border-color:#e59cae;
+}
+.cart-total-box{
+  background:linear-gradient(180deg,#fff7f9 0%,#fff8ef 100%);
+  border-color:#f0d8cf;
+}
+.cart-total-box .big{
+  color:#4b3d39;
+}
+.budget-float{
+  box-shadow:0 18px 38px rgba(151,105,91,.16);
+}
+.budget-float.good{
+  background:linear-gradient(180deg,rgba(243,250,240,.98),rgba(255,250,243,.98));
+  border-color:#cfe6c8;
+}
+.budget-float.warn{
+  background:linear-gradient(180deg,rgba(255,248,226,.98),rgba(255,250,243,.98));
+  border-color:#efd9a8;
+}
+.budget-float.bad{
+  background:linear-gradient(180deg,rgba(255,241,239,.98),rgba(255,248,245,.98));
+  border-color:#efcbc8;
+}
+.budget-float .bf-money{
+  color:#4b3d39;
+}
+.budget-float .bf-mini .mini{
+  background:rgba(255,254,250,.82);
+  border-color:#eedccf;
+}
+.fab{
+  background:linear-gradient(180deg,#fff7fb 0%,#fff1f5 100%);
+  color:#b9657c;
+  border-color:#f0cbd5;
+}
+.desktop-copyright .brand,
+.site-footer .brand{
+  color:#7b5f59;
+}
+.desktop-copyright .copyright-inner,
+.site-footer .footer-inner{
+  border-top-color:#eedccf;
+}
+@media (min-width:1101px){
+  .budget-float{
+    right:360px;
+    bottom:22px;
+  }
+}
+.type-assist-box{
+  margin-top:12px;
+  border:1px dashed #ead4cb;
+  border-radius:16px;
+  background:linear-gradient(180deg,#fffefa 0%,#fff7f3 100%);
+  padding:12px;
+}
+.type-assist-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+.type-assist-title{
+  font-size:13px;
+  font-weight:900;
+  color:#674f4a;
+}
+.type-assist-count{
+  flex:0 0 auto;
+  font-size:11px;
+  font-weight:800;
+  color:#b36b78;
+  background:#fff1f5;
+  border:1px solid #f0cbd5;
+  border-radius:999px;
+  padding:3px 8px;
+}
+.type-assist-list{
+  display:grid;
+  gap:6px;
+  max-height:116px;
+  overflow:auto;
+  margin:8px 0;
+}
+.type-assist-item{
+  border:1px solid #eedccf;
+  border-radius:12px;
+  background:#fffdfa;
+  padding:7px 8px;
+  font-size:12px;
+  line-height:1.35;
+  color:#735d58;
+}
+.type-assist-form{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:8px;
+}
+.type-assist-form .row{
+  align-items:stretch;
+}
+.type-assist-form input,
+.type-assist-form select{
+  min-width:0;
+}
+.cart-brand-group{
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  background:rgba(255,255,255,.28);
+}
+.cart-brand-group summary{
+  list-style:none;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:center;
+  padding:9px 10px;
+  font-size:12px;
+  font-weight:900;
+  color:var(--text);
+  background:rgba(255,255,255,.34);
+}
+.cart-brand-group summary::-webkit-details-marker{display:none}
+.cart-brand-meta{
+  flex:0 0 auto;
+  color:var(--muted);
+  font-weight:800;
+}
+.cart-brand-items{
+  display:grid;
+  gap:8px;
+  padding:8px;
+}
+.order-modal{
+  position:fixed;
+  inset:0;
+  z-index:90;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(15,23,42,.42);
+}
+.order-modal.open{display:flex}
+.order-modal-inner{
+  width:min(980px,100%);
+  max-height:88vh;
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:var(--panel);
+  box-shadow:0 24px 60px rgba(15,23,42,.24);
+  padding:18px;
+}
+.order-preview-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:12px;
+}
+.order-preview-table-wrap{
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:14px;
+}
+.order-preview-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:760px;
+  font-size:12px;
+}
+.order-preview-table th,
+.order-preview-table td{
+  padding:9px 10px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+  vertical-align:top;
+}
+.order-preview-table th{
+  position:sticky;
+  top:0;
+  z-index:1;
+  background:var(--blue-soft);
+  color:var(--text);
+  font-weight:900;
+}
+.order-preview-table tfoot td{
+  font-weight:900;
+  background:rgba(255,255,255,.42);
+}
+.order-preview-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+html[data-theme="dark"] .cart-brand-group,
+html[data-theme="dark"] .order-modal-inner,
+html[data-theme="dark"] .order-preview-table-wrap{
+  border-color:#403735;
+  background:#242120;
+}
+html[data-theme="dark"] .cart-brand-group summary,
+html[data-theme="dark"] .order-preview-table th,
+html[data-theme="dark"] .order-preview-table tfoot td{
+  background:#302a29;
+}
+html[data-theme="dark"] .order-preview-table th,
+html[data-theme="dark"] .order-preview-table td{
+  border-color:#403735;
+}
+.theme-switch-card{
+  display:grid;
+  gap:8px;
+}
+.theme-switch-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:10px;
+}
+.theme-preview{
+  display:flex;
+  gap:4px;
+  align-items:center;
+}
+.theme-dot{
+  width:13px;
+  height:13px;
+  border-radius:999px;
+  border:1px solid rgba(120,101,80,.18);
+  background:#fff;
+}
+.theme-dot.a{background:#f3aabd}
+.theme-dot.b{background:#ffe4bd}
+.theme-dot.c{background:#dcefd4}
+
+html[data-theme="light"]{
+  --bg:#f6f8fc;
+  --panel:rgba(255,255,255,.98);
+  --line:#e2e8f0;
+  --text:#172033;
+  --muted:#64748b;
+  --blue:#4f7cff;
+  --blue-soft:#edf3ff;
+  --green:#2f9b72;
+  --green-soft:#edf8f2;
+  --yellow:#c58a26;
+  --yellow-soft:#fff7e6;
+  --red:#d15b66;
+  --red-soft:#fff1f2;
+  --shadow:0 14px 30px rgba(15,23,42,.08);
+}
+html[data-theme="light"] body{background:linear-gradient(180deg,#f8fafc 0%,#eef4ff 100%);color:var(--text)}
+html[data-theme="light"] .panel,
+html[data-theme="light"] .block,
+html[data-theme="light"] .main-search-box,
+html[data-theme="light"] .summary .item,
+html[data-theme="light"] .side-item,
+html[data-theme="light"] .side-empty,
+html[data-theme="light"] .lightbox-inner,
+html[data-theme="light"] .drawer,
+html[data-theme="light"] .recommend-panel,
+html[data-theme="light"] .compare-panel,
+html[data-theme="light"] .cart-panel,
+html[data-theme="light"] .cand-panel,
+html[data-theme="light"] .output-box,
+html[data-theme="light"] .settings-card,
+html[data-theme="light"] .compare-card,
+html[data-theme="light"] .rec-item{
+  background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%);
+  border-color:#e2e8f0;
+  box-shadow:0 12px 26px rgba(15,23,42,.055);
+}
+html[data-theme="light"] .settings-panel{background:linear-gradient(180deg,#ffffff 0%,#f7fbff 100%);border-color:#dbe6f5}
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] .panel-title{color:#1f2937}
+html[data-theme="light"] h1::after{background:linear-gradient(90deg,#8fb3ff,#b7e4cf,#ffe3a3)}
+html[data-theme="light"] .desc,
+html[data-theme="light"] .tiny,
+html[data-theme="light"] .muted,
+html[data-theme="light"] .mini-stat,
+html[data-theme="light"] .summary .k,
+html[data-theme="light"] .count-badge{color:#64748b}
+html[data-theme="light"] .chip,
+html[data-theme="light"] .compare-tag{background:#f8fafc;border-color:#e2e8f0;color:#334155}
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea{background:#fff;border-color:#dbe3ef;color:#172033}
+html[data-theme="light"] input:focus,
+html[data-theme="light"] select:focus,
+html[data-theme="light"] textarea:focus{border-color:#8fb3ff;box-shadow:0 0 0 4px rgba(79,124,255,.12)}
+html[data-theme="light"] .btn.primary{background:linear-gradient(180deg,#7195ff,#4f7cff);box-shadow:0 10px 18px rgba(79,124,255,.18)}
+html[data-theme="light"] .btn.secondary{background:#fff;color:#334155;border-color:#e2e8f0}
+html[data-theme="light"] .card{background:linear-gradient(180deg,#fff,#fbfdff);border-color:#e2e8f0}
+html[data-theme="light"] .card.selected{outline-color:#8fb3ff;box-shadow:0 14px 28px rgba(79,124,255,.15)}
+html[data-theme="light"] .card-top,
+html[data-theme="light"] .no-image,
+html[data-theme="light"] .compare-cover{background:linear-gradient(180deg,#f8fafc,#eef4ff)}
+html[data-theme="light"] .type-assist-box{background:#fff;border-color:#dbe6f5}
+html[data-theme="light"] .type-assist-item{background:#fbfdff;border-color:#e2e8f0;color:#334155}
+html[data-theme="light"] .theme-dot.a{background:#7195ff}
+html[data-theme="light"] .theme-dot.b{background:#b7e4cf}
+html[data-theme="light"] .theme-dot.c{background:#ffe3a3}
+
+html[data-theme="dark"]{
+  --bg:#161718;
+  --panel:rgba(34,31,30,.98);
+  --line:#403735;
+  --text:#f4eee8;
+  --muted:#b9a9a0;
+  --blue:#f0a9bc;
+  --blue-soft:#4a2f38;
+  --green:#9fc692;
+  --green-soft:#243526;
+  --yellow:#e4bf75;
+  --yellow-soft:#473924;
+  --red:#e28c86;
+  --red-soft:#4a2e2e;
+  --shadow:0 18px 40px rgba(0,0,0,.28);
+}
+html[data-theme="dark"] body{background:linear-gradient(180deg,#191a1b 0%,#221e1d 100%);color:var(--text)}
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .block,
+html[data-theme="dark"] .main-search-box,
+html[data-theme="dark"] .summary .item,
+html[data-theme="dark"] .side-item,
+html[data-theme="dark"] .side-empty,
+html[data-theme="dark"] .lightbox-inner,
+html[data-theme="dark"] .drawer,
+html[data-theme="dark"] .recommend-panel,
+html[data-theme="dark"] .compare-panel,
+html[data-theme="dark"] .cart-panel,
+html[data-theme="dark"] .cand-panel,
+html[data-theme="dark"] .output-box,
+html[data-theme="dark"] .settings-card,
+html[data-theme="dark"] .compare-card,
+html[data-theme="dark"] .rec-item{
+  background:linear-gradient(180deg,#282423 0%,#211e1d 100%);
+  border-color:#403735;
+  box-shadow:0 14px 34px rgba(0,0,0,.24);
+}
+html[data-theme="dark"] .settings-panel{background:linear-gradient(180deg,#2d2526 0%,#24201f 100%);border-color:#4a3739}
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] .panel-title,
+html[data-theme="dark"] .summary .v,
+html[data-theme="dark"] .cart-total-box .big,
+html[data-theme="dark"] .budget-float .bf-money{color:#f4eee8}
+html[data-theme="dark"] h1::after{background:linear-gradient(90deg,#f0a9bc,#e4bf75,#9fc692)}
+html[data-theme="dark"] label{color:#d4c5bc}
+html[data-theme="dark"] .desc,
+html[data-theme="dark"] .tiny,
+html[data-theme="dark"] .muted,
+html[data-theme="dark"] .mini-stat,
+html[data-theme="dark"] .summary .k,
+html[data-theme="dark"] .count-badge{color:#b9a9a0}
+html[data-theme="dark"] .chip,
+html[data-theme="dark"] .compare-tag{background:#302a29;border-color:#463d3a;color:#e9ddd5}
+html[data-theme="dark"] input,
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea{background:#1e1c1b;border-color:#4a403d;color:#f4eee8}
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] select:focus,
+html[data-theme="dark"] textarea:focus{border-color:#f0a9bc;box-shadow:0 0 0 4px rgba(240,169,188,.16)}
+html[data-theme="dark"] .btn.secondary{background:#2f2928;color:#f0e6df;border-color:#4a403d}
+html[data-theme="dark"] .btn.primary{background:linear-gradient(180deg,#eeb0bf,#d98399);color:#2a1f22}
+html[data-theme="dark"] .btn.success{background:#263628;color:#bde0b3;border-color:#3f5a3e}
+html[data-theme="dark"] .btn.warn{background:#3e3321;color:#f1d08d;border-color:#5b4828}
+html[data-theme="dark"] .btn.danger{background:#422928;color:#f2aaa5;border-color:#65403c}
+html[data-theme="dark"] .status{background:linear-gradient(180deg,#27293a,#24201f);border-color:#41445d;color:#c9d0ff}
+html[data-theme="dark"] .status.good{background:linear-gradient(180deg,#223425,#24201f);border-color:#3f5a3e;color:#bde0b3}
+html[data-theme="dark"] .status.warn{background:linear-gradient(180deg,#3d321f,#24201f);border-color:#5b4828;color:#f1d08d}
+html[data-theme="dark"] .status.bad{background:linear-gradient(180deg,#432827,#24201f);border-color:#65403c;color:#f2aaa5}
+html[data-theme="dark"] .card{background:linear-gradient(180deg,#282423,#211e1d);border-color:#403735}
+html[data-theme="dark"] .card-top,
+html[data-theme="dark"] .no-image,
+html[data-theme="dark"] .compare-cover{background:linear-gradient(180deg,#302b2a,#252221)}
+html[data-theme="dark"] .badge{background:rgba(38,34,33,.92);border-color:#514744;color:#f0e6df}
+html[data-theme="dark"] .filters-list,
+html[data-theme="dark"] .price-filter-box,
+html[data-theme="dark"] .price-filter-section,
+html[data-theme="dark"] .type-assist-box{background:#242120;border-color:#403735}
+html[data-theme="dark"] .type-assist-item{background:#1f1d1c;border-color:#463d3a;color:#e9ddd5}
+html[data-theme="dark"] .price-chip{background:#1f1d1c;border-color:#463d3a}
+html[data-theme="dark"] .price-chip:hover,
+html[data-theme="dark"] .price-chip.selected{background:#3a2930;border-color:#d98399}
+html[data-theme="dark"] .cart-total-box,
+html[data-theme="dark"] .budget-float.good,
+html[data-theme="dark"] .budget-float.warn,
+html[data-theme="dark"] .budget-float.bad{background:linear-gradient(180deg,#2c2827,#242120);border-color:#403735}
+html[data-theme="dark"] .theme-dot{border-color:#615553}
+html[data-theme="dark"] .theme-dot.a{background:#f0a9bc}
+html[data-theme="dark"] .theme-dot.b{background:#e4bf75}
+html[data-theme="dark"] .theme-dot.c{background:#9fc692}
+html[data-theme="dark"] .sidebar .settings-panel input[type="text"],
+html[data-theme="dark"] .sidebar .settings-panel input[type="number"],
+html[data-theme="dark"] .sidebar .settings-panel select,
+html[data-theme="dark"] .settings-panel input[type="text"],
+html[data-theme="dark"] .settings-panel input[type="number"],
+html[data-theme="dark"] .settings-panel select,
+html[data-theme="dark"] .price-filter-summary,
+html[data-theme="dark"] .price-range-pill{
+  background:#1e1c1b !important;
+  border-color:#4a403d !important;
+  color:#f4eee8 !important;
+}
+html[data-theme="dark"] .price-filter-section,
+html[data-theme="dark"] .price-filter-section .price-filter-box,
+html[data-theme="dark"] .sidebar .settings-panel .price-filter-section,
+html[data-theme="dark"] .sidebar .settings-panel .price-filter-section .price-filter-box{
+  background:#242120 !important;
+  border-color:#403735 !important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder{
+  color:#8e7f79;
+}
+html[data-theme="dark"] select option{
+  background:#1e1c1b;
+  color:#f4eee8;
+}
+html[data-theme="dark"] .theme-switch-card .theme-preview{
+  background:transparent;
+}
+html[data-theme="dark"] .brand-filter-item.pinned{background:#352b20;border-color:#5b4828}
+html[data-theme="dark"] .pin-brand-btn{background:#2f2928;border-color:#5b4828;color:#f1d08d}
+html[data-theme="dark"] .pin-brand-btn:hover{background:#3e3321}
+@media (min-width:1101px){
+  .app{
+    position:relative;
+    grid-template-columns:var(--left-col,320px) minmax(420px,1fr) var(--right-col,320px);
+  }
+  .col-resizer{
+    position:absolute;
+    top:18px;
+    bottom:18px;
+    width:14px;
+    z-index:20;
+    cursor:col-resize;
+    transform:translateX(-50%);
+    border-radius:999px;
+  }
+  .col-resizer::before{
+    content:"";
+    position:absolute;
+    left:5px;
+    top:12px;
+    bottom:12px;
+    width:4px;
+    border-radius:999px;
+    background:rgba(151,105,91,.16);
+    transition:.16s ease;
+  }
+  .col-resizer:hover::before,
+  .col-resizer.dragging::before{
+    background:var(--blue);
+    box-shadow:0 0 0 4px rgba(231,164,181,.12);
+  }
+  html[data-theme="dark"] .col-resizer::before{
+    background:rgba(244,238,232,.18);
+  }
+}
+
+/* v46 compact polish */
+.app{gap:14px;padding:14px}
+.sidebar,.rightbar,.main{padding:14px;top:14px;height:calc(100vh - 28px)}
+.main{min-height:calc(100vh - 28px)}
+h1{font-size:24px}
+h2{font-size:15px;margin-bottom:10px}
+.desc{font-size:13px;line-height:1.5}
+.block{padding:12px;margin-bottom:12px;border-radius:14px}
+.settings-card{padding:10px;border-radius:14px}
+.settings-card.compact{padding:9px 10px}
+.row{gap:8px}
+.grid2,.grid3,.settings-subgrid{gap:8px}
+input[type="text"],input[type="number"],select,textarea{padding:8px 10px;border-radius:10px}
+label{font-size:12px;margin-bottom:5px}
+.btn{padding:8px 11px;border-radius:11px;font-size:13px}
+.btn.small{padding:6px 8px;font-size:11px;border-radius:9px}
+.chip{padding:6px 9px;font-size:12px}
+.summary{gap:10px;margin-bottom:12px}
+.summary .item{padding:10px 12px;border-radius:14px}
+.summary .v{font-size:22px}
+.toolbar{margin-bottom:12px}
+.main-search-row{margin-bottom:12px}
+.cards{gap:12px;margin-top:12px !important}
+.card{border-radius:15px}
+.card-body{padding:11px}
+.actions{margin-top:9px;gap:8px}
+.price-big{font-size:20px}
+.side-item{padding:9px;border-radius:12px}
+.cart-panel,.cand-panel,.recommend-panel,.compare-panel{padding:12px;border-radius:16px}
+.order-modal-inner,.compare-modal-inner{border-radius:18px;padding:14px}
+.order-preview-table th,.order-preview-table td{padding:8px 9px}
+
+/* v47: make controls quieter and less inflated */
+body{font-size:13px}
+h1{font-size:22px}
+h2{font-size:14px}
+.desc{font-size:12px}
+label{font-size:11px}
+input[type="text"],input[type="number"],select,textarea{font-size:12px;padding:7px 9px;border-radius:9px}
+.sidebar .settings-panel input[type="text"],
+.sidebar .settings-panel input[type="number"],
+.sidebar .settings-panel select{font-size:12px;padding:7px 9px;border-radius:10px}
+.btn{font-size:12px;padding:7px 10px;border-radius:10px;font-weight:700}
+.btn.small{font-size:10px;padding:5px 7px;border-radius:8px}
+.chip{font-size:11px;padding:5px 8px}
+.status{font-size:12px;padding:9px 11px;border-radius:12px}
+.block{padding:10px;margin-bottom:10px}
+.settings-card{padding:8px;border-radius:12px}
+.settings-card.compact{padding:8px 9px}
+.theme-switch-card{padding:10px 11px;border-radius:12px}
+.theme-switch-row{gap:8px}
+.theme-dot{width:14px;height:14px}
+.filters-list{max-height:150px;padding:6px;border-radius:10px}
+.check-item{font-size:12px;padding:5px 4px}
+.filter-heading-actions{gap:5px}
+.pin-brand-btn{width:21px;height:21px;font-size:11px}
+.price-filter-summary{padding:9px 10px;border-radius:10px}
+.price-summary-title{font-size:12px}
+.price-range-pill{font-size:10px;padding:3px 7px}
+.price-chip{padding:6px 7px;border-radius:10px}
+.price-chip-label,.price-chip-count{font-size:10px}
+.main-search-box{padding:10px 12px;border-radius:14px}
+.main-search-box input{font-size:15px}
+.summary{grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:9px}
+.summary .item{padding:9px 11px;border-radius:13px}
+.summary .k{font-size:11px;margin-bottom:4px}
+.summary .v{font-size:19px}
+.summary .v.sm{font-size:16px}
+.panel-title{font-size:14px}
+.mini-stat{font-size:11px}
+.cart-total-box{padding:9px 10px;border-radius:12px}
+.cart-total-box .big{font-size:20px}
+.cart-panel,.cand-panel,.recommend-panel,.compare-panel{padding:10px;border-radius:14px;margin-bottom:12px}
+.side-list{gap:8px}
+.side-name{font-size:12px}
+.side-meta{font-size:11px}
+.side-thumb{width:46px;height:46px}
+.side-item{grid-template-columns:46px 1fr auto;padding:7px;gap:8px;border-radius:12px}
+.cards{gap:10px}
+html[data-density="compact"] .cards{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px}
+html[data-density="compact"] .card-body{padding:9px}
+html[data-density="compact"] .title{font-size:12px;min-height:34px}
+html[data-density="compact"] .meta-line{font-size:10px}
+html[data-density="compact"] .badge{font-size:9px;padding:4px 7px}
+.price-big{font-size:17px}
+.qty-wrap{gap:4px;padding:3px;border-radius:10px}
+.qty-wrap input{width:42px;font-size:12px;padding:4px 2px}
+.quick-toggle{width:24px;height:24px}
+.quick-toggle input{width:12px;height:12px}
+.budget-float .bf-money{font-size:24px}
+.budget-float .bf-title{font-size:12px}
+.budget-float .bf-tip{font-size:11px}
+.budget-float .bf-mini .v{font-size:12px}
+.budget-float .bf-mini .k{font-size:10px}
+
+</style>
+</head>
+<body>
+<div class="app" id="appShell">
+  <aside class="sidebar panel">
+    <h1>内购挑选助手</h1>
+    <div class="desc">导入本月清单后，可以看图、筛选、算预算、整理订购单。适合自己挑，也适合和同事一起核对。</div>
+
+    <div class="block">
+      <h2>1. 导入本月清单</h2>
+      <label for="fileInput">选择商品清单文件</label>
+      <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
+      <div class="row wrap" style="margin-top:10px">
+        <span class="chip">支持 .xlsx / .xls / .csv</span>
+        <span class="chip">默认读取第 1 个表</span>
+      </div>
+      <div class="tiny" style="margin-top:10px;">小提醒：图片是否能显示取决于原图链接；重复商品会自动合并，方便后续核对。</div>
+    </div>
+
+    <div class="block">
+      <h2>2. 外观</h2>
+      <div class="theme-switch-card">
+        <label for="themeSelect">配色风格</label>
+        <div class="theme-switch-row">
+          <select id="themeSelect">
+            <option value="cream">奶油柔和</option>
+            <option value="light">浅色清爽</option>
+            <option value="dark">深色模式</option>
+          </select>
+          <div class="theme-preview" aria-hidden="true">
+            <span class="theme-dot a"></span>
+            <span class="theme-dot b"></span>
+            <span class="theme-dot c"></span>
+          </div>
+        </div>
+      </div>
+      <div class="theme-switch-card" style="margin-top:10px">
+        <label for="cardDensitySelect">卡片密度</label>
+        <select id="cardDensitySelect">
+          <option value="compact">紧凑</option>
+          <option value="comfy">舒适</option>
+          <option value="large">大图</option>
+        </select>
+      </div>
+      <div class="row wrap" style="margin-top:10px">
+        <button class="btn small secondary" id="resetLayoutBtn">重置布局</button>
+      </div>
+    </div>
+
+    <div class="block settings-panel">
+      <h2>3. 预算和筛选</h2>
+      <div style="margin-top:2px">
+        <div class="row wrap" style="justify-content:space-between;margin-bottom:6px">
+          <label style="margin:0">品牌筛选 <span class="count-badge" id="brandCount"></span></label>
+          <div class="filter-heading-actions">
+            <button class="btn small secondary" id="clearPinnedBrandsBtn" type="button">清空置顶</button>
+            <button class="btn small secondary" id="clearBrandFiltersBtn" type="button">清空品牌</button>
+          </div>
+        </div>
+        <div id="brandFilters" class="filters-list"></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="row wrap" style="justify-content:space-between;margin-bottom:6px">
+          <label style="margin:0">类型筛选 <span class="count-badge" id="typeCount"></span></label>
+          <button class="btn small secondary" id="clearTypeFiltersBtn" type="button">清空类型</button>
+        </div>
+        <div id="typeFilters" class="filters-list"></div>
+      </div>
+
+      <div class="settings-subgrid">
+        <div class="settings-card compact">
+          <label for="budgetInput">本次预算</label>
+          <input id="budgetInput" type="number" min="0" step="1" value="200" />
+        </div>
+        <div class="full-span settings-card">
+          <details class="price-filter-section" id="priceFilterSection">
+            <summary class="price-filter-summary">
+              <div class="price-summary-left">
+                <span class="price-summary-title">按价位挑</span>
+                <span class="price-summary-note">可以多选几个价位</span>
+              </div>
+              <div class="price-summary-right">
+                <div class="price-range-pill" id="priceRangeLabel">全部价位</div>
+                <span class="price-summary-arrow">▾</span>
+              </div>
+            </summary>
+            <div class="price-filter-box">
+              <div class="price-filter-head">
+                <div class="tiny">点选想看的价位段，可以多选；不选时默认显示全部。</div>
+              </div>
+              <div class="price-histogram-scroll"><div id="priceHistogram" class="price-histogram"></div></div>
+              <div id="priceBinGrid" class="price-bin-grid"></div>
+              <div class="price-filter-tip">再点一次就取消啦～</div>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div class="settings-subgrid" style="margin-top:10px">
+        <div class="settings-card compact">
+          <label for="sortSelect">排序方式</label>
+          <select id="sortSelect">
+            <option value="default">默认顺序</option>
+            <option value="selectedFirst">已选优先</option>
+            <option value="budgetFit">预算贴合优先</option>
+            <option value="priceAsc">价格从低到高</option>
+            <option value="priceDesc">价格从高到低</option>
+            <option value="brandAsc">品牌排序</option>
+            <option value="candidateFirst">候选优先</option>
+          </select>
+        </div>
+        <div class="settings-card compact">
+          <label for="viewModeSelect">浏览模式</label>
+          <select id="viewModeSelect">
+            <option value="all">全部商品</option>
+            <option value="onlyAffordable">只看预算内</option>
+            <option value="selectedOrCandidate">只看已选和候选</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>4. 输出清单</h2>
+      <div class="tiny">选好之后，可以复制订购单，也可以导出一张分享图用于确认。</div>
+      <div class="settings-card compact" style="margin-top:10px">
+        <label for="buyerInput">分享图署名</label>
+        <input id="buyerInput" type="text" placeholder="可留空" />
+      </div>
+      <div class="row wrap" style="margin-top:10px">
+        <button class="btn success" id="copyOrderBtn">复制订购单</button>
+        <button class="btn warn" id="downloadOrderBtn">下载 CSV</button>
+        <button class="btn secondary" id="exportJpgBtn">导出分享图</button>
+      </div>
+      <div class="output-box">
+        <label for="orderOutput">导出预览</label>
+        <textarea id="orderOutput" placeholder="选好之后，这里会生成可以直接复制的订购单内容。"></textarea>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2>5. 其他操作</h2>
+      <details class="mapping-box">
+        <summary>列映射设置 <span class="tiny">表头变了再打开</span></summary>
+        <div class="mapping-inner">
+          <p class="mapping-note">这里是告诉网页：Excel 里哪一列对应商品名、品牌、价格和图片。平时不用管，清单表头变了再调整。</p>
+          <div class="mapping-grid">
+            <div><label>商品编号列</label><select id="mapCode"></select></div>
+            <div><label>商品名称列</label><select id="mapName"></select></div>
+            <div><label>品牌列</label><select id="mapBrand"></select></div>
+            <div><label>规格/尺寸列</label><select id="mapSpec"></select></div>
+            <div><label>单价列</label><select id="mapPrice"></select></div>
+            <div><label>库存列</label><select id="mapStock"></select></div>
+            <div><label>图片列</label><select id="mapImage"></select></div>
+          </div>
+          <div class="row wrap" style="margin-top:10px">
+            <button class="btn small primary" id="applyMappingBtn">应用映射</button>
+          </div>
+        </div>
+      </details>
+      <details class="mapping-box" style="margin-top:10px">
+        <summary>分类维护 <span class="tiny">少数未识别商品再打开</span></summary>
+        <div class="mapping-inner">
+          <div class="type-assist-box" id="typeAssistBox">
+            <div class="type-assist-head">
+              <div class="type-assist-title">分类维护</div>
+              <div class="type-assist-count" id="typeAssistCount">待检查 0</div>
+            </div>
+            <div class="tiny">导入后如果有商品落到“其他”，可以在这里补一个关键词。关键词会保存在本机，下次导入继续生效。</div>
+            <div class="type-assist-list" id="typeAssistList"></div>
+            <div class="type-assist-form">
+              <input id="typeKeywordInput" type="text" placeholder="例如：书签、笔袋、夜灯" />
+              <div class="row wrap">
+                <select id="typeTargetSelect"></select>
+                <button class="btn small primary" id="addTypeKeywordBtn" type="button">添加关键词</button>
+                <button class="btn small secondary" id="resetTypeKeywordsBtn" type="button">重置自定义</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </div>
+  </aside>
+
+  <main class="main panel">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <span class="chip" id="fileChip">还没放清单</span>
+        <span class="chip" id="rowChip">0 个商品</span>
+        <span class="chip" id="showChip">当前显示 0 个</span>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn secondary small" id="selectVisibleBtn">本页都加购</button>
+        <button class="btn secondary small" id="candidateVisibleBtn">本页先候选</button>
+        <button class="btn danger small" id="clearSelectionTopBtn">清空购物车</button>
+      </div>
+    </div>
+
+    <div class="main-search-row">
+      <div class="main-search-box">
+        <label for="searchInput">搜索商品</label>
+        <input id="searchInput" type="text" placeholder="搜商品名 / 品牌 / 编号" />
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="item"><div class="k">已选款数</div><div class="v" id="selectedKinds">0</div></div>
+      <div class="item"><div class="k">已选件数</div><div class="v" id="selectedQty">0</div></div>
+      <div class="item"><div class="k">候选数量</div><div class="v" id="candidateKinds">0</div></div>
+      <div class="item"><div class="k">现在合计</div><div class="v" id="selectedTotal">¥0</div></div>
+      <div class="item"><div class="k">预算上限</div><div class="v sm" id="budgetShow">¥200</div></div>
+      <div class="item"><div class="k">还剩</div><div class="v" id="remainingShow">¥200</div></div>
+    </div>
+
+    <div id="statusBox" class="status ok">先导入本月清单。点卡片空白处会直接 +1，暂时不确定的可以先放进候选。</div>
+    <div id="cards" class="cards" style="margin-top:16px"></div>
+  </main>
+
+  <aside class="rightbar panel">
+    <div class="cart-panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">确定要买</div>
+          <div class="mini-stat" id="cartMiniStat">0 个商品 · 0 件</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn small secondary" id="cartUndoBtn">撤销</button>
+          <button class="btn small danger" id="clearSelectionBtn3">清空</button>
+        </div>
+      </div>
+      <div class="cart-total-box">
+        <div class="mini-stat">总价</div>
+        <div class="big" id="cartTotalBig">¥0</div>
+        <div class="tiny" id="budgetHint">还可以慢慢挑。</div>
+      </div>
+      <div class="side-list" id="cartList" style="margin-top:10px"></div>
+    </div>
+
+    <div class="cand-panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">候选清单</div>
+          <div class="mini-stat" id="candidateMiniStat">0 个待考虑</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn small secondary" id="moveAllCandidatesBtn">全部加购</button>
+          <button class="btn small danger" id="clearCandidatesBtn">清空</button>
+        </div>
+      </div>
+      <div class="side-list" id="candidateList"></div>
+    </div>
+
+    <div class="recommend-panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">预算小建议</div>
+          <div class="mini-stat" id="recommendMiniStat">凑预算 / 回预算</div>
+        </div>
+      </div>
+      <div class="recommend-list" id="recommendList"></div>
+    </div>
+
+    <div class="compare-panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">对比小桌</div>
+          <div class="mini-stat" id="compareMiniStat">0 个待对比</div>
+        </div>
+        <div class="btn-group">
+          <button class="btn small secondary" id="openCompareBtn">打开对比</button>
+          <button class="btn small danger" id="clearCompareBtn">清空</button>
+        </div>
+      </div>
+      <div class="compare-list" id="compareList"></div>
+    </div>
+
+    <div class="desktop-copyright">
+      <div class="copyright-inner">
+        <div class="brand">© 2026 Timins米团子＆ybk</div>
+        <div class="legal">All rights reserved · 内购挑选助手</div>
+        <div class="tiny">本工具仅用于商品筛选、预算整理与订购单导出；页面内商品信息与图片版权归原始权利方所有。</div>
+      </div>
+    </div>
+
+  </aside>
+  <div class="col-resizer left-resizer" id="leftResizer" aria-hidden="true"></div>
+  <div class="col-resizer right-resizer" id="rightResizer" aria-hidden="true"></div>
+</div>
+
+<div id="budgetFloat" class="budget-float good mobile-collapsed" aria-live="polite">
+  <button class="bf-bubble" id="budgetFloatBubble" type="button" aria-label="展开预算详情">
+    <span class="bf-bubble-money" id="budgetFloatBubbleRemaining">¥200</span>
+  </button>
+  <div class="bf-panel">
+    <div class="bf-head">
+      <div class="bf-title" id="budgetFloatTitle">余额充足</div>
+      <div class="bf-head-actions">
+        <div class="chip" id="budgetFloatBadge" aria-hidden="true"></div>
+        <button class="bf-toggle" id="budgetFloatToggleBtn" type="button" aria-label="收起预算详情">收起</button>
+      </div>
+    </div>
+    <div class="bf-money" id="budgetFloatRemaining">¥200</div>
+    <div class="bf-tip" id="budgetFloatTip">预算还很宽裕，慢慢挑就好。</div>
+    <div class="bf-mini">
+      <div class="mini"><div class="k">现在合计</div><div class="v" id="budgetFloatTotal">¥0</div></div>
+      <div class="mini"><div class="k">预算上限</div><div class="v" id="budgetFloatBudget">¥200</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="lightbox" class="lightbox" aria-hidden="true">
+  <div class="lightbox-inner">
+    <button class="btn secondary small lb-close" id="lightboxCloseBtn">收起大图</button>
+    <div class="lightbox-image" id="lightboxImageWrap">
+      <img id="lightboxImage" alt="" />
+      <div class="fallback hidden" id="lightboxFallback">暂时没有图片</div>
+    </div>
+    <div class="lightbox-side">
+      <div>
+        <div class="lb-title" id="lightboxTitle">商品名称</div>
+        <div class="row wrap" style="margin-top:8px">
+          <span class="chip" id="lightboxBrand">品牌</span>
+          <span class="chip" id="lightboxType">类型</span>
+          <span class="chip" id="lightboxPrice">¥0</span>
+        </div>
+      </div>
+      <div class="lb-meta" id="lightboxMeta"></div>
+      <div class="lb-footer">
+        <div class="lb-nav">
+          <button class="btn secondary" id="lightboxPrevBtn">上一款</button>
+          <button class="btn secondary" id="lightboxNextBtn">下一款</button>
+        </div>
+        <div class="row wrap">
+          <button class="btn secondary" id="lightboxCandidateBtn">加入候选</button>
+          <button class="btn primary" id="lightboxAddBtn">加入购物车 +1</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-actions">
+  <button class="fab" id="openFilterDrawerBtn">挑选条件</button>
+  <button class="fab" id="openCartDrawerBtn">购物车</button>
+  <button class="fab" id="openCandDrawerBtn">候选</button>
+  <button class="fab" id="openCompareBtnMobile">对比</button>
+</div>
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<div class="drawer" id="cartDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="panel-title">确定要买</div>
+      <div class="mini-stat" id="cartMiniStatMobile">0 个商品 · 0 件</div>
+    </div>
+    <div class="row wrap">
+      <button class="btn small secondary" id="cartDrawerUndoBtn">撤销</button>
+      <button class="btn small danger" id="cartDrawerClearBtn">清空</button>
+      <button class="btn small secondary" id="closeCartDrawerBtn">收起</button>
+    </div>
+  </div>
+  <div class="cart-total-box">
+    <div class="mini-stat">总价</div>
+    <div class="big" id="cartTotalBigMobile">¥0</div>
+    <div class="tiny" id="budgetHintMobile">还可以慢慢挑。</div>
+  </div>
+  <div class="drawer-list" id="cartListMobile" style="margin-top:10px"></div>
+</div>
+<div class="drawer" id="candDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="panel-title">候选清单</div>
+      <div class="mini-stat" id="candidateMiniStatMobile">0 个待考虑</div>
+    </div>
+    <div class="row wrap">
+      <button class="btn small secondary" id="moveAllCandidatesBtnMobile">全部加购</button>
+      <button class="btn small danger" id="clearCandidatesBtnMobile">清空</button>
+      <button class="btn small secondary" id="closeCandDrawerBtn">收起</button>
+    </div>
+  </div>
+  <div class="drawer-list" id="candidateListMobile"></div>
+</div>
+
+<div class="drawer" id="filterDrawer">
+  <div class="drawer-head">
+    <div>
+      <div class="panel-title">快捷挑选</div>
+      <div class="mini-stat">预算 / 搜索 / 排序 / 浏览模式</div>
+    </div>
+    <button class="btn small secondary" id="closeFilterDrawerBtn">收起</button>
+  </div>
+  <div class="mobile-filter-grid">
+    <div class="grid2">
+      <div>
+        <label for="budgetInputMobile">本次预算</label>
+        <input id="budgetInputMobile" type="number" min="0" step="1" value="200" />
+      </div>
+      <div>
+        <label for="searchInputMobile">搜索商品</label>
+        <input id="searchInputMobile" type="text" placeholder="搜商品名 / 品牌 / 编号" />
+      </div>
+      <div>
+        <label for="sortSelectMobile">排序方式</label>
+        <select id="sortSelectMobile">
+          <option value="default">默认顺序</option>
+          <option value="selectedFirst">已选优先</option>
+          <option value="budgetFit">预算贴合优先</option>
+          <option value="priceAsc">价格从低到高</option>
+          <option value="priceDesc">价格从高到低</option>
+          <option value="brandAsc">品牌排序</option>
+          <option value="candidateFirst">候选优先</option>
+        </select>
+      </div>
+      <div>
+        <label for="viewModeSelectMobile">浏览模式</label>
+        <select id="viewModeSelectMobile">
+          <option value="all">全部商品</option>
+          <option value="onlyAffordable">只看预算内</option>
+          <option value="selectedOrCandidate">只看已选和候选</option>
+        </select>
+      </div>
+    </div>
+    <div class="row wrap">
+      <button class="btn primary" id="applyMobileFiltersBtn">应用挑选条件</button>
+      <button class="btn secondary" id="syncMobileFiltersBtn">同步当前设置</button>
+    </div>
+  </div>
+</div>
+
+<div id="compareModal" class="compare-modal" aria-hidden="true">
+  <div class="compare-modal-inner">
+    <button class="btn secondary small compare-close" id="closeCompareBtn">收起对比</button>
+    <div class="panel-title" style="font-size:22px">商品对比</div>
+    <div class="mini-stat" id="compareModalStat">最多同时对比 4 个商品</div>
+    <div class="compare-grid" id="compareGrid"></div>
+  </div>
+</div>
+
+<div id="orderPreviewModal" class="order-modal" aria-hidden="true">
+  <div class="order-modal-inner">
+    <div class="order-preview-head">
+      <div>
+        <div class="panel-title" style="font-size:22px">确认订购单</div>
+        <div class="mini-stat" id="orderPreviewStat">请先核对内容</div>
+      </div>
+      <button class="btn secondary small" id="closeOrderPreviewBtn">关闭</button>
+    </div>
+    <div class="order-preview-table-wrap" id="orderPreviewTable"></div>
+    <div class="order-preview-actions">
+      <button class="btn secondary" id="cancelOrderPreviewBtn">返回修改</button>
+      <button class="btn primary" id="confirmOrderPreviewBtn">确认</button>
+    </div>
+  </div>
+</div>
+
+<div id="importCheckModal" class="order-modal" aria-hidden="true">
+  <div class="order-modal-inner">
+    <div class="order-preview-head">
+      <div>
+        <div class="panel-title" style="font-size:22px">导入检查</div>
+        <div class="mini-stat" id="importCheckStat">已整理本月清单</div>
+      </div>
+      <button class="btn secondary small" id="closeImportCheckBtn">关闭</button>
+    </div>
+    <div class="status ok" id="importCheckSummary"></div>
+    <div class="order-preview-table-wrap" id="importCheckDetails"></div>
+    <div class="order-preview-actions">
+      <button class="btn primary" id="confirmImportCheckBtn">知道了</button>
+    </div>
+  </div>
+</div>
+
+<div id="shareCard" class="share-card" aria-hidden="true"></div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="brand">© 2026 Timins米团子＆ybk</div>
+    <div class="legal">All rights reserved · 内购挑选助手</div>
+    <div class="tiny">本工具仅用于商品筛选、预算整理与订购单导出；页面内商品信息与图片版权归原始权利方所有。</div>
+  </div>
+</footer>
+
+<script>
+const STORAGE_KEY = 'timins_picker_state_v10';
+const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
+const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
+const THEME_KEY = 'timins_picker_theme_v1';
+const COLUMN_LAYOUT_KEY = 'timins_picker_columns_v1';
+const FAVORITE_BRANDS_KEY = 'timins_picker_favorite_brands_v1';
+const CARD_DENSITY_KEY = 'timins_picker_card_density_v1';
+const TYPE_RULES = [
+  ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
+  ['徽章/胸针', ['徽章','胸针','吧唧','别针','毛绒吧唧']],
+  ['贴纸/贴片', ['贴纸','贴贴乐','贴纸包','泡泡贴','刺绣贴','光栅贴纸','刘海贴','车贴','不干胶','冰箱贴','磁吸冰箱贴']],
+  ['杯具/餐厨', ['保温杯','马克杯','玻璃杯','吸管杯','水杯','陶瓷套杯','陶瓷杯','咖啡杯','双饮杯','造型杯','喷雾杯','牛奶杯','怀旧杯','杯垫','杯','叉子','餐具','饭盒','开瓶器','防烫手套']],
+  ['毛绒/公仔/盲盒', ['毛绒公仔','毛绒盲盒','毛绒挂件盲盒','公仔','玩偶','娃娃','毛绒','舒压球','解压捏捏球','捏捏球','回弹','盲盒','盲袋','糖果粒']],
+  ['家居布艺', ['毛毯','披肩','抱枕','靠枕','坐垫','座垫','后排双座垫','前排单座垫','防踢垫','热水袋','暖水袋','门挂','抽纸套','纸巾盒','擦手巾','地垫','床边毯','空调毯','手套']],
+  ['包袋/收纳', ['收纳袋','收纳','零钱包','帆布包','购物袋','礼品袋','福袋','单肩包','挎包','小圆包','补给包','抽绳','抽绳卡套','卡套','卡插','证件套','包']],
+  ['数码/办公周边', ['鼠标垫','护腕鼠标垫','手机支架','气囊支架','手机背夹','手机毛绒背夹','音响','音箱','音乐盒','加湿器','风扇','夜灯','留言板','卡插','台镜','小圆镜','镜子']],
+  ['文具/纸品', ['便签','便签纸','便利贴','手账本','手工账','笔记本','记事本','月历','日历','生活解鸭历','拼图','胶卷','书签','磁吸书签','笔袋','留言板']],
+  ['车载用品', ['车载','车品','香薰','停车牌','车挂','车载摆件','车载手机支架','车载香薰']],
+  ['摆件/手办/积木', ['摆件','手办','积木','摇摇乐','不倒翁','达摩','萌动球','水音铃','叠叠乐','搪胶','解压玩具','水晶球','灯光画','造型桶','存钱筒','水机','游戏水机','topper','磁石','零食夹','扭蛋机系列','街景摆件']],
+  ['美妆个护/穿戴', ['梳子','气垫梳','伸缩梳','发夹','头套','帽','渔夫帽','眼罩','宝宝裤','婴儿服','小圆镜','台镜','镜子','刘海贴','毛绒发夹']],
+  ['礼盒/节庆', ['礼盒','套盒','小盒','礼袋','红包','对联','春联','福字','圣诞','新年','春节','cny','CNY','蛇年','生日限定']],
+  ['家居日用/工具', ['开瓶器','零食夹','纸巾盒','抽纸套','热水袋','暖水袋','防踢垫']],
+  ['其他', []]
+];
+const QUICK_TYPE_BY_SEGMENT = {
+  '钥匙扣':'挂件/钥匙扣',
+  '钥匙链':'挂件/钥匙扣',
+  '挂件':'挂件/钥匙扣',
+  '毛绒挂件':'挂件/钥匙扣',
+  '徽章':'徽章/胸针',
+  '胸针':'徽章/胸针',
+  '吧唧':'徽章/胸针',
+  '贴纸':'贴纸/贴片',
+  '贴贴乐':'贴纸/贴片',
+  '泡泡贴':'贴纸/贴片',
+  '刺绣贴':'贴纸/贴片',
+  '冰箱贴':'贴纸/贴片',
+  '杯':'杯具/餐厨',
+  '保温杯':'杯具/餐厨',
+  '玻璃杯':'杯具/餐厨',
+  '吸管杯':'杯具/餐厨',
+  '马克杯':'杯具/餐厨',
+  '喷雾杯':'杯具/餐厨',
+  '牛奶杯':'杯具/餐厨',
+  '怀旧杯':'杯具/餐厨',
+  '杯垫':'杯具/餐厨',
+  '毛毯':'家居布艺',
+  '披肩':'家居布艺',
+  '抱枕':'家居布艺',
+  '靠枕':'家居布艺',
+  '坐垫':'家居布艺',
+  '防踢垫':'家居布艺',
+  '热水袋':'家居布艺',
+  '收纳':'包袋/收纳',
+  '收纳袋':'包袋/收纳',
+  '包':'包袋/收纳',
+  '卡套':'包袋/收纳',
+  '卡插':'包袋/收纳',
+  '毛绒':'毛绒/公仔/盲盒',
+  '公仔':'毛绒/公仔/盲盒',
+  '玩偶':'毛绒/公仔/盲盒',
+  '盲盒':'毛绒/公仔/盲盒',
+  '盲袋':'毛绒/公仔/盲盒',
+  '车品':'车载用品',
+  '车载':'车载用品',
+  '香薰':'车载用品',
+  '停车牌':'车载用品',
+  '文具':'文具/纸品',
+  '便签':'文具/纸品',
+  '便利贴':'文具/纸品',
+  '手账本':'文具/纸品',
+  '笔记本':'文具/纸品',
+  '日用百货':'文具/纸品',
+  '数码':'数码/办公周边',
+  '办公':'数码/办公周边',
+  '鼠标垫':'数码/办公周边',
+  '手机支架':'数码/办公周边',
+  '气囊支架':'数码/办公周边',
+  '音箱':'数码/办公周边',
+  '风扇':'数码/办公周边',
+  '夜灯':'数码/办公周边',
+  '摆件':'摆件/手办/积木',
+  '手办':'摆件/手办/积木',
+  '积木':'摆件/手办/积木',
+  '摇摇乐':'摆件/手办/积木',
+  '达摩':'摆件/手办/积木',
+  '解压玩具':'摆件/手办/积木',
+  '搪胶':'摆件/手办/积木',
+  '镜子':'美妆个护/穿戴',
+  '梳子':'美妆个护/穿戴',
+  '发夹':'美妆个护/穿戴',
+  '帽':'美妆个护/穿戴',
+  '眼罩':'美妆个护/穿戴',
+  '婴儿服':'美妆个护/穿戴',
+  '礼盒':'礼盒/节庆',
+  '礼袋':'礼盒/节庆',
+  '红包':'礼盒/节庆',
+  '对联':'礼盒/节庆',
+  '百货':''
+};
+const els = {
+  appShell: document.getElementById('appShell'),
+  leftResizer: document.getElementById('leftResizer'),
+  rightResizer: document.getElementById('rightResizer'),
+  fileInput: document.getElementById('fileInput'),
+  mapCode: document.getElementById('mapCode'),
+  mapName: document.getElementById('mapName'),
+  mapBrand: document.getElementById('mapBrand'),
+  mapSpec: document.getElementById('mapSpec'),
+  mapPrice: document.getElementById('mapPrice'),
+  mapStock: document.getElementById('mapStock'),
+  mapImage: document.getElementById('mapImage'),
+  applyMappingBtn: document.getElementById('applyMappingBtn'),
+  resetFiltersBtn: document.getElementById('resetFiltersBtn'),
+  resetLayoutBtn: document.getElementById('resetLayoutBtn'),
+  clearSelectionBtn: document.getElementById('clearSelectionBtn'),
+  clearSelectionBtn3: document.getElementById('clearSelectionBtn3'),
+  clearSelectionTopBtn: document.getElementById('clearSelectionTopBtn'),
+  undoBtn: document.getElementById('undoBtn'),
+  redoBtn: document.getElementById('redoBtn'),
+  cartUndoBtn: document.getElementById('cartUndoBtn'),
+  cartDrawerUndoBtn: document.getElementById('cartDrawerUndoBtn'),
+  clearCandidatesBtn: document.getElementById('clearCandidatesBtn'),
+  clearCandidatesBtnMobile: document.getElementById('clearCandidatesBtnMobile'),
+  moveAllCandidatesBtn: document.getElementById('moveAllCandidatesBtn'),
+  moveAllCandidatesBtnMobile: document.getElementById('moveAllCandidatesBtnMobile'),
+  clearBrandFiltersBtn: document.getElementById('clearBrandFiltersBtn'),
+  clearPinnedBrandsBtn: document.getElementById('clearPinnedBrandsBtn'),
+  clearTypeFiltersBtn: document.getElementById('clearTypeFiltersBtn'),
+  typeAssistBox: document.getElementById('typeAssistBox'),
+  typeAssistCount: document.getElementById('typeAssistCount'),
+  typeAssistList: document.getElementById('typeAssistList'),
+  typeKeywordInput: document.getElementById('typeKeywordInput'),
+  typeTargetSelect: document.getElementById('typeTargetSelect'),
+  addTypeKeywordBtn: document.getElementById('addTypeKeywordBtn'),
+  resetTypeKeywordsBtn: document.getElementById('resetTypeKeywordsBtn'),
+  budgetInput: document.getElementById('budgetInput'),
+  buyerInput: document.getElementById('buyerInput'),
+  themeSelect: document.getElementById('themeSelect'),
+  searchInput: document.getElementById('searchInput'),
+  priceHistogram: document.getElementById('priceHistogram'),
+  priceBinGrid: document.getElementById('priceBinGrid'),
+  priceRangeLabel: document.getElementById('priceRangeLabel'),
+  sortSelect: document.getElementById('sortSelect'),
+  viewModeSelect: document.getElementById('viewModeSelect'),
+  cardDensitySelect: document.getElementById('cardDensitySelect'),
+  onlyInStock: document.getElementById('onlyInStock'),
+  onlySelected: document.getElementById('onlySelected'),
+  brandFilters: document.getElementById('brandFilters'),
+  typeFilters: document.getElementById('typeFilters'),
+  brandCount: document.getElementById('brandCount'),
+  typeCount: document.getElementById('typeCount'),
+  fileChip: document.getElementById('fileChip'),
+  rowChip: document.getElementById('rowChip'),
+  showChip: document.getElementById('showChip'),
+  cards: document.getElementById('cards'),
+  statusBox: document.getElementById('statusBox'),
+  selectedKinds: document.getElementById('selectedKinds'),
+  selectedQty: document.getElementById('selectedQty'),
+  candidateKinds: document.getElementById('candidateKinds'),
+  selectedTotal: document.getElementById('selectedTotal'),
+  budgetShow: document.getElementById('budgetShow'),
+  remainingShow: document.getElementById('remainingShow'),
+  selectVisibleBtn: document.getElementById('selectVisibleBtn'),
+  candidateVisibleBtn: document.getElementById('candidateVisibleBtn'),
+  copyOrderBtn: document.getElementById('copyOrderBtn'),
+  downloadOrderBtn: document.getElementById('downloadOrderBtn'),
+  exportJpgBtn: document.getElementById('exportJpgBtn'),
+  orderOutput: document.getElementById('orderOutput'),
+  cartList: document.getElementById('cartList'),
+  candidateList: document.getElementById('candidateList'),
+  compareList: document.getElementById('compareList'),
+  recommendList: document.getElementById('recommendList'),
+  cartMiniStat: document.getElementById('cartMiniStat'),
+  candidateMiniStat: document.getElementById('candidateMiniStat'),
+  compareMiniStat: document.getElementById('compareMiniStat'),
+  recommendMiniStat: document.getElementById('recommendMiniStat'),
+  cartTotalBig: document.getElementById('cartTotalBig'),
+  budgetHint: document.getElementById('budgetHint'),
+  cartListMobile: document.getElementById('cartListMobile'),
+  candidateListMobile: document.getElementById('candidateListMobile'),
+  cartMiniStatMobile: document.getElementById('cartMiniStatMobile'),
+  candidateMiniStatMobile: document.getElementById('candidateMiniStatMobile'),
+  cartTotalBigMobile: document.getElementById('cartTotalBigMobile'),
+  budgetHintMobile: document.getElementById('budgetHintMobile'),
+  budgetFloat: document.getElementById('budgetFloat'),
+  budgetFloatBubble: document.getElementById('budgetFloatBubble'),
+  budgetFloatBubbleRemaining: document.getElementById('budgetFloatBubbleRemaining'),
+  budgetFloatToggleBtn: document.getElementById('budgetFloatToggleBtn'),
+  budgetFloatTitle: document.getElementById('budgetFloatTitle'),
+  budgetFloatBadge: document.getElementById('budgetFloatBadge'),
+  budgetFloatRemaining: document.getElementById('budgetFloatRemaining'),
+  budgetFloatTip: document.getElementById('budgetFloatTip'),
+  budgetFloatTotal: document.getElementById('budgetFloatTotal'),
+  budgetFloatBudget: document.getElementById('budgetFloatBudget'),
+  lightbox: document.getElementById('lightbox'),
+  lightboxCloseBtn: document.getElementById('lightboxCloseBtn'),
+  lightboxPrevBtn: document.getElementById('lightboxPrevBtn'),
+  lightboxNextBtn: document.getElementById('lightboxNextBtn'),
+  lightboxAddBtn: document.getElementById('lightboxAddBtn'),
+  lightboxCandidateBtn: document.getElementById('lightboxCandidateBtn'),
+  lightboxImage: document.getElementById('lightboxImage'),
+  lightboxFallback: document.getElementById('lightboxFallback'),
+  lightboxTitle: document.getElementById('lightboxTitle'),
+  lightboxBrand: document.getElementById('lightboxBrand'),
+  lightboxType: document.getElementById('lightboxType'),
+  lightboxPrice: document.getElementById('lightboxPrice'),
+  lightboxMeta: document.getElementById('lightboxMeta'),
+  openCartDrawerBtn: document.getElementById('openCartDrawerBtn'),
+  openCandDrawerBtn: document.getElementById('openCandDrawerBtn'),
+  openFilterDrawerBtn: document.getElementById('openFilterDrawerBtn'),
+  openCompareBtn: document.getElementById('openCompareBtn'),
+  openCompareBtnMobile: document.getElementById('openCompareBtnMobile'),
+  closeCartDrawerBtn: document.getElementById('closeCartDrawerBtn'),
+  closeCandDrawerBtn: document.getElementById('closeCandDrawerBtn'),
+  closeFilterDrawerBtn: document.getElementById('closeFilterDrawerBtn'),
+  drawerBackdrop: document.getElementById('drawerBackdrop'),
+  cartDrawer: document.getElementById('cartDrawer'),
+  candDrawer: document.getElementById('candDrawer'),
+  filterDrawer: document.getElementById('filterDrawer'),
+  cartDrawerClearBtn: document.getElementById('cartDrawerClearBtn'),
+  budgetInputMobile: document.getElementById('budgetInputMobile'),
+  searchInputMobile: document.getElementById('searchInputMobile'),
+  sortSelectMobile: document.getElementById('sortSelectMobile'),
+  viewModeSelectMobile: document.getElementById('viewModeSelectMobile'),
+  onlyInStockMobile: document.getElementById('onlyInStockMobile'),
+  onlySelectedMobile: document.getElementById('onlySelectedMobile'),
+  applyMobileFiltersBtn: document.getElementById('applyMobileFiltersBtn'),
+  syncMobileFiltersBtn: document.getElementById('syncMobileFiltersBtn'),
+  compareModal: document.getElementById('compareModal'),
+  compareGrid: document.getElementById('compareGrid'),
+  compareModalStat: document.getElementById('compareModalStat'),
+  closeCompareBtn: document.getElementById('closeCompareBtn'),
+  clearCompareBtn: document.getElementById('clearCompareBtn'),
+  orderPreviewModal: document.getElementById('orderPreviewModal'),
+  orderPreviewStat: document.getElementById('orderPreviewStat'),
+  orderPreviewTable: document.getElementById('orderPreviewTable'),
+  closeOrderPreviewBtn: document.getElementById('closeOrderPreviewBtn'),
+  cancelOrderPreviewBtn: document.getElementById('cancelOrderPreviewBtn'),
+  confirmOrderPreviewBtn: document.getElementById('confirmOrderPreviewBtn'),
+  importCheckModal: document.getElementById('importCheckModal'),
+  importCheckStat: document.getElementById('importCheckStat'),
+  importCheckSummary: document.getElementById('importCheckSummary'),
+  importCheckDetails: document.getElementById('importCheckDetails'),
+  closeImportCheckBtn: document.getElementById('closeImportCheckBtn'),
+  confirmImportCheckBtn: document.getElementById('confirmImportCheckBtn'),
+  shareCard: document.getElementById('shareCard')
+};
+
+const state = {
+  fileName:'',
+  rawRows:[],
+  headers:[],
+  mapping:{},
+  rows:[],
+  rowMap:{},
+  visibleRows:[],
+  filters:{
+    search:'',
+    priceBins:new Set(),
+    onlyInStock:false,
+    onlySelected:false,
+    brands:new Set(),
+    types:new Set(),
+    sortBy:'default',
+    viewMode:'all'
+  },
+  availableBrands:[],
+  availableTypes:[],
+  favoriteBrands:new Set(),
+  customTypeRules:{},
+  selections:{},
+  candidates:{},
+  compare:{},
+  budget:200,
+  shareBuyer:'',
+  theme:'cream',
+  cardDensity:'compact',
+  priceBounds:{min:0,max:100,step:1},
+  undoStack:[],
+  redoStack:[],
+  lightboxIndex:-1,
+  renderToken:0,
+  highlightCardId:'',
+  duplicateRowsRemoved:0
+};
+let budgetFloatMobileExpanded = false;
+let lastBudgetFloatIsMobile = null;
+let columnLayout = {left:320,right:320};
+let pendingOrderAction = '';
+
+function loadPersisted(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const obj = JSON.parse(raw);
+      state.selections = obj.selections && typeof obj.selections==='object' ? obj.selections : {};
+      state.candidates = obj.candidates && typeof obj.candidates==='object' ? obj.candidates : {};
+      state.compare = obj.compare && typeof obj.compare==='object' ? obj.compare : {};
+      if(Number.isFinite(Number(obj.budget))) state.budget = Math.max(0, Number(obj.budget));
+      if(typeof obj.shareBuyer === 'string') state.shareBuyer = obj.shareBuyer.trim();
+    }
+  }catch(e){}
+  loadCustomTypeRules();
+  loadFavoriteBrands();
+  loadTheme();
+  loadCardDensity();
+}
+function persistState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    selections:state.selections,
+    candidates:state.candidates,
+    compare:state.compare,
+    budget:state.budget,
+    shareBuyer:state.shareBuyer
+  }));
+}
+function loadTheme(){
+  const saved = localStorage.getItem(THEME_KEY);
+  state.theme = ['cream','light','dark'].includes(saved) ? saved : 'cream';
+  applyTheme(state.theme);
+}
+function applyTheme(theme){
+  const next = ['cream','light','dark'].includes(theme) ? theme : 'cream';
+  state.theme = next;
+  document.documentElement.setAttribute('data-theme', next);
+  if(els.themeSelect) els.themeSelect.value = next;
+  localStorage.setItem(THEME_KEY, next);
+}
+function loadCardDensity(){
+  const saved = localStorage.getItem(CARD_DENSITY_KEY);
+  state.cardDensity = ['comfy','compact','large'].includes(saved) ? saved : 'compact';
+  applyCardDensity(state.cardDensity);
+}
+function applyCardDensity(density){
+  const next = ['comfy','compact','large'].includes(density) ? density : 'comfy';
+  state.cardDensity = next;
+  document.documentElement.setAttribute('data-density', next);
+  if(els.cardDensitySelect) els.cardDensitySelect.value = next;
+  localStorage.setItem(CARD_DENSITY_KEY, next);
+}
+function loadColumnLayout(){
+  try{
+    const raw = localStorage.getItem(COLUMN_LAYOUT_KEY);
+    const obj = raw ? JSON.parse(raw) : {};
+    if(Number.isFinite(Number(obj.left))) columnLayout.left = Number(obj.left);
+    if(Number.isFinite(Number(obj.right))) columnLayout.right = Number(obj.right);
+  }catch(e){}
+  applyColumnLayout();
+}
+function saveColumnLayout(){
+  localStorage.setItem(COLUMN_LAYOUT_KEY, JSON.stringify(columnLayout));
+}
+function applyColumnLayout(){
+  if(!els.appShell) return;
+  const left = clamp(columnLayout.left || 320, 260, 560);
+  const right = clamp(columnLayout.right || 320, 260, 560);
+  columnLayout = {left, right};
+  els.appShell.style.setProperty('--left-col', `${left}px`);
+  els.appShell.style.setProperty('--right-col', `${right}px`);
+  updateColumnResizerPositions();
+}
+function resetColumnLayout(){
+  columnLayout = {left:320, right:320};
+  applyColumnLayout();
+  saveColumnLayout();
+  setStatus('三栏布局已恢复默认宽度。','good');
+}
+function updateColumnResizerPositions(){
+  if(!els.appShell || !els.leftResizer || !els.rightResizer || window.innerWidth <= 1100) return;
+  requestAnimationFrame(()=>{
+    const appRect = els.appShell.getBoundingClientRect();
+    const leftRect = document.querySelector('.sidebar')?.getBoundingClientRect();
+    const rightRect = document.querySelector('.rightbar')?.getBoundingClientRect();
+    if(leftRect) els.leftResizer.style.left = `${leftRect.right - appRect.left + 9}px`;
+    if(rightRect) els.rightResizer.style.left = `${rightRect.left - appRect.left - 9}px`;
+  });
+}
+function makeColumnsResizable(){
+  if(!els.appShell || !els.leftResizer || !els.rightResizer) return;
+  const minSide = 260;
+  const maxSide = 560;
+  const minMain = 460;
+  const startDrag = (kind, e)=>{
+    if(window.innerWidth <= 1100 || e.button !== 0) return;
+    const handle = kind === 'left' ? els.leftResizer : els.rightResizer;
+    handle.classList.add('dragging');
+    const move = (evt)=>{
+      const rect = els.appShell.getBoundingClientRect();
+      const styles = getComputedStyle(els.appShell);
+      const gap = parseFloat(styles.columnGap || styles.gap) || 16;
+      const maxAvailable = Math.max(minSide, rect.width - minMain - gap*2);
+      if(kind === 'left'){
+        columnLayout.left = clamp(evt.clientX - rect.left - gap/2, minSide, Math.min(maxSide, maxAvailable - columnLayout.right));
+      }else{
+        columnLayout.right = clamp(rect.right - evt.clientX - gap/2, minSide, Math.min(maxSide, maxAvailable - columnLayout.left));
+      }
+      applyColumnLayout();
+    };
+    const stop = ()=>{
+      handle.classList.remove('dragging');
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', stop);
+      window.removeEventListener('pointercancel', stop);
+      saveColumnLayout();
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', stop);
+    window.addEventListener('pointercancel', stop);
+    e.preventDefault();
+  };
+  els.leftResizer.addEventListener('pointerdown', e => startDrag('left', e));
+  els.rightResizer.addEventListener('pointerdown', e => startDrag('right', e));
+  window.addEventListener('resize', ()=>{ applyColumnLayout(); updateColumnResizerPositions(); });
+}
+function getTypeNames(){
+  return TYPE_RULES.map(([type]) => type).filter(type => type && type !== '其他');
+}
+function loadCustomTypeRules(){
+  try{
+    const raw = localStorage.getItem(CUSTOM_TYPE_RULES_KEY);
+    const obj = raw ? JSON.parse(raw) : {};
+    const validTypes = new Set(getTypeNames());
+    state.customTypeRules = {};
+    Object.entries(obj || {}).forEach(([type, words]) => {
+      if(!validTypes.has(type) || !Array.isArray(words)) return;
+      const clean = [...new Set(words.map(cleanString).filter(Boolean))];
+      if(clean.length) state.customTypeRules[type] = clean;
+    });
+  }catch(e){
+    state.customTypeRules = {};
+  }
+}
+function persistCustomTypeRules(){
+  localStorage.setItem(CUSTOM_TYPE_RULES_KEY, JSON.stringify(state.customTypeRules || {}));
+}
+function loadFavoriteBrands(){
+  try{
+    const raw = localStorage.getItem(FAVORITE_BRANDS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    state.favoriteBrands = new Set(Array.isArray(arr) ? arr.map(cleanString).filter(Boolean) : []);
+  }catch(e){
+    state.favoriteBrands = new Set();
+  }
+}
+function persistFavoriteBrands(){
+  localStorage.setItem(FAVORITE_BRANDS_KEY, JSON.stringify([...state.favoriteBrands]));
+}
+function sortBrandsForDisplay(items){
+  return [...items].sort((a,b)=>{
+    const af = state.favoriteBrands.has(a) ? 0 : 1;
+    const bf = state.favoriteBrands.has(b) ? 0 : 1;
+    if(af !== bf) return af - bf;
+    return a.localeCompare(b,'zh');
+  });
+}
+function activeTypeRules(){
+  const custom = Object.entries(state.customTypeRules || {}).map(([type, words]) => [type, words || []]);
+  return custom.concat(TYPE_RULES);
+}
+function snapshot(){
+  return {
+    selections: JSON.parse(JSON.stringify(state.selections)),
+    candidates: JSON.parse(JSON.stringify(state.candidates)),
+    compare: JSON.parse(JSON.stringify(state.compare)),
+    budget: state.budget
+  };
+}
+function pushHistory(){
+  state.undoStack.push(snapshot());
+  if(state.undoStack.length>60) state.undoStack.shift();
+  state.redoStack = [];
+}
+function applySnapshot(snap){
+  if(!snap) return;
+  state.selections = snap.selections || {};
+  state.candidates = snap.candidates || {};
+  state.compare = snap.compare || {};
+  state.budget = Number.isFinite(Number(snap.budget)) ? Math.max(0, Number(snap.budget)) : state.budget;
+  els.budgetInput.value = String(state.budget);
+  if(els.buyerInput) els.buyerInput.value = getShareBuyer();
+  syncMobileQuickControls();
+  persistState();
+  refreshAll();
+}
+function undoAction(){
+  if(!state.undoStack.length){ setStatus('还没有可以撤销的操作。','warn'); return; }
+  state.redoStack.push(snapshot());
+  const snap = state.undoStack.pop();
+  applySnapshot(snap);
+  setStatus('已撤销上一步。','good');
+}
+function redoAction(){
+  if(!state.redoStack.length){ setStatus('还没有可以恢复的操作。','warn'); return; }
+  state.undoStack.push(snapshot());
+  const snap = state.redoStack.pop();
+  applySnapshot(snap);
+  setStatus('已恢复上一步。','good');
+}
+function escapeHtml(v){
+  return String(v ?? '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
+}
+function cleanString(v){ return v==null ? '' : String(v).trim(); }
+function parseNumber(v){
+  if(v==null || v==='') return NaN;
+  if(typeof v==='number') return v;
+  const n = Number(String(v).replace(/[^\d.\-]/g,''));
+  return Number.isFinite(n)?n:NaN;
+}
+function fmtMoney(v){
+  const n = Number(v || 0);
+  return `¥${n.toFixed(2).replace(/\.00$/,'')}`;
+}
+function getPriceBoundsFromRows(rows){
+  const prices = (rows || []).map(r => Number(r && r.price)).filter(Number.isFinite);
+  if(!prices.length) return {min:0,max:100,step:1};
+  let min = Math.min(...prices);
+  let max = Math.max(...prices);
+  const hasDecimal = prices.some(v => Math.abs(v - Math.round(v)) > 0.001);
+  min = Math.floor(min);
+  max = Math.ceil(max);
+  if(min === max) max = min + (hasDecimal ? 1 : 1);
+  return {min, max, step: hasDecimal ? 0.1 : 1};
+}
+function applyPriceBounds(resetToFull=false){
+  state.priceBounds = getPriceBoundsFromRows(state.rows);
+  if(resetToFull) state.filters.priceBins.clear();
+  updatePriceFilterUI(state.rows);
+}
+function normalizePriceRangeValues(){
+  return;
+}
+function formatPriceBinLabel(start, end, isLast){
+  const left = Number(start || 0);
+  if(isLast) return `${left}+`;
+  const right = Math.max(left, Math.floor(end - 1));
+  return `${left}-${right}`;
+}
+function getCommonPriceBins(maxPrice){
+  const boundaries = [0, 10, 16, 20, 30, 40, 50, 60, 80, 100, 200, Infinity];
+  let cutoff = boundaries.findIndex(v => v > maxPrice);
+  if(cutoff < 1) cutoff = 1;
+  const bins = [];
+  for(let i = 0; i < cutoff; i += 1){
+    const start = boundaries[i];
+    const end = boundaries[i + 1];
+    bins.push({
+      start,
+      end,
+      label: formatPriceBinLabel(start, end, end === Infinity)
+    });
+  }
+  return bins.length ? bins : [{start:0, end:Infinity, label:'0+'}];
+}
+function updatePriceFilterUI(baseRows){
+  const b = state.priceBounds || {min:0,max:100};
+  const sourceRows = Array.isArray(baseRows) ? baseRows : state.rows;
+  const bins = getCommonPriceBins(b.max);
+  const selectedKeys = state.filters.priceBins || new Set();
+  const hasSelection = selectedKeys.size > 0;
+  if(els.priceRangeLabel){
+    const selectedLabels = bins.filter(bin => selectedKeys.has(bin.label)).map(bin => bin.label);
+    els.priceRangeLabel.textContent = hasSelection ? selectedLabels.join(' / ') : '全部价位';
+  }
+  const counts = bins.map(() => 0);
+  sourceRows.forEach(r => {
+    const price = Number(r && r.price);
+    if(!Number.isFinite(price)) return;
+    const idx = bins.findIndex(bin => price >= bin.start && (bin.end === Infinity ? true : price < bin.end));
+    counts[idx >= 0 ? idx : bins.length - 1] += 1;
+  });
+  const peak = Math.max(1, ...counts);
+
+  if(els.priceHistogram){
+    const binWidth = window.matchMedia && window.matchMedia('(max-width: 760px)').matches ? 42 : 46;
+    els.priceHistogram.style.gridTemplateColumns = `repeat(${bins.length}, ${binWidth}px)`;
+    els.priceHistogram.innerHTML = bins.map((bin, idx) => {
+      const count = counts[idx] || 0;
+      const selected = selectedKeys.has(bin.label);
+      const cls = hasSelection ? (selected ? 'selected' : 'dim') : '';
+      const height = Math.max(8, Math.round((count / peak) * 48));
+      return `<button class="price-bin ${cls}" type="button" data-price-bin="${escapeHtml(bin.label)}" title="${escapeHtml(bin.label)} · ${count} 个商品">
+        <div class="price-bin-count">${count}</div>
+        <div class="price-bin-bar" style="height:${height}px"></div>
+        <div class="price-bin-label">${escapeHtml(bin.label)}</div>
+      </button>`;
+    }).join('');
+  }
+
+  if(els.priceBinGrid){
+    els.priceBinGrid.innerHTML = bins.map((bin, idx) => {
+      const count = counts[idx] || 0;
+      const selected = selectedKeys.has(bin.label);
+      const cls = hasSelection ? (selected ? 'selected' : 'dim') : '';
+      const pct = Math.max(6, Math.round((count / peak) * 100));
+      return `<button class="price-chip ${cls}" type="button" data-price-bin="${escapeHtml(bin.label)}" title="${escapeHtml(bin.label)} · ${count} 个商品">
+        <div class="price-chip-label">${escapeHtml(bin.label)}</div>
+        <div class="price-chip-count">${count}</div>
+        <div class="price-chip-bar"><span style="width:${pct}%"></span></div>
+      </button>`;
+    }).join('');
+  }
+}
+function rowMatchesSelectedPriceBins(r){
+  const selectedKeys = state.filters.priceBins || new Set();
+  if(!selectedKeys.size) return true;
+  const price = Number(r && r.price);
+  if(!Number.isFinite(price)) return false;
+  const bins = getCommonPriceBins((state.priceBounds || {max:100}).max);
+  const bin = bins.find(bin => price >= bin.start && (bin.end === Infinity ? true : price < bin.end));
+  return !!(bin && selectedKeys.has(bin.label));
+}
+function rowMatchesNonPriceFilters(r, summary){
+  const text = `${r.name} ${r.brand} ${r.code} ${r.type}`.toLowerCase();
+  if(state.filters.search && !text.includes(state.filters.search)) return false;
+  if(state.filters.onlyInStock && !(Number.isFinite(r.stock) ? r.stock > 0 : true)) return false;
+  if(state.filters.onlySelected && !getSelection(r.id).selected) return false;
+  if(state.filters.brands.size && !state.filters.brands.has(r.brand)) return false;
+  if(state.filters.types.size && !state.filters.types.has(r.type)) return false;
+  if(state.filters.viewMode === 'onlyAffordable' && r.price > Math.max(0, summary.remaining)) return false;
+  if(state.filters.viewMode === 'selectedOrCandidate' && !(getSelection(r.id).selected || isCandidate(r.id))) return false;
+  return true;
+}
+function getShareBuyer(){
+  const v = cleanString(state.shareBuyer || '');
+  return v;
+}
+function setStatus(msg, mode='ok'){
+  els.statusBox.className = `status ${mode}`;
+  els.statusBox.innerHTML = msg;
+}
+function splitNameSegments(name){
+  const t = cleanString(name);
+  const parts = t.split(/[—\-_/]/).map(s=>s.trim()).filter(Boolean);
+  const bracket = [...t.matchAll(/[【\[]([^】\]]+)[】\]]/g)].map(m=>m[1].trim()).filter(Boolean);
+  return [...new Set([...bracket, ...parts])];
+}
+function guessSpec(name){
+  const text = cleanString(name);
+  const m1 = text.match(/(\d+(?:\.\d+)?\s*(?:cm|mm|m))/ig);
+  if(m1 && m1.length) return m1.join(' / ');
+  const m2 = text.match(/[（(]([^()（）]*(?:尺寸|规格|cm|mm)[^()（）]*)[）)]/i);
+  if(m2 && m2[1]) return cleanString(m2[1]);
+  return '';
+}
+function guessType(name){
+  const text = cleanString(name);
+  const segments = splitNameSegments(text);
+  for(const seg of segments){
+    const cleanSeg = seg.replace(/[【】[\]]/g,'').trim();
+    if(QUICK_TYPE_BY_SEGMENT[cleanSeg]) return QUICK_TYPE_BY_SEGMENT[cleanSeg];
+  }
+  const lower = text.toLowerCase();
+  for(const [type, words] of activeTypeRules()){
+    if(words.some(w => lower.includes(w.toLowerCase()))) return type;
+  }
+  return '其他';
+}
+function guessBrandFromName(name){
+  const t = cleanString(name);
+  const m = t.match(/[【\[]([^】\]]+)[】\]]/);
+  return m && m[1] ? m[1].split(/[—\-_/]/)[0].trim() : '';
+}
+function detectMapping(headers){
+  const lower = headers.map(h => String(h).toLowerCase());
+  function pick(keys){
+    const idx = lower.findIndex(h => keys.some(k => h.includes(k)));
+    return idx >= 0 ? headers[idx] : '';
+  }
+  return {
+    code: pick(['货品编号','商品编号','编号','sku','编码']),
+    name: pick(['货品名称','产品名称','商品名称','品名','名称']),
+    brand: pick(['品牌','品牌名']),
+    spec: pick(['规格/尺寸','规格','尺寸']),
+    price: pick(['零售价','单价','价格','售价']),
+    stock: pick(['可发库存','库存']),
+    image: pick(['图片','图片链接','主图','img','image'])
+  };
+}
+function getOptionHTML(headers, value){
+  const options = [''].concat(headers);
+  return options.map(h => `<option value="${escapeHtml(h)}" ${h===value?'selected':''}>${h || '— 不使用该列 —'}</option>`).join('');
+}
+function renderMappingSelectors(){
+  els.mapCode.innerHTML = getOptionHTML(state.headers, state.mapping.code);
+  els.mapName.innerHTML = getOptionHTML(state.headers, state.mapping.name);
+  els.mapBrand.innerHTML = getOptionHTML(state.headers, state.mapping.brand);
+  els.mapSpec.innerHTML = getOptionHTML(state.headers, state.mapping.spec);
+  els.mapPrice.innerHTML = getOptionHTML(state.headers, state.mapping.price);
+  els.mapStock.innerHTML = getOptionHTML(state.headers, state.mapping.stock);
+  els.mapImage.innerHTML = getOptionHTML(state.headers, state.mapping.image);
+}
+function makeRowId(row, idx){
+  const code = cleanString(row.code);
+  const name = cleanString(row.name);
+  const brand = cleanString(row.brand);
+  const spec = cleanString(row.spec);
+  const price = Number.isFinite(Number(row.price)) ? Number(row.price) : 0;
+  const image = cleanString(row.image);
+  return code || `${name}__${brand}__${spec}__${price}__${image}` || `row__${idx}`;
+}
+function makeDedupKey(row){
+  const code = cleanString(row.code);
+  if(code) return `code::${code}`;
+  const name = cleanString(row.name);
+  const brand = cleanString(row.brand);
+  const spec = cleanString(row.spec);
+  const price = Number.isFinite(Number(row.price)) ? Number(row.price) : 0;
+  const image = cleanString(row.image);
+  return `fallback::${name}__${brand}__${spec}__${price}__${image}`;
+}
+function normalizeRow(raw, idx){
+  const map = state.mapping;
+  const name = cleanString(raw[map.name]);
+  const brand = cleanString(raw[map.brand]) || guessBrandFromName(name) || '未分类';
+  const spec = cleanString(raw[map.spec]) || guessSpec(name);
+  const price = Math.max(0, parseNumber(raw[map.price]) || 0);
+  const stock = Number.isFinite(parseNumber(raw[map.stock])) ? Number(parseNumber(raw[map.stock])) : null;
+  const image = cleanString(raw[map.image]);
+  const code = cleanString(raw[map.code]);
+  const type = guessType(name);
+  const row = {
+    idx,
+    code,
+    name: name || `未命名商品 ${idx+1}`,
+    brand,
+    type,
+    spec,
+    price,
+    stock,
+    image,
+    source: raw
+  };
+  row.id = makeRowId(row, idx);
+  row.dedupKey = makeDedupKey(row);
+  return row;
+}
+function buildRowsFromRaw(){
+  const normalized = state.rawRows.map((r, idx) => normalizeRow(r, idx)).filter(r => r.name);
+  const seen = new Map();
+  const deduped = [];
+  let removed = 0;
+
+  normalized.forEach((row) => {
+    const key = row.dedupKey || row.id;
+    if(seen.has(key)){
+      removed += 1;
+      const kept = seen.get(key);
+      if((!kept.image) && row.image) kept.image = row.image;
+      if((kept.stock == null) && row.stock != null) kept.stock = row.stock;
+      return;
+    }
+    seen.set(key, row);
+    deduped.push(row);
+  });
+
+  state.duplicateRowsRemoved = removed;
+  state.rows = deduped;
+  state.rowMap = Object.fromEntries(state.rows.map(r => [r.id, r]));
+  state.availableBrands = [...new Set(state.rows.map(r => r.brand).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh'));
+  state.availableTypes = [...new Set(state.rows.map(r => r.type).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'zh'));
+  applyPriceBounds(true);
+  renderFilterLists();
+  applyFilters();
+  els.rowChip.textContent = `${state.rows.length} 个商品`;
+}
+function mappedCellIsBlank(raw, key){
+  const col = state.mapping && state.mapping[key];
+  return !col || !cleanString(raw && raw[col]);
+}
+function buildImportStatus(prefix='已读入'){
+  const rows = state.rows || [];
+  const rawCount = state.rawRows.length;
+  const missingName = state.rawRows.filter(r => mappedCellIsBlank(r, 'name')).length;
+  const missingBrand = rows.filter(r => mappedCellIsBlank(r.source, 'brand')).length;
+  const missingPrice = rows.filter(r => !Number.isFinite(Number(r.price)) || Number(r.price) <= 0).length;
+  const missingImage = rows.filter(r => !r.image).length;
+  const stockUnknown = rows.filter(r => r.stock == null).length;
+  const otherType = rows.filter(r => r.type === '其他').length;
+  const issues = [];
+  if(missingName) issues.push(`商品名缺失 ${missingName} 行`);
+  if(missingBrand) issues.push(`品牌为空/需猜测 ${missingBrand} 个`);
+  if(missingPrice) issues.push(`价格缺失或为 0 的 ${missingPrice} 个`);
+  if(missingImage) issues.push(`没有图片 ${missingImage} 个`);
+  if(stockUnknown) issues.push(`库存未知 ${stockUnknown} 个`);
+  if(otherType) issues.push(`分类为“其他” ${otherType} 个`);
+  const dedupText = state.duplicateRowsRemoved ? `已合并重复商品 ${state.duplicateRowsRemoved} 条` : '未发现重复商品';
+  const detail = issues.length ? `检查提醒：${issues.join('，')}。` : '检查结果：价格、品牌、分类等信息看起来比较完整。';
+  const mode = rows.length && issues.length ? 'warn' : (rows.length ? 'good' : 'bad');
+  const fileText = state.fileName ? `${escapeHtml(state.fileName)}，` : '';
+  return {
+    mode,
+    rawCount,
+    rowCount: rows.length,
+    dedupText,
+    issues,
+    detail,
+    html:`${escapeHtml(prefix)} ${fileText}原始 ${rawCount} 行，整理后 ${rows.length} 个商品；${dedupText}。<br>${escapeHtml(detail)}`
+  };
+}
+function openImportCheck(status){
+  if(!els.importCheckModal) return;
+  const safeStatus = status || buildImportStatus();
+  els.importCheckStat.textContent = `原始 ${safeStatus.rawCount || 0} 行 · 整理后 ${safeStatus.rowCount || 0} 个商品`;
+  els.importCheckSummary.className = `status ${safeStatus.mode || 'ok'}`;
+  els.importCheckSummary.innerHTML = `重复检查：${escapeHtml(safeStatus.dedupText || '未发现重复商品')}`;
+  const issueRows = (safeStatus.issues || []).length
+    ? safeStatus.issues.map(item => `<tr><td>${escapeHtml(item)}</td></tr>`).join('')
+    : '<tr><td>没有明显异常，可以直接开始筛选。</td></tr>';
+  els.importCheckDetails.innerHTML = `<table class="order-preview-table"><tbody>${issueRows}</tbody></table>`;
+  els.importCheckModal.classList.add('open');
+  els.importCheckModal.setAttribute('aria-hidden','false');
+}
+function closeImportCheck(){
+  if(!els.importCheckModal) return;
+  els.importCheckModal.classList.remove('open');
+  els.importCheckModal.setAttribute('aria-hidden','true');
+}
+function renderFilterList(container, items, setRef){
+  container.innerHTML = items.length ? items.map(item => `
+    <label class="check-item">
+      <input type="checkbox" value="${escapeHtml(item)}" ${setRef.has(item)?'checked':''}/>
+      <span>${escapeHtml(item)}</span>
+    </label>`).join('') : '<div class="tiny">暂无可筛选项</div>';
+}
+function renderBrandFilterList(){
+  const items = sortBrandsForDisplay(state.availableBrands);
+  els.brandFilters.innerHTML = items.length ? items.map(item => {
+    const pinned = state.favoriteBrands.has(item);
+    return `
+      <div class="check-item brand-filter-item ${pinned ? 'pinned' : ''}">
+        <label class="filter-check-label">
+          <input type="checkbox" value="${escapeHtml(item)}" ${state.filters.brands.has(item)?'checked':''}/>
+          <span>${escapeHtml(item)}</span>
+        </label>
+        <button class="pin-brand-btn" type="button" data-pin-brand="${escapeHtml(item)}" title="${pinned ? '取消常用品牌' : '设为常用品牌'}" aria-label="${pinned ? '取消常用品牌' : '设为常用品牌'}">${pinned ? '★' : '☆'}</button>
+      </div>`;
+  }).join('') : '<div class="tiny">暂无可筛选项</div>';
+}
+function renderFilterLists(){
+  renderBrandFilterList();
+  renderFilterList(els.typeFilters, state.availableTypes, state.filters.types);
+  const pinnedCount = [...state.favoriteBrands].filter(b => state.availableBrands.includes(b)).length;
+  els.brandCount.textContent = state.filters.brands.size ? `已选 ${state.filters.brands.size}` : (pinnedCount ? `置顶 ${pinnedCount}` : '');
+  els.typeCount.textContent = state.filters.types.size ? `已选 ${state.filters.types.size}` : '';
+  renderTypeAssist();
+}
+function renderTypeTargetSelect(){
+  if(!els.typeTargetSelect) return;
+  const current = els.typeTargetSelect.value;
+  els.typeTargetSelect.innerHTML = getTypeNames()
+    .map(type => `<option value="${escapeHtml(type)}" ${type===current?'selected':''}>${escapeHtml(type)}</option>`)
+    .join('');
+}
+function otherTypeRows(){
+  return state.rows.filter(r => r.type === '其他');
+}
+function renderTypeAssist(){
+  if(!els.typeAssistBox || !els.typeAssistCount || !els.typeAssistList) return;
+  renderTypeTargetSelect();
+  const rows = otherTypeRows();
+  const customCount = Object.values(state.customTypeRules || {}).reduce((sum, words) => sum + (Array.isArray(words) ? words.length : 0), 0);
+  els.typeAssistCount.textContent = rows.length ? `待检查 ${rows.length}` : (state.rows.length ? '分类正常' : '待导入');
+  if(!state.rows.length){
+    els.typeAssistList.innerHTML = '<div class="tiny">导入清单后，这里会显示被分到“其他”的商品。</div>';
+    return;
+  }
+  if(!rows.length){
+    els.typeAssistList.innerHTML = `<div class="tiny">当前没有落到“其他”的商品。${customCount ? `已保存 ${customCount} 个自定义关键词。` : ''}</div>`;
+    return;
+  }
+  els.typeAssistList.innerHTML = rows.slice(0, 8).map(r => `
+    <button class="type-assist-item" type="button" data-keyword-suggest="${escapeHtml(suggestKeywordFromName(r.name))}">
+      ${escapeHtml(r.name)}
+    </button>
+  `).join('') + (rows.length > 8 ? `<div class="tiny">还有 ${rows.length - 8} 个，可通过商品名里的品类词继续补充。</div>` : '');
+}
+function suggestKeywordFromName(name){
+  const segments = splitNameSegments(name)
+    .map(s => s.replace(/[【】[\]（）()]/g,'').trim())
+    .filter(s => s && !/^\d+(?:\.\d+)?\s*(?:cm|mm|m)?$/i.test(s));
+  return segments.slice().reverse().find(s => s.length >= 2 && s.length <= 8) || segments[0] || cleanString(name).slice(0, 8);
+}
+function addCustomTypeKeyword(){
+  const keyword = cleanString(els.typeKeywordInput && els.typeKeywordInput.value);
+  const type = cleanString(els.typeTargetSelect && els.typeTargetSelect.value);
+  if(!keyword){ setStatus('请先输入一个分类关键词。','warn'); return; }
+  if(!type || type === '其他'){ setStatus('请选择要归入的分类。','warn'); return; }
+  const list = state.customTypeRules[type] || [];
+  if(!list.includes(keyword)) list.push(keyword);
+  state.customTypeRules[type] = list;
+  persistCustomTypeRules();
+  if(els.typeKeywordInput) els.typeKeywordInput.value = '';
+  if(state.rawRows.length) buildRowsFromRaw();
+  else renderTypeAssist();
+  setStatus(`已把“${escapeHtml(keyword)}”加入“${escapeHtml(type)}”分类关键词。`,'good');
+}
+function resetCustomTypeKeywords(){
+  state.customTypeRules = {};
+  persistCustomTypeRules();
+  if(state.rawRows.length) buildRowsFromRaw();
+  else renderTypeAssist();
+  setStatus('自定义分类关键词已重置。','good');
+}
+function updateSetFromContainer(container, setRef){
+  setRef.clear();
+  container.querySelectorAll('input[type="checkbox"]:checked').forEach(i => setRef.add(i.value));
+}
+function getSelection(id){
+  const curr = state.selections[id];
+  return curr && typeof curr === 'object' ? curr : {selected:false, qty:0};
+}
+function isCandidate(id){
+  return !!state.candidates[id];
+}
+function isCompared(id){
+  return !!state.compare[id];
+}
+function comparedRows(){
+  return state.rows.filter(r => state.compare[r.id]);
+}
+function getRowById(id){
+  return state.rowMap[id] || state.rows.find(r => r.id === id) || null;
+}
+function needsCardListRerenderForSelectionChange(){
+  const sortBy = state.filters.sortBy;
+  const viewMode = state.filters.viewMode;
+  return !!(
+    state.filters.onlySelected ||
+    viewMode === 'onlyAffordable' ||
+    viewMode === 'selectedOrCandidate' ||
+    sortBy === 'selectedFirst' ||
+    sortBy === 'budgetFit'
+  );
+}
+function toggleCompare(id){
+  if(state.compare[id]) delete state.compare[id];
+  else{
+    const currentIds = Object.keys(state.compare);
+    if(currentIds.length >= 4){
+      delete state.compare[currentIds[0]];
+    }
+    state.compare[id] = true;
+  }
+  persistState();
+}
+function clearCompare(){
+  pushHistory();
+  state.compare = {};
+  persistState();
+  refreshAll(true);
+  setStatus('对比小桌已经清空。','good');
+}
+function removeCompare(id){
+  delete state.compare[id];
+  persistState();
+}
+function setSelected(id, selected, qty){
+  const curr = getSelection(id);
+  if(selected){
+    const raw = Number(qty ?? curr.qty ?? 0);
+    const nextQty = Math.max(1, Number.isFinite(raw) ? Math.floor(raw) : 0);
+    state.selections[id] = { selected:true, qty: nextQty || 1 };
+  }else{
+    delete state.selections[id];
+  }
+  persistState();
+}
+function setQty(id, qty){
+  const raw = Number(qty);
+  const q = Number.isFinite(raw) ? Math.floor(raw) : 0;
+  if(q <= 0){
+    delete state.selections[id];
+    persistState();
+    return;
+  }
+  state.selections[id] = { selected: true, qty: q };
+  persistState();
+}
+function toggleCandidate(id){
+  if(state.candidates[id]) delete state.candidates[id];
+  else state.candidates[id] = true;
+  persistState();
+}
+function removeCandidate(id){
+  delete state.candidates[id];
+  persistState();
+}
+function removeSelection(id){
+  delete state.selections[id];
+  persistState();
+}
+function isRowOverBudget(row, summary){
+  return !!(row && row.price > Math.max(0, summary.remaining) && summary.remaining <= Math.max(50, state.budget*0.5));
+}
+function makeBudgetMaskHTML(row, summary){
+  if(!isRowOverBudget(row, summary)) return '';
+  return `<div class="budget-mask">单价 ${escapeHtml(fmtMoney(row.price))}<br>高于剩余 ${escapeHtml(fmtMoney(Math.max(0, summary.remaining)))}</div>`;
+}
+function updateCardSelectionState(card, row, summary, highlight=false){
+  if(!card || !row) return;
+  const sel = getSelection(row.id);
+  const selected = !!sel.selected;
+  const qty = selected ? Math.max(1, Number(sel.qty) || 1) : 0;
+  const overBudget = isRowOverBudget(row, summary);
+  card.classList.toggle('selected', selected);
+  card.classList.toggle('over-budget', overBudget);
+  if(highlight){
+    card.classList.remove('just-updated');
+    void card.offsetWidth;
+    card.classList.add('just-updated');
+    setTimeout(()=>card.classList.remove('just-updated'), 420);
+  }
+  const qtyInput = card.querySelector('.qty-input');
+  if(qtyInput){
+    qtyInput.value = qty;
+    qtyInput.disabled = !selected;
+  }
+  const toggle = card.querySelector('.select-toggle');
+  if(toggle) toggle.checked = selected;
+  const maskHtml = makeBudgetMaskHTML(row, summary);
+  const top = card.querySelector('.card-top');
+  const existingMask = card.querySelector('.budget-mask');
+  if(maskHtml){
+    if(existingMask) existingMask.outerHTML = maskHtml;
+    else if(top) top.insertAdjacentHTML('beforeend', maskHtml);
+  }else if(existingMask){
+    existingMask.remove();
+  }
+}
+function updateVisibleBudgetStates(summary, skipId=''){
+  els.cards.querySelectorAll('.card[data-id]').forEach(card => {
+    const id = card.dataset.id;
+    if(skipId && id === skipId) return;
+    const row = getRowById(id);
+    if(!row) return;
+    const overBudget = isRowOverBudget(row, summary);
+    card.classList.toggle('over-budget', overBudget);
+    const maskHtml = makeBudgetMaskHTML(row, summary);
+    const top = card.querySelector('.card-top');
+    const existingMask = card.querySelector('.budget-mask');
+    if(maskHtml){
+      if(existingMask) existingMask.outerHTML = maskHtml;
+      else if(top) top.insertAdjacentHTML('beforeend', maskHtml);
+    }else if(existingMask){
+      existingMask.remove();
+    }
+  });
+}
+function refreshAfterSelectionChange(anchorId=''){
+  if(needsCardListRerenderForSelectionChange()){
+    refreshAll(true, anchorId);
+    return;
+  }
+  renderSummaryAndExport();
+  renderSideLists();
+  renderRecommendations();
+  const summary = selectedSummary();
+  updateVisibleBudgetStates(summary, anchorId);
+  if(anchorId){
+    const card = els.cards.querySelector(`.card[data-id="${CSS.escape(anchorId)}"]`);
+    const row = getRowById(anchorId);
+    if(card && row) updateCardSelectionState(card, row, summary, true);
+  }
+  if(els.lightbox.classList.contains('open')) renderLightbox();
+  syncMobileQuickControls();
+  persistState();
+  triggerFeedbackPulse(anchorId);
+}
+function quickAddByCard(id){
+  pushHistory();
+  const curr = getSelection(id);
+  const base = curr.selected ? Math.max(1, Number(curr.qty)||1) : 0;
+  setQty(id, base + 1);
+  setStatus('已加入购物车，并帮你 +1。','good');
+  refreshAfterSelectionChange(id);
+}
+function addToCandidate(id){
+  pushHistory();
+  toggleCandidate(id);
+  setStatus(state.candidates[id] ? '已加入候选。' : '已从候选移出。','good');
+  refreshAll(true, id);
+}
+function addToCompare(id){
+  pushHistory();
+  const existed = isCompared(id);
+  toggleCompare(id);
+  const rows = comparedRows();
+  setStatus(existed ? '已移出对比小桌。' : `已放到对比小桌（当前 ${rows.length}/4）。`,'good');
+  refreshAll(true, id);
+}
+function selectedSummary(){
+  const rows = state.rows.filter(r => getSelection(r.id).selected);
+  const kinds = rows.length;
+  let qty = 0, total = 0;
+  rows.forEach(r => {
+    const q = Math.max(1, Number(getSelection(r.id).qty) || 1);
+    qty += q;
+    total += q * (r.price || 0);
+  });
+  return { rows, kinds, qty, total, remaining: state.budget - total };
+}
+function candidateRows(){
+  return state.rows.filter(r => state.candidates[r.id]);
+}
+function sortRows(rows){
+  const by = state.filters.sortBy;
+  const remaining = Math.max(0, selectedSummary().remaining);
+  const arr = rows.slice();
+  if(by === 'priceAsc') arr.sort((a,b) => (a.price||0) - (b.price||0) || a.name.localeCompare(b.name,'zh'));
+  else if(by === 'priceDesc') arr.sort((a,b) => (b.price||0) - (a.price||0) || a.name.localeCompare(b.name,'zh'));
+  else if(by === 'brandAsc') arr.sort((a,b) => a.brand.localeCompare(b.brand,'zh') || a.name.localeCompare(b.name,'zh'));
+  else if(by === 'selectedFirst') arr.sort((a,b) => Number(getSelection(b.id).selected) - Number(getSelection(a.id).selected) || a.name.localeCompare(b.name,'zh'));
+  else if(by === 'candidateFirst') arr.sort((a,b) => Number(isCandidate(b.id)) - Number(isCandidate(a.id)) || a.name.localeCompare(b.name,'zh'));
+  else if(by === 'budgetFit'){
+    arr.sort((a,b) => {
+      const da = Math.abs((a.price||0) - remaining);
+      const db = Math.abs((b.price||0) - remaining);
+      const pa = (a.price||0) > remaining ? 1 : 0;
+      const pb = (b.price||0) > remaining ? 1 : 0;
+      return pa - pb || da - db || (a.price||0) - (b.price||0);
+    });
+  }
+  return arr;
+}
+function applyFilters(skipListSync=false){
+  state.filters.search = cleanString(els.searchInput.value).toLowerCase();
+  normalizePriceRangeValues();
+  state.filters.onlyInStock = !!(els.onlyInStock && els.onlyInStock.checked);
+  state.filters.onlySelected = !!(els.onlySelected && els.onlySelected.checked);
+  state.filters.sortBy = els.sortSelect.value || 'default';
+  state.filters.viewMode = els.viewModeSelect.value || 'all';
+  updateSetFromContainer(els.brandFilters, state.filters.brands);
+  updateSetFromContainer(els.typeFilters, state.filters.types);
+  const s = selectedSummary();
+  const baseRows = state.rows.filter(r => rowMatchesNonPriceFilters(r, s));
+  updatePriceFilterUI(baseRows);
+  let rows = baseRows.filter(r => rowMatchesSelectedPriceBins(r));
+  rows = sortRows(rows);
+  state.visibleRows = rows;
+  if(!skipListSync) renderFilterLists();
+  refreshAll();
+}
+function makeCard(row, summary){
+  const sel = getSelection(row.id);
+  const selected = !!sel.selected;
+  const qty = selected ? Math.max(1, Number(sel.qty) || 1) : 0;
+  const candidate = isCandidate(row.id);
+  const compared = isCompared(row.id);
+  const highlighted = state.highlightCardId && row.id === state.highlightCardId;
+  const overBudget = isRowOverBudget(row, summary);
+  const imageHtml = row.image ? `<img src="${escapeHtml(row.image)}" alt="${escapeHtml(row.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.classList.add('hidden'); this.parentNode.querySelector('.no-image').classList.remove('hidden');">` : '';
+  const budgetMask = makeBudgetMaskHTML(row, summary);
+  return `
+    <article class="card ${selected?'selected':''} ${candidate?'candidate':''} ${compared?'compared':''} ${overBudget?'over-budget':''} ${highlighted?'just-updated':''}" data-id="${escapeHtml(row.id)}">
+      <div class="card-top">
+        ${imageHtml}
+        <div class="no-image ${row.image?'hidden':''}">暂时没有图片</div>
+        <button class="preview-btn" type="button" data-action="preview" data-id="${escapeHtml(row.id)}" title="查看大图" aria-label="查看大图">🔍</button>
+        <div class="badge-row">
+          <span class="badge">${escapeHtml(row.brand)}</span>
+          <span class="badge ${row.stock===0?'stock0':'stockok'}">${row.stock==null?'库存未知':(row.stock>0?`库存 ${escapeHtml(row.stock)}`:'无库存')}</span>
+          ${candidate ? '<span class="badge candidate-badge">已候选</span>' : ''}
+          ${compared ? '<span class="badge compare-chip">已对比</span>' : ''}
+        </div>
+        ${budgetMask}
+      </div>
+      <div class="card-body">
+        <div class="title">${escapeHtml(row.name)}</div>
+        <div class="meta">
+          <div class="meta-line"><b>类型：</b>${escapeHtml(row.type)}</div>
+          <div class="meta-line"><b>编号：</b>${escapeHtml(row.code || '—')}</div>
+          <div class="meta-line"><b>规格：</b>${escapeHtml(row.spec || '—')}</div>
+        </div>
+        <div class="actions">
+          <div class="action-row">
+            <div class="price-big">${escapeHtml(fmtMoney(row.price))}</div>
+            <div class="row wrap" style="justify-content:flex-end">
+              <button class="btn small secondary compare-toggle" data-id="${escapeHtml(row.id)}">${compared ? '移出对比' : '加入对比'}</button>
+              <button class="btn small secondary candidate-toggle" data-id="${escapeHtml(row.id)}">${candidate ? '移出候选' : '先放候选'}</button>
+            </div>
+          </div>
+          <div class="action-row">
+            <div class="qty-wrap">
+              <button class="btn small secondary qty-minus" data-id="${escapeHtml(row.id)}">－</button>
+              <input class="qty-input" data-id="${escapeHtml(row.id)}" type="number" min="0" value="${qty}" ${selected?'':'disabled'} />
+              <button class="btn small secondary qty-plus" data-id="${escapeHtml(row.id)}">＋</button>
+            </div>
+            <label class="quick-toggle" title="勾选加入购物车" aria-label="勾选加入购物车"><input class="select-toggle" data-id="${escapeHtml(row.id)}" type="checkbox" ${selected?'checked':''} /></label>
+          </div>
+        </div>
+      </div>
+    </article>
+  `;
+}
+function renderCards(highlightId='', onDone=null){
+  const s = selectedSummary();
+  state.renderToken += 1;
+  const token = state.renderToken;
+  state.highlightCardId = highlightId || '';
+  const prevHeight = els.cards.offsetHeight || 0;
+  const hadContent = !!els.cards.childElementCount;
+  if(prevHeight > 0) els.cards.style.minHeight = prevHeight + 'px';
+
+  const finalize = (swapFn)=>{
+    if(token !== state.renderToken) return;
+    if(hadContent) els.cards.classList.add('is-soft-updating');
+    requestAnimationFrame(()=>{
+      if(token !== state.renderToken) return;
+      swapFn();
+      requestAnimationFrame(()=>{
+        els.cards.classList.remove('is-soft-updating');
+        els.cards.style.minHeight = '';
+        if(typeof onDone === 'function') onDone();
+      });
+    });
+  };
+
+  if(!state.rows.length){
+    els.showChip.textContent = '当前显示 0 个';
+    finalize(()=>{ els.cards.innerHTML = '<div class="empty">先放入本月 Excel 清单吧。</div>'; });
+    return;
+  }
+  if(!state.visibleRows.length){
+    els.showChip.textContent = '当前显示 0 个';
+    finalize(()=>{ els.cards.innerHTML = '<div class="empty">当前条件下没有商品，换个筛选试试。</div>'; });
+    return;
+  }
+
+  els.showChip.textContent = `当前显示 ${state.visibleRows.length} 个`;
+  const chunkSize = window.innerWidth <= 760 ? 24 : 48;
+  let index = 0;
+  const buffer = document.createElement('div');
+  function appendChunk(){
+    if(token !== state.renderToken) return;
+    const frag = document.createDocumentFragment();
+    const end = Math.min(index + chunkSize, state.visibleRows.length);
+    for(; index < end; index++){
+      const wrap = document.createElement('div');
+      wrap.innerHTML = makeCard(state.visibleRows[index], s);
+      frag.appendChild(wrap.firstElementChild);
+    }
+    buffer.appendChild(frag);
+    if(index < state.visibleRows.length){
+      requestAnimationFrame(appendChunk);
+    }else{
+      finalize(()=>{ els.cards.replaceChildren(...Array.from(buffer.childNodes)); });
+    }
+  }
+  requestAnimationFrame(appendChunk);
+}
+function triggerFeedbackPulse(anchorId=''){
+  [els.selectedTotal, els.remainingShow, els.cartTotalBig, els.cartTotalBigMobile, els.budgetFloatRemaining].forEach(el=>{
+    if(!el) return;
+    el.classList.remove('flash-pop');
+    void el.offsetWidth;
+    el.classList.add('flash-pop');
+    setTimeout(()=>el.classList.remove('flash-pop'), 380);
+  });
+  if(anchorId){
+    const card = els.cards.querySelector(`.card[data-id="${CSS.escape(anchorId)}"]`);
+    if(card){
+      card.classList.remove('just-updated');
+      void card.offsetWidth;
+      card.classList.add('just-updated');
+      setTimeout(()=>card.classList.remove('just-updated'), 480);
+    }
+  }
+}
+function renderSideLists(){
+  const s = selectedSummary();
+  const cartRows = s.rows;
+  const candRows = candidateRows();
+
+  function itemHtml(r, kind){
+    const sel = getSelection(r.id);
+    const qty = Math.max(1, Number(sel.qty) || 1);
+    const thumb = r.image ? `<img src="${escapeHtml(r.image)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">` : '';
+    const actions = kind === 'cart'
+      ? `<div class="side-actions">
+           <div class="qty-wrap">
+             <button class="btn small secondary side-minus" data-id="${escapeHtml(r.id)}">－</button>
+             <input class="qty-input side-qty" data-id="${escapeHtml(r.id)}" type="number" min="0" value="${qty}" />
+             <button class="btn small secondary side-plus" data-id="${escapeHtml(r.id)}">＋</button>
+           </div>
+           <button class="btn small danger side-remove-selection" data-id="${escapeHtml(r.id)}">删除</button>
+         </div>`
+      : `<div class="side-actions">
+           <button class="btn small primary side-move-to-cart" data-id="${escapeHtml(r.id)}">加购 +1</button>
+           <button class="btn small danger side-remove-candidate" data-id="${escapeHtml(r.id)}">移出</button>
+         </div>`;
+    return `<div class="side-item">
+      <div class="side-thumb">${thumb}</div>
+      <div>
+        <div class="side-name">${escapeHtml(r.name)}</div>
+        <div class="side-meta">${escapeHtml(r.brand)} · ${escapeHtml(r.type)}<br>${escapeHtml(fmtMoney(r.price))}${kind==='cart' ? ` · 小计 ${escapeHtml(fmtMoney(qty*r.price))}`:''}</div>
+      </div>
+      ${actions}
+    </div>`;
+  }
+  function groupedCartHtml(rows){
+    if(!rows.length) return '<div class="side-empty">购物车还空着。<br>点卡片空白处就会 +1。</div>';
+    const groups = new Map();
+    rows.forEach(r => {
+      const brand = r.brand || '未分类品牌';
+      if(!groups.has(brand)) groups.set(brand, []);
+      groups.get(brand).push(r);
+    });
+    return [...groups.entries()].map(([brand, list]) => {
+      let qty = 0, total = 0;
+      list.forEach(r => {
+        const q = Math.max(1, Number(getSelection(r.id).qty) || 1);
+        qty += q;
+        total += q * (r.price || 0);
+      });
+      return `<details class="cart-brand-group" open>
+        <summary>
+          <span>${escapeHtml(brand)}</span>
+          <span class="cart-brand-meta">${list.length} 款 · ${qty} 件 · ${escapeHtml(fmtMoney(total))}</span>
+        </summary>
+        <div class="cart-brand-items">${list.map(r => itemHtml(r,'cart')).join('')}</div>
+      </details>`;
+    }).join('');
+  }
+
+  els.cartList.innerHTML = groupedCartHtml(cartRows);
+  els.cartListMobile.innerHTML = els.cartList.innerHTML;
+  els.candidateList.innerHTML = candRows.length ? candRows.map(r => itemHtml(r,'cand')).join('') : '<div class="side-empty">暂时不确定的商品可以先放这里。</div>';
+  els.candidateListMobile.innerHTML = els.candidateList.innerHTML;
+
+  const cartStat = `${s.kinds} 个商品 · ${s.qty} 件`;
+  const candStat = `${candRows.length} 个待考虑`;
+  els.cartMiniStat.textContent = cartStat;
+  els.cartMiniStatMobile.textContent = cartStat;
+  els.candidateMiniStat.textContent = candStat;
+  els.candidateMiniStatMobile.textContent = candStat;
+  els.cartTotalBig.textContent = fmtMoney(s.total);
+  els.cartTotalBigMobile.textContent = fmtMoney(s.total);
+
+  const hint = s.remaining >= Math.max(60, state.budget*0.35)
+    ? '预算还很宽裕，慢慢挑就好。'
+    : s.remaining >= 0
+      ? `还剩 ${fmtMoney(s.remaining)}，可以优先看更贴合预算的款。`
+      : `已超出 ${fmtMoney(Math.abs(s.remaining))}，先撤掉一件高价款会轻松点。`;
+  els.budgetHint.textContent = hint;
+  els.budgetHintMobile.textContent = hint;
+}
+
+function renderComparePanel(){
+  const rows = comparedRows();
+  els.compareMiniStat.textContent = `${rows.length} 个待对比`;
+  if(!rows.length){
+    els.compareList.innerHTML = '<div class="compare-empty">把犹豫款放进这里，再一起对比。</div>';
+    els.compareGrid.innerHTML = '<div class="compare-empty">对比小桌还空着。商品卡片里点“加入对比”即可。</div>';
+    els.compareModalStat.textContent = '最多同时对比 4 个商品';
+    return;
+  }
+  els.compareList.innerHTML = rows.map(r => `
+    <div class="compare-item">
+      <div>
+        <div class="compare-name">${escapeHtml(r.name)}</div>
+        <div class="compare-meta">${escapeHtml(r.brand)} · ${escapeHtml(r.type)} · ${escapeHtml(fmtMoney(r.price))}</div>
+      </div>
+      <div class="compare-actions">
+        <button class="btn small secondary compare-open-one" data-id="${escapeHtml(r.id)}">查看</button>
+        <button class="btn small danger compare-remove" data-id="${escapeHtml(r.id)}">移出</button>
+      </div>
+    </div>
+  `).join('');
+  els.compareGrid.innerHTML = rows.map(r => `
+    <div class="compare-card">
+      <div class="compare-cover">${r.image ? `<img src="${escapeHtml(r.image)}" alt="${escapeHtml(r.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">` : '<div class="fallback">暂时没有图片</div>'}</div>
+      <div class="compare-body">
+        <div class="compare-title">${escapeHtml(r.name)}</div>
+        <div class="row wrap">
+          <span class="compare-tag">${escapeHtml(r.brand)}</span>
+          <span class="compare-tag">${escapeHtml(r.type)}</span>
+          <span class="compare-tag">${escapeHtml(fmtMoney(r.price))}</span>
+        </div>
+        <div class="kv"><b>商品编号：</b>${escapeHtml(r.code || '—')}</div>
+        <div class="kv"><b>规格/尺寸：</b>${escapeHtml(r.spec || '—')}</div>
+        <div class="kv"><b>库存：</b>${r.stock==null ? '未知' : escapeHtml(r.stock)}</div>
+      </div>
+      <div class="compare-actions" style="padding:0 14px 14px">
+        <button class="btn small primary compare-add-cart" data-id="${escapeHtml(r.id)}">加购 +1</button>
+        <button class="btn small danger compare-remove" data-id="${escapeHtml(r.id)}">移出对比</button>
+      </div>
+    </div>
+  `).join('');
+  els.compareModalStat.textContent = `${rows.length} 个商品正在对比`;
+}
+function budgetRecommendations(){
+  const s = selectedSummary();
+  const pool = (state.visibleRows.length ? state.visibleRows : state.rows).filter(r => !getSelection(r.id).selected);
+  const remaining = Math.max(0, s.remaining);
+  const fit = pool
+    .filter(r => r.price > 0 && r.price <= remaining)
+    .sort((a,b) => Math.abs(remaining - a.price) - Math.abs(remaining - b.price) || a.price - b.price)
+    .slice(0, 5);
+  const over = s.rows
+    .slice()
+    .sort((a,b) => (b.price||0) - (a.price||0))
+    .slice(0, 5);
+  return {fit, over, summary:s};
+}
+function renderRecommendations(){
+  const {fit, over, summary:s} = budgetRecommendations();
+  const blocks = [];
+  if(s.remaining >= 0){
+    els.recommendMiniStat.textContent = `还剩 ${fmtMoney(s.remaining)} 可以挑`;
+    if(fit.length){
+      blocks.push(...fit.map(r => `
+        <div class="rec-item">
+          <div>
+            <div class="rec-name">${escapeHtml(r.name)}</div>
+            <div class="rec-meta">${escapeHtml(r.brand)} · ${escapeHtml(fmtMoney(r.price))} · 距离满额差 ${escapeHtml(fmtMoney(Math.max(0, s.remaining - r.price)))}</div>
+          </div>
+          <div class="compare-actions">
+            <button class="btn small primary rec-add" data-id="${escapeHtml(r.id)}">加购</button>
+            <button class="btn small secondary rec-compare" data-id="${escapeHtml(r.id)}">对比</button>
+          </div>
+        </div>`));
+    }else{
+      blocks.push('<div class="compare-empty">当前筛选范围里，暂时没有更贴合剩余预算的款。</div>');
+    }
+  }else{
+    els.recommendMiniStat.textContent = `已超 ${fmtMoney(Math.abs(s.remaining))}`;
+    blocks.push(...over.map(r => `
+      <div class="rec-item">
+        <div>
+          <div class="rec-name">${escapeHtml(r.name)}</div>
+          <div class="rec-meta">${escapeHtml(r.brand)} · ${escapeHtml(fmtMoney(r.price))} · 移除后预计回收 ${escapeHtml(fmtMoney(r.price))}</div>
+        </div>
+        <div class="compare-actions">
+          <button class="btn small danger rec-remove" data-id="${escapeHtml(r.id)}">移出</button>
+          <button class="btn small secondary rec-compare" data-id="${escapeHtml(r.id)}">对比</button>
+        </div>
+      </div>`));
+  }
+  els.recommendList.innerHTML = blocks.join('');
+}
+function openCompareModal(){
+  renderComparePanel();
+  els.compareModal.classList.add('open');
+}
+function closeCompareModal(){
+  els.compareModal.classList.remove('open');
+}
+function syncMobileQuickControls(){
+  if(!els.budgetInputMobile) return;
+  els.budgetInputMobile.value = els.budgetInput.value || String(state.budget);
+  els.searchInputMobile.value = els.searchInput.value || '';
+  els.sortSelectMobile.value = els.sortSelect.value || 'default';
+  els.viewModeSelectMobile.value = els.viewModeSelect.value || 'all';
+  if(els.onlyInStockMobile && els.onlyInStock) els.onlyInStockMobile.checked = !!els.onlyInStock.checked;
+  if(els.onlySelectedMobile && els.onlySelected) els.onlySelectedMobile.checked = !!els.onlySelected.checked;
+}
+function applyMobileQuickControls(){
+  els.budgetInput.value = els.budgetInputMobile.value;
+  els.searchInput.value = els.searchInputMobile.value;
+  els.sortSelect.value = els.sortSelectMobile.value;
+  els.viewModeSelect.value = els.viewModeSelectMobile.value;
+  if(els.onlyInStock && els.onlyInStockMobile) els.onlyInStock.checked = !!els.onlyInStockMobile.checked;
+  if(els.onlySelected && els.onlySelectedMobile) els.onlySelected.checked = !!els.onlySelectedMobile.checked;
+  const n = parseNumber(els.budgetInput.value);
+  state.budget = Number.isFinite(n) ? Math.max(0, n) : 0;
+  persistState();
+  applyFilters();
+  closeDrawers();
+}
+function renderShareCard(){
+  const s = selectedSummary();
+  const rows = s.rows;
+  const count = rows.length;
+  const cols = count <= 1 ? 1 : (count === 2 ? 2 : 3);
+  const cardWidth = cols === 1 ? 820 : (cols === 2 ? 980 : 1120);
+  const brandSet = [...new Set(rows.map(r => r.brand).filter(Boolean))];
+  const buyer = getShareBuyer();
+  const buyerText = buyer ? `选购人：${escapeHtml(buyer)} · ` : '';
+  els.shareCard.style.width = `${cardWidth}px`;
+  els.shareCard.innerHTML = `
+    <div class="share-shell">
+      <div class="share-head">
+        <div>
+          <div class="share-title">内购选择清单</div>
+          <div class="share-sub">${buyerText}选品确认图</div>
+        </div>
+        <div>
+          <div class="share-total">总价 ${escapeHtml(fmtMoney(s.total))} · 共 ${escapeHtml(s.qty)} 件</div>
+          <div class="share-summary">${escapeHtml(brandSet.slice(0,6).join(' / ') || '品牌合集')}${brandSet.length > 6 ? ' 等' : ''}</div>
+        </div>
+      </div>
+      <div class="share-grid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">
+        ${rows.map(r => {
+          const q = Math.max(1, Number(getSelection(r.id).qty)||1);
+          return `<div class="share-item">
+            <div class="share-item-cover">
+              <div class="share-item-cover-inner">${r.image ? `<img src="${escapeHtml(r.image)}" alt="${escapeHtml(r.name)}" crossorigin="anonymous">` : '<div class="fallback">暂时没有图片</div>'}</div>
+            </div>
+            <div class="share-item-body">
+              <div class="share-item-title">${escapeHtml(r.name)}</div>
+              <div class="share-item-meta">${escapeHtml(r.brand)} · ${escapeHtml(r.type)}<br>单价 ${escapeHtml(fmtMoney(r.price))} · 数量 ${escapeHtml(q)} · 小计 ${escapeHtml(fmtMoney(q*r.price))}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="share-foot">© 2026 Timins米团子＆ybk · 内购挑选助手</div>
+    </div>
+  `;
+}
+async function exportSelectedAsJpg(){
+  const rows = buildOrderRows();
+  if(!rows.length){ setStatus('购物车还空着，暂时没有可以导出的分享图。','warn'); return; }
+  renderShareCard();
+  try{
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const rect = els.shareCard.getBoundingClientRect();
+    const canvas = await html2canvas(els.shareCard, {
+      backgroundColor:'#ffffff',
+      scale:2,
+      useCORS:true,
+      logging:false,
+      width: Math.ceil(rect.width),
+      height: Math.ceil(rect.height),
+      windowWidth: Math.ceil(rect.width + 40),
+      windowHeight: Math.ceil(rect.height + 40),
+      scrollX: 0,
+      scrollY: 0
+    });
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/jpeg', 0.94);
+    a.download = `内购选择清单_${new Date().toISOString().slice(0,10)}.jpg`;
+    a.click();
+    setStatus('分享图已导出。','good');
+  }catch(e){
+    console.error(e);
+    setStatus('分享图导出失败，可能是部分图片源站禁止跨域读取。可以先改用文字订购单。','warn');
+  }
+}
+
+function updateBudgetFloat(){
+  const s = selectedSummary();
+  const budget = Math.max(0, Number(state.budget||0));
+  const remaining = s.remaining;
+  const ratio = budget > 0 ? remaining / budget : 0;
+  let mode='good', title='余额充足', tip='预算还很宽裕，可以继续挑选。';
+  if(remaining < 0){
+    mode='bad'; title='超预算啦'; tip=`已经超出 ${fmtMoney(Math.abs(remaining))}，先移除一两件高价款会轻松点。`;
+  }else if(ratio <= 0.25 || remaining <= 50){
+    mode='bad'; title='余额紧张'; tip=`只剩 ${fmtMoney(remaining)}，高于余额的商品会自动变灰。`;
+  }else if(ratio <= 0.55){
+    mode='warn'; title='留意余额'; tip=`还剩 ${fmtMoney(remaining)}，可以优先看更贴合预算的款。`;
+  }
+  els.budgetFloat.classList.remove('good','warn','bad');
+  els.budgetFloat.classList.add(mode);
+  els.budgetFloatTitle.textContent = title;
+  els.budgetFloatRemaining.textContent = fmtMoney(remaining);
+  els.budgetFloatBubbleRemaining.textContent = fmtMoney(remaining);
+  els.budgetFloatTip.textContent = tip;
+  els.budgetFloatTotal.textContent = fmtMoney(s.total);
+  els.budgetFloatBudget.textContent = fmtMoney(budget);
+}
+function renderSummaryAndExport(){
+  const s = selectedSummary();
+  els.selectedKinds.textContent = String(s.kinds);
+  els.selectedQty.textContent = String(s.qty);
+  els.candidateKinds.textContent = String(candidateRows().length);
+  els.selectedTotal.textContent = fmtMoney(s.total);
+  els.budgetShow.textContent = fmtMoney(state.budget);
+  els.remainingShow.textContent = fmtMoney(s.remaining);
+  buildOrderOutput();
+  updateBudgetFloat();
+}
+function buildOrderRows(){
+  const s = selectedSummary();
+  const rows = s.rows.map((r, idx) => {
+    const q = Math.max(1, Number(getSelection(r.id).qty)||1);
+    const subtotal = q * (r.price||0);
+    return [
+      r.brand || '',
+      r.name || '',
+      r.code || '',
+      r.spec || '',
+      Number(r.price||0).toFixed(2),
+      q,
+      subtotal.toFixed(2),
+      idx === 0 ? s.total.toFixed(2) : ''
+    ];
+  });
+  return rows;
+}
+function buildOrderOutput(){
+  const header = ['IP名','产品名称','商品编号','规格/尺寸','商品单价','数量','商品总价','总额'];
+  const rows = buildOrderRows();
+  const all = [header].concat(rows);
+  els.orderOutput.value = all.map(r => r.join('\t')).join('\n');
+}
+async function copyOrderToClipboard(){
+  if(!buildOrderRows().length){ setStatus('购物车还空着，暂时没有可以复制的内容。','warn'); return; }
+  openOrderPreview('copy');
+}
+async function executeCopyOrderToClipboard(){
+  try{
+    await navigator.clipboard.writeText(els.orderOutput.value);
+    setStatus('订购单已经复制好啦。','good');
+  }catch(e){
+    els.orderOutput.select();
+    document.execCommand('copy');
+    setStatus('已尝试复制订购单。','good');
+  }
+}
+function downloadOrderCSV(){
+  const rows = buildOrderRows();
+  if(!rows.length){ setStatus('购物车还空着，暂时没有可以下载的内容。','warn'); return; }
+  openOrderPreview('download');
+}
+function executeDownloadOrderCSV(){
+  const header = ['IP名','产品名称','商品编号','规格/尺寸','商品单价','数量','商品总价','总额'];
+  const rows = buildOrderRows();
+  const csv = [header].concat(rows).map(r => r.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(["\ufeff"+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `内购订购单_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+function openOrderPreview(action){
+  const rows = buildOrderRows();
+  if(!rows.length){ setStatus('购物车还空着，暂时没有可以导出的内容。','warn'); return; }
+  pendingOrderAction = action;
+  const header = ['IP名','产品名称','商品编号','规格/尺寸','商品单价','数量','商品总价'];
+  const s = selectedSummary();
+  els.orderPreviewStat.textContent = `${s.kinds} 款 · ${s.qty} 件 · 合计 ${fmtMoney(s.total)}`;
+  els.confirmOrderPreviewBtn.textContent = action === 'download' ? '确认下载 CSV' : '确认复制订购单';
+  els.orderPreviewTable.innerHTML = `
+    <table class="order-preview-table">
+      <thead><tr>${header.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(r => `<tr>${r.slice(0,7).map(v => `<td>${escapeHtml(v)}</td>`).join('')}</tr>`).join('')}</tbody>
+      <tfoot><tr><td colspan="6">总额</td><td>${escapeHtml(s.total.toFixed(2))}</td></tr></tfoot>
+    </table>`;
+  els.orderPreviewModal.classList.add('open');
+  els.orderPreviewModal.setAttribute('aria-hidden','false');
+}
+function closeOrderPreview(){
+  pendingOrderAction = '';
+  if(!els.orderPreviewModal) return;
+  els.orderPreviewModal.classList.remove('open');
+  els.orderPreviewModal.setAttribute('aria-hidden','true');
+}
+async function confirmOrderPreview(){
+  const action = pendingOrderAction;
+  closeOrderPreview();
+  if(action === 'download') executeDownloadOrderCSV();
+  else if(action === 'copy') await executeCopyOrderToClipboard();
+}
+function parseWorkbook(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try{
+      const wb = XLSX.read(evt.target.result, {type:'array'});
+      const firstSheetName = wb.SheetNames[0];
+      const sheet = wb.Sheets[firstSheetName];
+      const rows = XLSX.utils.sheet_to_json(sheet, {defval:'', raw:false});
+      state.fileName = file.name;
+      state.rawRows = rows;
+      state.headers = rows.length ? Object.keys(rows[0]) : [];
+      state.mapping = detectMapping(state.headers);
+      renderMappingSelectors();
+      buildRowsFromRaw();
+      els.fileChip.textContent = file.name;
+      const status = buildImportStatus('已读入');
+      setStatus(`已读入 ${escapeHtml(file.name)}，整理后 ${state.rows.length} 个商品。导入检查已生成。`, status.mode);
+      openImportCheck(status);
+    }catch(err){
+      console.error(err);
+      setStatus('读取 Excel 失败，请确认文件格式正确。','bad');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+function applyMappingFromSelectors(){
+  state.mapping = {
+    code: els.mapCode.value,
+    name: els.mapName.value,
+    brand: els.mapBrand.value,
+    spec: els.mapSpec.value,
+    price: els.mapPrice.value,
+    stock: els.mapStock.value,
+    image: els.mapImage.value
+  };
+  buildRowsFromRaw();
+  const status = buildImportStatus('列映射已应用');
+  setStatus('列映射已应用，导入检查已更新。', status.mode);
+  openImportCheck(status);
+}
+function refreshAll(preserveScroll=false, anchorId=''){
+  const restoreY = preserveScroll ? (window.scrollY || window.pageYOffset || 0) : null;
+  let anchorTopBefore = null;
+  if(preserveScroll && anchorId){
+    const anchorBefore = document.querySelector(`.card[data-id="${CSS.escape(anchorId)}"]`) || document.querySelector(`[data-id="${CSS.escape(anchorId)}"]`);
+    if(anchorBefore) anchorTopBefore = anchorBefore.getBoundingClientRect().top;
+  }
+  renderSummaryAndExport();
+  renderCards(anchorId, ()=>{
+    if(preserveScroll || anchorId) triggerFeedbackPulse(anchorId);
+  });
+  renderSideLists();
+  renderRecommendations();
+  renderComparePanel();
+  renderTypeAssist();
+  syncMobileQuickControls();
+  persistState();
+  if(preserveScroll){
+    const restoreBase = ()=> window.scrollTo(0, restoreY);
+    let tries = 0;
+    const restoreWithAnchor = ()=>{
+      restoreBase();
+      if(anchorId && anchorTopBefore != null){
+        const anchorAfter = document.querySelector(`.card[data-id="${CSS.escape(anchorId)}"]`) || document.querySelector(`[data-id="${CSS.escape(anchorId)}"]`);
+        if(anchorAfter){
+          const diff = anchorAfter.getBoundingClientRect().top - anchorTopBefore;
+          if(Math.abs(diff) > 1) window.scrollBy(0, diff);
+        }
+      }
+      tries += 1;
+      if(tries < 10) requestAnimationFrame(restoreWithAnchor);
+    };
+    requestAnimationFrame(restoreWithAnchor);
+    setTimeout(restoreWithAnchor, 80);
+    setTimeout(restoreWithAnchor, 220);
+    setTimeout(restoreWithAnchor, 500);
+  }
+  updateColumnResizerPositions();
+}
+function resetFilters(){
+  els.searchInput.value = '';
+  if(els.searchInputMobile) els.searchInputMobile.value = '';
+  state.filters.priceBins.clear();
+  els.sortSelect.value = 'default';
+  els.viewModeSelect.value = 'all';
+  if(els.onlyInStock) els.onlyInStock.checked = false;
+  if(els.onlySelected) els.onlySelected.checked = false;
+  state.filters.brands.clear();
+  state.filters.types.clear();
+  renderFilterLists();
+  updatePriceFilterUI(state.rows);
+  applyFilters();
+  setStatus('筛选条件已经重置。','good');
+}
+function clearSelections(){
+  pushHistory();
+  state.selections = {};
+  persistState();
+  refreshAll(true);
+  setStatus('购物车已经清空。','good');
+}
+function clearCandidates(){
+  pushHistory();
+  state.candidates = {};
+  persistState();
+  refreshAll(true);
+  setStatus('候选清单已经清空。','good');
+}
+function clearBrandFilters(){
+  state.filters.brands.clear();
+  renderFilterLists();
+  applyFilters();
+}
+function toggleFavoriteBrand(brand){
+  const name = cleanString(brand);
+  if(!name) return;
+  if(state.favoriteBrands.has(name)){
+    state.favoriteBrands.delete(name);
+    setStatus(`已取消置顶品牌：${name}`,'good');
+  }else{
+    state.favoriteBrands.add(name);
+    setStatus(`已置顶常用品牌：${name}`,'good');
+  }
+  persistFavoriteBrands();
+  renderFilterLists();
+}
+function clearPinnedBrands(){
+  state.favoriteBrands.clear();
+  persistFavoriteBrands();
+  renderFilterLists();
+  setStatus('常用品牌置顶已清空。','good');
+}
+function clearTypeFilters(){
+  state.filters.types.clear();
+  renderFilterLists();
+  applyFilters();
+}
+function toggleVisibleToCart(){
+  if(!state.visibleRows.length){ setStatus('当前没有可见商品可以操作。','warn'); return; }
+  pushHistory();
+  state.visibleRows.forEach(r => setQty(r.id, Math.max(1, Number(getSelection(r.id).qty)||1)));
+  refreshAll(true);
+  setStatus('当前可见商品都已加入购物车。','good');
+}
+function toggleVisibleToCandidate(){
+  if(!state.visibleRows.length){ setStatus('当前没有可见商品可以操作。','warn'); return; }
+  pushHistory();
+  state.visibleRows.forEach(r => { state.candidates[r.id] = true; });
+  persistState();
+  refreshAll(true);
+  setStatus('当前可见商品都已加入候选。','good');
+}
+function moveAllCandidatesToCart(){
+  const rows = candidateRows();
+  if(!rows.length){ setStatus('候选清单还空着。','warn'); return; }
+  pushHistory();
+  rows.forEach(r => {
+    setQty(r.id, Math.max(1, Number(getSelection(r.id).qty)||1));
+    delete state.candidates[r.id];
+  });
+  refreshAll(true);
+  setStatus('候选清单里的商品已经全部加入购物车。','good');
+}
+function openLightboxById(id){
+  const index = state.visibleRows.findIndex(r => r.id === id);
+  const idx = index >= 0 ? index : state.rows.findIndex(r => r.id === id);
+  if(idx < 0) return;
+  state.lightboxIndex = idx;
+  renderLightbox();
+  els.lightbox.classList.add('open');
+  els.lightbox.setAttribute('aria-hidden','false');
+}
+function closeLightbox(){
+  els.lightbox.classList.remove('open');
+  els.lightbox.setAttribute('aria-hidden','true');
+}
+function currentLightboxRow(){
+  if(state.lightboxIndex < 0) return null;
+  const row = state.visibleRows[state.lightboxIndex] || state.rows[state.lightboxIndex];
+  if(row) return row;
+  return state.rows[Math.min(state.lightboxIndex, state.rows.length - 1)] || null;
+}
+function renderLightbox(){
+  const row = currentLightboxRow();
+  if(!row) return;
+  const sel = getSelection(row.id);
+  els.lightboxTitle.textContent = row.name;
+  els.lightboxBrand.textContent = row.brand;
+  els.lightboxType.textContent = row.type;
+  els.lightboxPrice.textContent = fmtMoney(row.price);
+  els.lightboxImage.classList.toggle('hidden', !row.image);
+  els.lightboxFallback.classList.toggle('hidden', !!row.image);
+  if(row.image){
+    els.lightboxImage.src = row.image;
+    els.lightboxImage.onerror = () => {
+      els.lightboxImage.classList.add('hidden');
+      els.lightboxFallback.classList.remove('hidden');
+    };
+    els.lightboxImage.onload = () => {
+      els.lightboxImage.classList.remove('hidden');
+      els.lightboxFallback.classList.add('hidden');
+    };
+  }else{
+    els.lightboxImage.removeAttribute('src');
+  }
+  els.lightboxMeta.innerHTML = `
+    <div class="kv"><b>品牌：</b>${escapeHtml(row.brand)}</div>
+    <div class="kv"><b>类型：</b>${escapeHtml(row.type)}</div>
+    <div class="kv"><b>编号：</b>${escapeHtml(row.code || '—')}</div>
+    <div class="kv"><b>规格：</b>${escapeHtml(row.spec || '—')}</div>
+    <div class="kv"><b>库存：</b>${row.stock==null ? '未知' : escapeHtml(row.stock)}</div>
+    <div class="kv"><b>当前已选数量：</b>${sel.selected ? escapeHtml(sel.qty) : '0'}</div>
+    <div class="kv"><b>候选状态：</b>${isCandidate(row.id) ? '已在候选清单' : '还没放入候选'}</div>
+  `;
+  els.lightboxCandidateBtn.textContent = isCandidate(row.id) ? '移出候选' : '加入候选';
+}
+function lightboxShift(step){
+  const list = state.visibleRows.length ? state.visibleRows : state.rows;
+  if(!list.length) return;
+  const current = currentLightboxRow();
+  let idx = list.findIndex(r => current && r.id === current.id);
+  if(idx < 0) idx = 0;
+  idx = (idx + step + list.length) % list.length;
+  state.lightboxIndex = idx;
+  renderLightbox();
+}
+function isMobileBudgetFloatMode(){ return window.innerWidth <= 760; }
+function syncBudgetFloatDisplay(forceRestore=false){
+  const mobile = isMobileBudgetFloatMode();
+  if(mobile && lastBudgetFloatIsMobile === false) budgetFloatMobileExpanded = false;
+  if(mobile){
+    els.budgetFloat.classList.toggle('mobile-collapsed', !budgetFloatMobileExpanded);
+    els.budgetFloat.style.left = '';
+    els.budgetFloat.style.top = '';
+    els.budgetFloat.style.right = '';
+    els.budgetFloat.style.bottom = '';
+  }else{
+    els.budgetFloat.classList.remove('mobile-collapsed');
+    if(forceRestore || lastBudgetFloatIsMobile !== false) restoreBudgetFloatPosition();
+  }
+  lastBudgetFloatIsMobile = mobile;
+}
+function setBudgetFloatMobileExpanded(expanded){
+  budgetFloatMobileExpanded = !!expanded;
+  syncBudgetFloatDisplay(false);
+}
+function clamp(n,min,max){ return Math.min(max, Math.max(min,n)); }
+function saveBudgetFloatPosition(){
+  const left = parseFloat(els.budgetFloat.style.left);
+  const top = parseFloat(els.budgetFloat.style.top);
+  if(Number.isFinite(left) && Number.isFinite(top)) localStorage.setItem(FLOAT_POS_KEY, JSON.stringify({left,top}));
+}
+function restoreBudgetFloatPosition(){
+  try{
+    const raw = localStorage.getItem(FLOAT_POS_KEY);
+    if(!raw) return;
+    const pos = JSON.parse(raw);
+    if(!pos || !Number.isFinite(pos.left) || !Number.isFinite(pos.top)) return;
+    const width = els.budgetFloat.offsetWidth || 300;
+    const height = els.budgetFloat.offsetHeight || 180;
+    els.budgetFloat.style.left = `${clamp(pos.left,8,Math.max(8,window.innerWidth-width-8))}px`;
+    els.budgetFloat.style.top = `${clamp(pos.top,8,Math.max(8,window.innerHeight-height-8))}px`;
+    els.budgetFloat.style.right = 'auto';
+    els.budgetFloat.style.bottom = 'auto';
+  }catch(e){}
+}
+function makeBudgetFloatDraggable(){
+  const box = els.budgetFloat;
+  const handle = box.querySelector('.bf-head') || box;
+  let dragging = false, pointerId = null, startX=0,startY=0,baseLeft=0,baseTop=0;
+  handle.addEventListener('pointerdown', (e)=>{
+    if(isMobileBudgetFloatMode()) return;
+    if(e.button !== 0) return;
+    const rect = box.getBoundingClientRect();
+    dragging = true; pointerId = e.pointerId; startX = e.clientX; startY = e.clientY; baseLeft = rect.left; baseTop = rect.top;
+    box.classList.add('dragging');
+    box.style.left = `${rect.left}px`; box.style.top = `${rect.top}px`; box.style.right = 'auto'; box.style.bottom = 'auto';
+    if(handle.setPointerCapture) handle.setPointerCapture(pointerId);
+    e.preventDefault();
+  });
+  handle.addEventListener('pointermove', (e)=>{
+    if(!dragging || e.pointerId !== pointerId) return;
+    const width = box.offsetWidth || 300, height = box.offsetHeight || 180;
+    box.style.left = `${clamp(baseLeft + (e.clientX-startX),8,Math.max(8,window.innerWidth-width-8))}px`;
+    box.style.top = `${clamp(baseTop + (e.clientY-startY),8,Math.max(8,window.innerHeight-height-8))}px`;
+  });
+  const stop = (e)=>{
+    if(!dragging) return;
+    if(e && e.pointerId != null && e.pointerId !== pointerId) return;
+    dragging = false; pointerId = null; box.classList.remove('dragging'); saveBudgetFloatPosition();
+  };
+  handle.addEventListener('pointerup', stop);
+  handle.addEventListener('pointercancel', stop);
+  window.addEventListener('resize', ()=>{
+    syncBudgetFloatDisplay(false);
+    if(isMobileBudgetFloatMode()) return;
+    const rect = box.getBoundingClientRect();
+    const width = box.offsetWidth || 300, height = box.offsetHeight || 180;
+    if(box.style.left && box.style.top){
+      box.style.left = `${clamp(rect.left,8,Math.max(8,window.innerWidth-width-8))}px`;
+      box.style.top = `${clamp(rect.top,8,Math.max(8,window.innerHeight-height-8))}px`;
+      saveBudgetFloatPosition();
+    }
+  });
+}
+function openDrawer(which){
+  els.drawerBackdrop.classList.add('show');
+  if(which === 'cart') els.cartDrawer.classList.add('open');
+  if(which === 'cand') els.candDrawer.classList.add('open');
+  if(which === 'filter') els.filterDrawer.classList.add('open');
+}
+function closeDrawers(){
+  els.drawerBackdrop.classList.remove('show');
+  els.cartDrawer.classList.remove('open');
+  els.candDrawer.classList.remove('open');
+  els.filterDrawer.classList.remove('open');
+}
+function bindDelegatedSideActions(container){
+  container.addEventListener('click', (e)=>{
+    const t = e.target;
+    if(t.classList.contains('side-minus')){
+      pushHistory();
+      const id = t.dataset.id;
+      const sel = getSelection(id);
+      const curr = sel.selected ? Math.max(1, Number(sel.qty)||1) : 0;
+      setQty(id, curr - 1);
+      refreshAfterSelectionChange(id);
+      return;
+    }
+    if(t.classList.contains('side-plus')){
+      pushHistory();
+      const id = t.dataset.id;
+      const sel = getSelection(id);
+      const curr = sel.selected ? Math.max(1, Number(sel.qty)||1) : 0;
+      setQty(id, curr + 1);
+      refreshAfterSelectionChange(id);
+      return;
+    }
+    if(t.classList.contains('side-remove-selection')){
+      pushHistory();
+      const id = t.dataset.id;
+      removeSelection(id);
+      refreshAfterSelectionChange(id);
+      return;
+    }
+    if(t.classList.contains('side-remove-candidate')){
+      pushHistory();
+      const id = t.dataset.id;
+      removeCandidate(id);
+      refreshAll(true, id);
+      return;
+    }
+    if(t.classList.contains('side-move-to-cart')){
+      pushHistory();
+      const id = t.dataset.id;
+      const sel = getSelection(id);
+      const curr = sel.selected ? Math.max(1, Number(sel.qty)||1) : 0;
+      setQty(id, curr + 1);
+      removeCandidate(id);
+      refreshAll(true);
+      return;
+    }
+  });
+  container.addEventListener('change', (e)=>{
+    const t = e.target;
+    if(t.classList.contains('side-qty')){
+      pushHistory();
+      const id = t.dataset.id;
+      setQty(id, t.value);
+      refreshAfterSelectionChange(id);
+    }
+  });
+}
+function attachEvents(){
+  els.fileInput.addEventListener('change', (e)=> parseWorkbook(e.target.files && e.target.files[0]));
+  els.applyMappingBtn.addEventListener('click', applyMappingFromSelectors);
+  if(els.resetFiltersBtn) els.resetFiltersBtn.addEventListener('click', resetFilters);
+  if(els.resetLayoutBtn) els.resetLayoutBtn.addEventListener('click', resetColumnLayout);
+  [els.clearSelectionBtn, els.clearSelectionBtn3, els.clearSelectionTopBtn, els.cartDrawerClearBtn].forEach(b => b && b.addEventListener('click', clearSelections));
+  [els.undoBtn, els.redoBtn, els.cartUndoBtn, els.cartDrawerUndoBtn].forEach((b, idx) => {
+    if(!b) return;
+    b.addEventListener('click', idx===1 ? redoAction : undoAction);
+  });
+  if(els.clearCandidatesBtn) els.clearCandidatesBtn.addEventListener('click', clearCandidates);
+  if(els.clearCandidatesBtnMobile) els.clearCandidatesBtnMobile.addEventListener('click', clearCandidates);
+  if(els.clearCompareBtn) els.clearCompareBtn.addEventListener('click', clearCompare);
+  if(els.moveAllCandidatesBtn) els.moveAllCandidatesBtn.addEventListener('click', moveAllCandidatesToCart);
+  if(els.moveAllCandidatesBtnMobile) els.moveAllCandidatesBtnMobile.addEventListener('click', moveAllCandidatesToCart);
+  els.clearBrandFiltersBtn.addEventListener('click', clearBrandFilters);
+  if(els.clearPinnedBrandsBtn) els.clearPinnedBrandsBtn.addEventListener('click', clearPinnedBrands);
+  els.clearTypeFiltersBtn.addEventListener('click', clearTypeFilters);
+  if(els.addTypeKeywordBtn) els.addTypeKeywordBtn.addEventListener('click', addCustomTypeKeyword);
+  if(els.resetTypeKeywordsBtn) els.resetTypeKeywordsBtn.addEventListener('click', resetCustomTypeKeywords);
+  if(els.typeKeywordInput) els.typeKeywordInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') addCustomTypeKeyword(); });
+  if(els.typeAssistList) els.typeAssistList.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-keyword-suggest]');
+    if(btn && els.typeKeywordInput) els.typeKeywordInput.value = btn.dataset.keywordSuggest || '';
+  });
+  if(els.searchInput) els.searchInput.addEventListener('input', ()=>applyFilters());
+  [els.priceHistogram, els.priceBinGrid].forEach(box => { if(!box) return; box.addEventListener('click', (e)=>{ const btn = e.target.closest('[data-price-bin]'); if(!btn) return; const key = btn.getAttribute('data-price-bin'); if(!key) return; if(state.filters.priceBins.has(key)) state.filters.priceBins.delete(key); else state.filters.priceBins.add(key); applyFilters(); }); });
+  [els.sortSelect, els.viewModeSelect].forEach(i => i.addEventListener('change', ()=>applyFilters()));
+  [els.onlyInStock, els.onlySelected].filter(Boolean).forEach(i => i.addEventListener('change', ()=>applyFilters()));
+  els.brandFilters.addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-pin-brand]');
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFavoriteBrand(btn.dataset.pinBrand || '');
+  });
+  els.brandFilters.addEventListener('change', ()=>applyFilters(false));
+  els.typeFilters.addEventListener('change', ()=>applyFilters(false));
+  els.budgetInput.addEventListener('input', ()=>{
+    const n = parseNumber(els.budgetInput.value);
+    state.budget = Number.isFinite(n) ? Math.max(0, n) : 0;
+    persistState();
+    syncMobileQuickControls();
+    refreshAll();
+  });
+  if(els.buyerInput) els.buyerInput.addEventListener('input', ()=>{
+    state.shareBuyer = cleanString(els.buyerInput.value);
+    persistState();
+  });
+  if(els.themeSelect) els.themeSelect.addEventListener('change', ()=> applyTheme(els.themeSelect.value));
+  if(els.cardDensitySelect) els.cardDensitySelect.addEventListener('change', ()=> applyCardDensity(els.cardDensitySelect.value));
+  els.selectVisibleBtn.addEventListener('click', toggleVisibleToCart);
+  els.candidateVisibleBtn.addEventListener('click', toggleVisibleToCandidate);
+  els.copyOrderBtn.addEventListener('click', copyOrderToClipboard);
+  els.downloadOrderBtn.addEventListener('click', downloadOrderCSV);
+  els.exportJpgBtn.addEventListener('click', exportSelectedAsJpg);
+
+  els.cards.addEventListener('change', (e)=>{
+    const t = e.target;
+    if(t.classList.contains('select-toggle')){
+      pushHistory();
+      const id = t.dataset.id;
+      setSelected(id, t.checked);
+      refreshAfterSelectionChange(id);
+      return;
+    }
+    if(t.classList.contains('qty-input')){
+      pushHistory();
+      const id = t.dataset.id;
+      setQty(id, t.value);
+      refreshAfterSelectionChange(id);
+      return;
+    }
+  });
+  els.cards.addEventListener('click', (e)=>{
+    const t = e.target;
+    const previewBtn = t.closest('[data-action="preview"]');
+    if(previewBtn){
+      openLightboxById(previewBtn.dataset.id);
+      return;
+    }
+    if(t.classList.contains('qty-plus')){
+      pushHistory();
+      const id = t.dataset.id;
+      const sel = getSelection(id);
+      const curr = sel.selected ? Math.max(1, Number(sel.qty)||1) : 0;
+      setQty(id, curr + 1);
+      refreshAfterSelectionChange(id);
+      return;
+    }
+    if(t.classList.contains('qty-minus')){
+      pushHistory();
+      const id = t.dataset.id;
+      const sel = getSelection(id);
+      const curr = sel.selected ? Math.max(1, Number(sel.qty)||1) : 0;
+      setQty(id, curr - 1);
+      refreshAfterSelectionChange(id);
+      return;
+    }
+    if(t.classList.contains('candidate-toggle')){
+      addToCandidate(t.dataset.id);
+      return;
+    }
+    if(t.classList.contains('compare-toggle')){
+      addToCompare(t.dataset.id);
+      return;
+    }
+    if(t.closest('input,button,label,textarea,select,a')) return;
+    const card = t.closest('.card');
+    if(card) quickAddByCard(card.dataset.id);
+  });
+
+  bindDelegatedSideActions(els.cartList);
+  bindDelegatedSideActions(els.cartListMobile);
+  bindDelegatedSideActions(els.candidateList);
+  bindDelegatedSideActions(els.candidateListMobile);
+
+  [els.recommendList, els.compareList, els.compareGrid].forEach(container => {
+    if(!container) return;
+    container.addEventListener('click', (e)=>{
+      const t = e.target;
+      if(t.classList.contains('rec-add') || t.classList.contains('compare-add-cart')){
+        quickAddByCard(t.dataset.id);
+        return;
+      }
+      if(t.classList.contains('rec-remove')){
+        pushHistory();
+        const id = t.dataset.id;
+        removeSelection(id);
+        refreshAfterSelectionChange(id);
+        return;
+      }
+      if(t.classList.contains('rec-compare')){
+        addToCompare(t.dataset.id);
+        return;
+      }
+      if(t.classList.contains('compare-remove')){
+        pushHistory();
+        const id = t.dataset.id;
+        removeCompare(id);
+        refreshAll(true, id);
+        return;
+      }
+      if(t.classList.contains('compare-open-one')){
+        openLightboxById(t.dataset.id);
+        return;
+      }
+    });
+  });
+
+  els.lightboxCloseBtn.addEventListener('click', closeLightbox);
+  els.lightboxPrevBtn.addEventListener('click', ()=>lightboxShift(-1));
+  els.lightboxNextBtn.addEventListener('click', ()=>lightboxShift(1));
+  els.lightboxAddBtn.addEventListener('click', ()=>{
+    const row = currentLightboxRow();
+    if(!row) return;
+    quickAddByCard(row.id);
+    renderLightbox();
+  });
+  els.lightboxCandidateBtn.addEventListener('click', ()=>{
+    const row = currentLightboxRow();
+    if(!row) return;
+    addToCandidate(row.id);
+    renderLightbox();
+  });
+  els.lightbox.addEventListener('click', (e)=>{ if(e.target === els.lightbox) closeLightbox(); });
+  document.addEventListener('keydown', (e)=>{
+    if(els.orderPreviewModal && els.orderPreviewModal.classList.contains('open') && e.key === 'Escape'){ closeOrderPreview(); }
+    if(els.importCheckModal && els.importCheckModal.classList.contains('open') && e.key === 'Escape'){ closeImportCheck(); }
+    if(els.compareModal.classList.contains('open') && e.key === 'Escape'){ closeCompareModal(); }
+    if(!els.lightbox.classList.contains('open')) return;
+    if(e.key === 'Escape') closeLightbox();
+    if(e.key === 'ArrowLeft') lightboxShift(-1);
+    if(e.key === 'ArrowRight') lightboxShift(1);
+  });
+
+  if(els.openCompareBtn) els.openCompareBtn.addEventListener('click', openCompareModal);
+  if(els.openCompareBtnMobile) els.openCompareBtnMobile.addEventListener('click', openCompareModal);
+  if(els.closeCompareBtn) els.closeCompareBtn.addEventListener('click', closeCompareModal);
+  if(els.compareModal) els.compareModal.addEventListener('click', (e)=>{ if(e.target === els.compareModal) closeCompareModal(); });
+  if(els.closeOrderPreviewBtn) els.closeOrderPreviewBtn.addEventListener('click', closeOrderPreview);
+  if(els.cancelOrderPreviewBtn) els.cancelOrderPreviewBtn.addEventListener('click', closeOrderPreview);
+  if(els.confirmOrderPreviewBtn) els.confirmOrderPreviewBtn.addEventListener('click', confirmOrderPreview);
+  if(els.orderPreviewModal) els.orderPreviewModal.addEventListener('click', (e)=>{ if(e.target === els.orderPreviewModal) closeOrderPreview(); });
+  if(els.closeImportCheckBtn) els.closeImportCheckBtn.addEventListener('click', closeImportCheck);
+  if(els.confirmImportCheckBtn) els.confirmImportCheckBtn.addEventListener('click', closeImportCheck);
+  if(els.importCheckModal) els.importCheckModal.addEventListener('click', (e)=>{ if(e.target === els.importCheckModal) closeImportCheck(); });
+
+  if(els.budgetFloatBubble) els.budgetFloatBubble.addEventListener('click', ()=> setBudgetFloatMobileExpanded(true));
+  if(els.budgetFloatToggleBtn) els.budgetFloatToggleBtn.addEventListener('click', (e)=>{ e.stopPropagation(); setBudgetFloatMobileExpanded(false); });
+
+  els.openCartDrawerBtn.addEventListener('click', ()=>openDrawer('cart'));
+  els.openCandDrawerBtn.addEventListener('click', ()=>openDrawer('cand'));
+  els.openFilterDrawerBtn.addEventListener('click', ()=>{ syncMobileQuickControls(); openDrawer('filter'); });
+  els.closeCartDrawerBtn.addEventListener('click', closeDrawers);
+  els.closeCandDrawerBtn.addEventListener('click', closeDrawers);
+  els.closeFilterDrawerBtn.addEventListener('click', closeDrawers);
+  els.drawerBackdrop.addEventListener('click', closeDrawers);
+
+  els.applyMobileFiltersBtn.addEventListener('click', applyMobileQuickControls);
+  els.syncMobileFiltersBtn.addEventListener('click', syncMobileQuickControls);
+}
+function init(){
+  loadPersisted();
+  els.budgetInput.value = String(state.budget);
+  applyTheme(state.theme);
+  applyCardDensity(state.cardDensity);
+  state.mapping = detectMapping([]);
+  renderMappingSelectors();
+  renderFilterLists();
+  renderSummaryAndExport();
+  renderRecommendations();
+  renderComparePanel();
+  syncMobileQuickControls();
+  attachEvents();
+  restoreBudgetFloatPosition();
+  syncBudgetFloatDisplay(true);
+  makeBudgetFloatDraggable();
+  loadColumnLayout();
+  makeColumnsResizable();
+}
+init();
+</script>
+</body>
+</html>
