@@ -1339,7 +1339,7 @@ input:focus,select:focus,textarea:focus{
 }
 
 
-/* v49: 左栏折叠瘦身与文件名溢出修复 */
+/* v48: 修复深色漏色、外观栏间距和卡片按钮换行 */
 :root{
   --bg:#fff8f1;
   --panel:rgba(255,254,250,.98);
@@ -2218,88 +2218,6 @@ html[data-theme="dark"] .price-bin-bar{background:#3b3432;border-color:#514744}
 html[data-theme="dark"] .price-bin-label,
 html[data-theme="dark"] .price-bin-count{color:#b9a9a0}
 
-/* v49: collapse low-frequency sidebar controls and prevent file-name overflow */
-#fileInput{
-  display:block;
-  width:100%;
-  max-width:100%;
-  min-width:0;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  font-size:12px;
-  color:#5f514d;
-}
-#fileInput::file-selector-button{
-  margin-right:8px;
-  padding:5px 9px;
-  border:1px solid #d9c8bb;
-  border-radius:8px;
-  background:#fffaf5;
-  color:#4b3f3d;
-  font-weight:700;
-  cursor:pointer;
-}
-.inline-fold{
-  margin-top:7px;
-}
-.inline-fold summary,
-.fold-block > summary{
-  list-style:none;
-  cursor:pointer;
-  user-select:none;
-}
-.inline-fold summary::-webkit-details-marker,
-.fold-block > summary::-webkit-details-marker{display:none}
-.inline-fold summary{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:700;
-}
-.inline-fold summary::after,
-.fold-block > summary::after{
-  content:"展开";
-  font-size:10px;
-  color:var(--muted);
-  font-weight:600;
-}
-.inline-fold[open] summary::after,
-.fold-block[open] > summary::after{content:"收起"}
-.fold-block > summary{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-}
-.fold-title{
-  font-size:14px;
-  font-weight:900;
-  color:var(--text);
-}
-.fold-body{
-  margin-top:9px;
-}
-.settings-panel{padding:9px}
-.settings-panel h2{margin-bottom:8px}
-.settings-panel .settings-subgrid{gap:7px}
-.settings-panel .settings-subgrid + .settings-subgrid{margin-top:7px !important}
-.settings-panel .settings-card{padding:7px 8px}
-.filter-section{margin-top:8px}
-.filter-section .filters-list{max-height:116px}
-.output-fold .mapping-inner{padding-top:8px}
-.output-fold .output-box{margin-top:8px;padding:8px;border-radius:12px}
-.output-fold textarea{min-height:82px}
-html[data-theme="dark"] #fileInput{color:#d4c5bc}
-html[data-theme="dark"] #fileInput::file-selector-button{
-  background:#2f2928;
-  border-color:#4a403d;
-  color:#f0e6df;
-}
-html[data-theme="dark"] .fold-title{color:#f4eee8}
-
 </style>
 </head>
 <body>
@@ -2310,20 +2228,17 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
 
     <div class="block">
       <h2>1. 导入本月清单</h2>
+      <label for="fileInput">选择商品清单文件</label>
       <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
-      <details class="inline-fold">
-        <summary>导入说明</summary>
-        <div class="row wrap" style="margin-top:8px">
-          <span class="chip">支持 .xlsx / .xls / .csv</span>
-          <span class="chip">默认读取第 1 个表</span>
-        </div>
-        <div class="tiny" style="margin-top:8px;">图片是否能显示取决于原图链接；重复商品会自动合并，方便后续核对。</div>
-      </details>
+      <div class="row wrap" style="margin-top:10px">
+        <span class="chip">支持 .xlsx / .xls / .csv</span>
+        <span class="chip">默认读取第 1 个表</span>
+      </div>
+      <div class="tiny" style="margin-top:10px;">小提醒：图片是否能显示取决于原图链接；重复商品会自动合并，方便后续核对。</div>
     </div>
 
-    <details class="block fold-block">
-      <summary><span class="fold-title">2. 外观</span><span class="tiny">配色 / 密度</span></summary>
-      <div class="fold-body">
+    <div class="block">
+      <h2>2. 外观</h2>
       <div class="theme-switch-card">
         <label for="themeSelect">配色风格</label>
         <div class="theme-switch-row">
@@ -2350,11 +2265,29 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
       <div class="row wrap" style="margin-top:10px">
         <button class="btn small secondary" id="resetLayoutBtn">重置布局</button>
       </div>
-      </div>
-    </details>
+    </div>
 
     <div class="block settings-panel">
       <h2>3. 预算和筛选</h2>
+      <div style="margin-top:2px">
+        <div class="row wrap" style="justify-content:space-between;margin-bottom:6px">
+          <label style="margin:0">品牌筛选 <span class="count-badge" id="brandCount"></span></label>
+          <div class="filter-heading-actions">
+            <button class="btn small secondary" id="clearPinnedBrandsBtn" type="button">清空置顶</button>
+            <button class="btn small secondary" id="clearBrandFiltersBtn" type="button">清空品牌</button>
+          </div>
+        </div>
+        <div id="brandFilters" class="filters-list"></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="row wrap" style="justify-content:space-between;margin-bottom:6px">
+          <label style="margin:0">类型筛选 <span class="count-badge" id="typeCount"></span></label>
+          <button class="btn small secondary" id="clearTypeFiltersBtn" type="button">清空类型</button>
+        </div>
+        <div id="typeFilters" class="filters-list"></div>
+      </div>
+
       <div class="settings-subgrid">
         <div class="settings-card compact">
           <label for="budgetInput">本次预算</label>
@@ -2405,48 +2338,24 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
           </select>
         </div>
       </div>
-      <div class="filter-section">
-        <div class="row wrap" style="justify-content:space-between;margin-bottom:6px">
-          <label style="margin:0">品牌筛选 <span class="count-badge" id="brandCount"></span></label>
-          <div class="filter-heading-actions">
-            <button class="btn small secondary" id="clearPinnedBrandsBtn" type="button">清空置顶</button>
-            <button class="btn small secondary" id="clearBrandFiltersBtn" type="button">清空品牌</button>
-          </div>
-        </div>
-        <div id="brandFilters" class="filters-list"></div>
-      </div>
-
-      <div class="filter-section">
-        <div class="row wrap" style="justify-content:space-between;margin-bottom:6px">
-          <label style="margin:0">类型筛选 <span class="count-badge" id="typeCount"></span></label>
-          <button class="btn small secondary" id="clearTypeFiltersBtn" type="button">清空类型</button>
-        </div>
-        <div id="typeFilters" class="filters-list"></div>
-      </div>
     </div>
 
     <div class="block">
       <h2>4. 输出清单</h2>
-      <div class="row wrap">
+      <div class="tiny">选好之后，可以复制订购单，也可以导出一张分享图用于确认。</div>
+      <div class="settings-card compact" style="margin-top:10px">
+        <label for="buyerInput">分享图署名</label>
+        <input id="buyerInput" type="text" placeholder="可留空" />
+      </div>
+      <div class="row wrap" style="margin-top:10px">
         <button class="btn success" id="copyOrderBtn">复制订购单</button>
         <button class="btn warn" id="downloadOrderBtn">下载 CSV</button>
+        <button class="btn secondary" id="exportJpgBtn">导出分享图</button>
       </div>
-      <details class="mapping-box output-fold" style="margin-top:10px">
-        <summary>分享图和导出预览 <span class="tiny">需要时再打开</span></summary>
-        <div class="mapping-inner">
-          <div class="settings-card compact">
-            <label for="buyerInput">分享图署名</label>
-            <input id="buyerInput" type="text" placeholder="可留空" />
-          </div>
-          <div class="row wrap" style="margin-top:8px">
-            <button class="btn secondary" id="exportJpgBtn">导出分享图</button>
-          </div>
-          <div class="output-box">
-            <label for="orderOutput">导出预览</label>
-            <textarea id="orderOutput" placeholder="选好之后，这里会生成可以直接复制的订购单内容。"></textarea>
-          </div>
-        </div>
-      </details>
+      <div class="output-box">
+        <label for="orderOutput">导出预览</label>
+        <textarea id="orderOutput" placeholder="选好之后，这里会生成可以直接复制的订购单内容。"></textarea>
+      </div>
     </div>
 
     <div class="block">
