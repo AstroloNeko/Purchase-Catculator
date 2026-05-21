@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v58" />
+<meta name="app-version" content="v57" />
 <title>内购挑选助手</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -1343,7 +1343,7 @@ input:focus,select:focus,textarea:focus{
 }
 
 
-/* v58: 修复预算胶囊拖拽后的点击展开判断 */
+/* v57: 修复预算胶囊拖拽与点击展开兼容 */
 :root{
   --bg:#fff8f1;
   --panel:rgba(255,254,250,.98);
@@ -2953,7 +2953,7 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
 </footer>
 
 <script>
-const APP_VERSION = 'v58';
+const APP_VERSION = 'v57';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -4961,14 +4961,14 @@ function restoreBudgetFloatPosition(){
 }
 function makeBudgetFloatDraggable(){
   const box = els.budgetFloat;
-  let dragging = false, moved = false, startedOnBubble = false, pointerId = null, startX=0,startY=0,baseLeft=0,baseTop=0;
+  let dragging = false, moved = false, pointerId = null, startX=0,startY=0,baseLeft=0,baseTop=0;
   box.addEventListener('pointerdown', (e)=>{
     if(isMobileBudgetFloatMode()) return;
     if(e.button !== 0) return;
     if(e.target.closest('button,input,select,textarea,a') && !(budgetFloatCollapsed && e.target.closest('.bf-bubble'))) return;
     if(!budgetFloatCollapsed && !e.target.closest('.bf-head')) return;
     const rect = box.getBoundingClientRect();
-    dragging = true; moved = false; startedOnBubble = !!e.target.closest('.bf-bubble'); pointerId = e.pointerId; startX = e.clientX; startY = e.clientY; baseLeft = rect.left; baseTop = rect.top;
+    dragging = true; moved = false; pointerId = e.pointerId; startX = e.clientX; startY = e.clientY; baseLeft = rect.left; baseTop = rect.top;
     box.classList.add('dragging');
     box.style.left = `${rect.left}px`; box.style.top = `${rect.top}px`; box.style.right = 'auto'; box.style.bottom = 'auto';
     if(box.setPointerCapture) box.setPointerCapture(pointerId);
@@ -4984,12 +4984,12 @@ function makeBudgetFloatDraggable(){
   const stop = (e)=>{
     if(!dragging) return;
     if(e && e.pointerId != null && e.pointerId !== pointerId) return;
-    const shouldOpenBubble = e && e.type === 'pointerup' && !moved && budgetFloatCollapsed && startedOnBubble;
+    const shouldOpenBubble = e && e.type === 'pointerup' && !moved && budgetFloatCollapsed && e.target && e.target.closest('.bf-bubble');
     if(moved){
       budgetFloatSuppressClick = true;
       setTimeout(()=>{ budgetFloatSuppressClick = false; }, 0);
     }
-    dragging = false; moved = false; startedOnBubble = false; pointerId = null; box.classList.remove('dragging'); saveBudgetFloatPosition();
+    dragging = false; moved = false; pointerId = null; box.classList.remove('dragging'); saveBudgetFloatPosition();
     if(shouldOpenBubble){
       budgetFloatCollapsed = false;
       syncBudgetFloatDisplay(false);
