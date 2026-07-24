@@ -6,10 +6,12 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v58" />
+<meta name="app-version" content="v60" />
 <title>内购挑选助手</title>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<link rel="icon" href="data:," />
+<script src="./vendor/xlsx.full.min.js"></script>
+<script src="./vendor/html2canvas.min.js"></script>
+<script src="./classification-rules.js?v=20260724.1"></script>
 <style>
 :root{
   --bg:#f6f8fc;
@@ -1791,6 +1793,34 @@ textarea:focus{
   flex-wrap:wrap;
   margin-top:14px;
 }
+.reconcile-summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin:12px 0;
+}
+.reconcile-stat{
+  min-width:0;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:rgba(255,255,255,.36);
+}
+.reconcile-stat .k{
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.35;
+}
+.reconcile-stat .v{
+  margin-top:4px;
+  color:var(--text);
+  font-size:17px;
+  font-weight:900;
+}
+html[data-theme="dark"] .reconcile-stat{background:#2b2625;border-color:#403735}
+@media (max-width:620px){
+  .reconcile-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 html[data-theme="dark"] .cart-brand-group,
 html[data-theme="dark"] .order-modal-inner,
 html[data-theme="dark"] .order-preview-table-wrap{
@@ -2410,7 +2440,7 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
     display:none !important;
   }
   .sidebar::after{
-    content:"© 2026 Timins米团子＆ybk\A All rights reserved · 内购挑选助手";
+    content:"© 2026 Timins米团子\A All rights reserved · 内购挑选助手";
     white-space:pre-line;
     display:block;
     margin-top:14px;
@@ -2634,7 +2664,7 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
               <div class="type-assist-title">分类维护</div>
               <div class="type-assist-count" id="typeAssistCount">待检查 0</div>
             </div>
-            <div class="tiny">导入后如果有商品落到“其他”，可以在这里补一个关键词。关键词会保存在本机，下次导入继续生效。</div>
+            <div class="tiny">导入后如果有商品落到“其他”，可以在这里补一个关键词。关键词会保存在本机，下次导入继续生效。<span id="rulePackVersion"></span></div>
             <div class="type-assist-list" id="typeAssistList"></div>
             <div class="type-assist-form">
               <input id="typeKeywordInput" type="text" placeholder="例如：书签、笔袋、夜灯" />
@@ -2748,7 +2778,7 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
 
     <div class="desktop-copyright">
       <div class="copyright-inner">
-        <div class="brand">© 2026 Timins米团子＆ybk</div>
+        <div class="brand">© 2026 Timins米团子</div>
         <div class="legal">All rights reserved · 内购挑选助手</div>
         <div class="tiny">本工具仅用于商品筛选、预算整理与订购单导出；页面内商品信息与图片版权归原始权利方所有。</div>
       </div>
@@ -2942,18 +2972,36 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
   </div>
 </div>
 
+<div id="catalogReconcileModal" class="order-modal" aria-hidden="true">
+  <div class="order-modal-inner">
+    <div class="order-preview-head">
+      <div>
+        <div class="panel-title" style="font-size:22px">核对上次购物车</div>
+        <div class="mini-stat" id="catalogReconcileStat">新清单已经读入</div>
+      </div>
+    </div>
+    <div class="status warn" id="catalogReconcileMessage"></div>
+    <div class="reconcile-summary" id="catalogReconcileSummary"></div>
+    <div class="order-preview-table-wrap" id="catalogReconcileDetails"></div>
+    <div class="order-preview-actions">
+      <button class="btn danger" id="clearCartForNewCatalogBtn" type="button">清空购物车</button>
+      <button class="btn primary" id="keepCartForNewCatalogBtn" type="button">保留可匹配商品</button>
+    </div>
+  </div>
+</div>
+
 <div id="shareCard" class="share-card" aria-hidden="true"></div>
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <div class="brand">© 2026 Timins米团子＆ybk</div>
+    <div class="brand">© 2026 Timins米团子</div>
     <div class="legal">All rights reserved · 内购挑选助手</div>
     <div class="tiny">本工具仅用于商品筛选、预算整理与订购单导出；页面内商品信息与图片版权归原始权利方所有。</div>
   </div>
 </footer>
 
 <script>
-const APP_VERSION = 'v58';
+const APP_VERSION = 'v60';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -2961,7 +3009,11 @@ const THEME_KEY = 'timins_picker_theme_v1';
 const COLUMN_LAYOUT_KEY = 'timins_picker_columns_v1';
 const FAVORITE_BRANDS_KEY = 'timins_picker_favorite_brands_v1';
 const CARD_DENSITY_KEY = 'timins_picker_card_density_v1';
-const TYPE_RULES = [
+const CATALOG_DB_NAME = 'timins_purchase_picker';
+const CATALOG_DB_VERSION = 1;
+const CATALOG_STORE_NAME = 'catalogs';
+const LATEST_CATALOG_ID = 'latest';
+const FALLBACK_TYPE_RULES = [
   ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
   ['徽章/胸针', ['徽章','胸针','吧唧','别针','毛绒吧唧']],
   ['贴纸/贴片', ['贴纸','贴贴乐','贴纸包','泡泡贴','刺绣贴','光栅贴纸','刘海贴','车贴','不干胶','冰箱贴','磁吸冰箱贴']],
@@ -2978,7 +3030,7 @@ const TYPE_RULES = [
   ['家居日用/工具', ['开瓶器','零食夹','纸巾盒','抽纸套','热水袋','暖水袋','防踢垫']],
   ['其他', []]
 ];
-const QUICK_TYPE_BY_SEGMENT = {
+const FALLBACK_QUICK_TYPE_BY_SEGMENT = {
   '钥匙扣':'挂件/钥匙扣',
   '钥匙链':'挂件/钥匙扣',
   '挂件':'挂件/钥匙扣',
@@ -3054,6 +3106,13 @@ const QUICK_TYPE_BY_SEGMENT = {
   '对联':'礼盒/节庆',
   '百货':''
 };
+const RULE_PACK = window.PURCHASE_PICKER_RULE_PACK || {};
+const TYPE_RULES = Array.isArray(RULE_PACK.typeRules) && RULE_PACK.typeRules.length
+  ? RULE_PACK.typeRules
+  : FALLBACK_TYPE_RULES;
+const QUICK_TYPE_BY_SEGMENT = RULE_PACK.quickTypeBySegment && typeof RULE_PACK.quickTypeBySegment === 'object'
+  ? RULE_PACK.quickTypeBySegment
+  : FALLBACK_QUICK_TYPE_BY_SEGMENT;
 const els = {
   appShell: document.getElementById('appShell'),
   leftResizer: document.getElementById('leftResizer'),
@@ -3091,6 +3150,7 @@ const els = {
   typeTargetSelect: document.getElementById('typeTargetSelect'),
   addTypeKeywordBtn: document.getElementById('addTypeKeywordBtn'),
   resetTypeKeywordsBtn: document.getElementById('resetTypeKeywordsBtn'),
+  rulePackVersion: document.getElementById('rulePackVersion'),
   budgetInput: document.getElementById('budgetInput'),
   buyerInput: document.getElementById('buyerInput'),
   themeSelect: document.getElementById('themeSelect'),
@@ -3201,11 +3261,19 @@ const els = {
   importCheckDetails: document.getElementById('importCheckDetails'),
   closeImportCheckBtn: document.getElementById('closeImportCheckBtn'),
   confirmImportCheckBtn: document.getElementById('confirmImportCheckBtn'),
+  catalogReconcileModal: document.getElementById('catalogReconcileModal'),
+  catalogReconcileStat: document.getElementById('catalogReconcileStat'),
+  catalogReconcileMessage: document.getElementById('catalogReconcileMessage'),
+  catalogReconcileSummary: document.getElementById('catalogReconcileSummary'),
+  catalogReconcileDetails: document.getElementById('catalogReconcileDetails'),
+  clearCartForNewCatalogBtn: document.getElementById('clearCartForNewCatalogBtn'),
+  keepCartForNewCatalogBtn: document.getElementById('keepCartForNewCatalogBtn'),
   shareCard: document.getElementById('shareCard')
 };
 
 const state = {
   fileName:'',
+  catalogMeta:null,
   rawRows:[],
   headers:[],
   mapping:{},
@@ -3248,7 +3316,123 @@ let budgetFloatSuppressClick = false;
 let lastBudgetFloatIsMobile = null;
 let columnLayout = {left:320,right:320};
 let pendingOrderAction = '';
+let pendingCatalogReconcile = null;
 let cartGroupsCollapsed = false;
+
+function openCatalogDb(){
+  return new Promise((resolve, reject)=>{
+    if(!('indexedDB' in window)){
+      reject(new Error('当前浏览器不支持 IndexedDB'));
+      return;
+    }
+    const request = indexedDB.open(CATALOG_DB_NAME, CATALOG_DB_VERSION);
+    request.onupgradeneeded = ()=>{
+      const db = request.result;
+      if(!db.objectStoreNames.contains(CATALOG_STORE_NAME)){
+        db.createObjectStore(CATALOG_STORE_NAME, {keyPath:'id'});
+      }
+    };
+    request.onsuccess = ()=> resolve(request.result);
+    request.onerror = ()=> reject(request.error || new Error('无法打开本地清单数据库'));
+  });
+}
+async function saveLatestCatalog(){
+  if(!state.rawRows.length) return false;
+  let db;
+  try{
+    db = await openCatalogDb();
+    await new Promise((resolve, reject)=>{
+      const tx = db.transaction(CATALOG_STORE_NAME, 'readwrite');
+      tx.objectStore(CATALOG_STORE_NAME).put({
+        id:LATEST_CATALOG_ID,
+        schemaVersion:1,
+        fileName:state.fileName,
+        catalogMeta:state.catalogMeta,
+        rawRows:state.rawRows,
+        headers:state.headers,
+        mapping:state.mapping,
+        savedAt:Date.now()
+      });
+      tx.oncomplete = ()=> resolve();
+      tx.onerror = ()=> reject(tx.error || new Error('保存清单失败'));
+      tx.onabort = ()=> reject(tx.error || new Error('保存清单已中止'));
+    });
+    return true;
+  }catch(err){
+    console.warn('保存最近清单失败', err);
+    return false;
+  }finally{
+    if(db) db.close();
+  }
+}
+async function readLatestCatalog(){
+  let db;
+  try{
+    db = await openCatalogDb();
+    return await new Promise((resolve, reject)=>{
+      const request = db.transaction(CATALOG_STORE_NAME, 'readonly')
+        .objectStore(CATALOG_STORE_NAME)
+        .get(LATEST_CATALOG_ID);
+      request.onsuccess = ()=> resolve(request.result || null);
+      request.onerror = ()=> reject(request.error || new Error('读取清单失败'));
+    });
+  }catch(err){
+    console.warn('读取最近清单失败', err);
+    return null;
+  }finally{
+    if(db) db.close();
+  }
+}
+async function clearSavedCatalog(){
+  let db;
+  try{
+    db = await openCatalogDb();
+    await new Promise((resolve, reject)=>{
+      const tx = db.transaction(CATALOG_STORE_NAME, 'readwrite');
+      tx.objectStore(CATALOG_STORE_NAME).delete(LATEST_CATALOG_ID);
+      tx.oncomplete = ()=> resolve();
+      tx.onerror = ()=> reject(tx.error || new Error('清理清单失败'));
+    });
+  }catch(err){
+    console.warn('清理最近清单失败', err);
+  }finally{
+    if(db) db.close();
+  }
+}
+async function restoreLatestCatalog(){
+  const saved = await readLatestCatalog();
+  if(!saved || !Array.isArray(saved.rawRows) || !saved.rawRows.length) return false;
+  state.fileName = cleanString(saved.fileName) || '上次导入的清单';
+  state.catalogMeta = saved.catalogMeta && typeof saved.catalogMeta === 'object'
+    ? saved.catalogMeta
+    : {name:state.fileName, fingerprint:`saved::${saved.savedAt || 0}`, importedAt:saved.savedAt || Date.now()};
+  state.rawRows = saved.rawRows;
+  state.headers = Array.isArray(saved.headers) && saved.headers.length
+    ? saved.headers
+    : Object.keys(saved.rawRows[0] || {});
+  state.mapping = saved.mapping && typeof saved.mapping === 'object'
+    ? saved.mapping
+    : detectMapping(state.headers);
+  renderMappingSelectors();
+  buildRowsFromRaw();
+  els.fileChip.textContent = `${state.fileName}（已恢复）`;
+  const when = saved.savedAt ? new Date(saved.savedAt).toLocaleString('zh-CN', {hour12:false}) : '';
+  setStatus(`已恢复上次清单，共 ${state.rows.length} 个商品${when ? ` · 保存于 ${escapeHtml(when)}` : ''}。`, 'good');
+  return true;
+}
+function verifyRuntimeDependencies(){
+  const missing = [];
+  if(typeof window.XLSX === 'undefined'){
+    missing.push('Excel 读取组件');
+    els.fileInput.disabled = true;
+  }
+  if(typeof window.html2canvas === 'undefined'){
+    missing.push('分享图组件');
+    if(els.exportJpgBtn) els.exportJpgBtn.disabled = true;
+  }
+  if(!RULE_PACK.version) missing.push('统一分类规则包');
+  return missing;
+}
 
 function loadPersisted(){
   try{
@@ -3817,6 +4001,169 @@ function closeImportCheck(){
   els.importCheckModal.classList.remove('open');
   els.importCheckModal.setAttribute('aria-hidden','true');
 }
+function makeCatalogFingerprint(file){
+  if(!file) return '';
+  return [cleanString(file.name), Number(file.size) || 0, Number(file.lastModified) || 0].join('::');
+}
+function stableCatalogKey(row){
+  const code = cleanString(row && row.code).toLowerCase();
+  if(code) return `code::${code}`;
+  return [
+    cleanString(row && row.name).toLowerCase(),
+    cleanString(row && row.brand).toLowerCase(),
+    cleanString(row && row.spec).toLowerCase()
+  ].join('::');
+}
+function captureCatalogContext(){
+  return {
+    fileName:state.fileName,
+    catalogMeta:state.catalogMeta ? {...state.catalogMeta} : null,
+    rows:state.rows.map(r => ({
+      id:r.id,
+      code:r.code,
+      name:r.name,
+      brand:r.brand,
+      spec:r.spec,
+      price:r.price,
+      stock:r.stock
+    })),
+    selections:JSON.parse(JSON.stringify(state.selections || {})),
+    candidates:JSON.parse(JSON.stringify(state.candidates || {})),
+    compare:JSON.parse(JSON.stringify(state.compare || {}))
+  };
+}
+function remapCatalogBucket(bucket, oldRowsById, newRowsByKey, mode){
+  const next = {};
+  Object.entries(bucket || {}).forEach(([oldId, value])=>{
+    if(!value || (mode === 'selection' && !value.selected)) return;
+    const oldRow = oldRowsById.get(oldId);
+    const newRow = oldRow ? newRowsByKey.get(stableCatalogKey(oldRow)) : state.rowMap[oldId];
+    if(!newRow) return;
+    if(mode === 'selection'){
+      const qty = Math.max(1, Number(value.qty) || 1);
+      const existingQty = next[newRow.id] ? Number(next[newRow.id].qty) || 1 : 0;
+      next[newRow.id] = {selected:true, qty:Math.max(existingQty, qty)};
+    }else{
+      next[newRow.id] = true;
+    }
+  });
+  return next;
+}
+function prepareCatalogReconcile(previous){
+  if(!previous || !Array.isArray(previous.rows) || !previous.rows.length) return null;
+  const oldRowsById = new Map(previous.rows.map(r => [r.id, r]));
+  const newRowsByKey = new Map();
+  state.rows.forEach(r => {
+    const key = stableCatalogKey(r);
+    if(!newRowsByKey.has(key)) newRowsByKey.set(key, r);
+  });
+
+  state.selections = remapCatalogBucket(previous.selections, oldRowsById, newRowsByKey, 'selection');
+  state.candidates = remapCatalogBucket(previous.candidates, oldRowsById, newRowsByKey, 'flag');
+  state.compare = remapCatalogBucket(previous.compare, oldRowsById, newRowsByKey, 'flag');
+  persistState();
+  refreshAll();
+
+  const oldCartRows = previous.rows.filter(r => {
+    const item = previous.selections && previous.selections[r.id];
+    return item && item.selected;
+  });
+  if(!oldCartRows.length) return null;
+  const sameFingerprint = previous.catalogMeta && state.catalogMeta
+    && previous.catalogMeta.fingerprint
+    && previous.catalogMeta.fingerprint === state.catalogMeta.fingerprint;
+  if(sameFingerprint) return null;
+
+  const details = [];
+  let matchedCount = 0;
+  let missingCount = 0;
+  let priceChangedCount = 0;
+  let stockChangedCount = 0;
+  oldCartRows.forEach(oldRow => {
+    const newRow = newRowsByKey.get(stableCatalogKey(oldRow));
+    if(!newRow){
+      missingCount += 1;
+      details.push({
+        result:'新清单中没有',
+        name:oldRow.name,
+        before:`${fmtMoney(oldRow.price)} · 库存 ${oldRow.stock == null ? '未知' : oldRow.stock}`,
+        after:'已从购物车移除'
+      });
+      return;
+    }
+    matchedCount += 1;
+    const changes = [];
+    if(Math.abs(Number(oldRow.price || 0) - Number(newRow.price || 0)) > 0.001){
+      priceChangedCount += 1;
+      changes.push('价格变化');
+    }
+    if(oldRow.stock !== newRow.stock){
+      stockChangedCount += 1;
+      changes.push('库存变化');
+    }
+    if(cleanString(oldRow.name) !== cleanString(newRow.name)) changes.push('名称变化');
+    if(changes.length){
+      details.push({
+        result:changes.join('、'),
+        name:newRow.name,
+        before:`${fmtMoney(oldRow.price)} · 库存 ${oldRow.stock == null ? '未知' : oldRow.stock}`,
+        after:`${fmtMoney(newRow.price)} · 库存 ${newRow.stock == null ? '未知' : newRow.stock}`
+      });
+    }
+  });
+  return {
+    previousFile:previous.fileName || '上次清单',
+    currentFile:state.fileName || '新清单',
+    oldCartCount:oldCartRows.length,
+    matchedCount,
+    missingCount,
+    priceChangedCount,
+    stockChangedCount,
+    details
+  };
+}
+function openCatalogReconcile(report, importStatus){
+  if(!report || !els.catalogReconcileModal){
+    openImportCheck(importStatus);
+    return;
+  }
+  pendingCatalogReconcile = {report, importStatus};
+  els.catalogReconcileStat.textContent = `${report.previousFile} → ${report.currentFile}`;
+  els.catalogReconcileMessage.innerHTML = `检测到上次购物车有 <b>${report.oldCartCount}</b> 款。系统已经按商品编号或商品信息找到新清单中的对应商品，请确认是否继续保留。`;
+  els.catalogReconcileSummary.innerHTML = [
+    ['可继续', report.matchedCount],
+    ['新清单中没有', report.missingCount],
+    ['价格变化', report.priceChangedCount],
+    ['库存变化', report.stockChangedCount]
+  ].map(([label, value]) => `<div class="reconcile-stat"><div class="k">${escapeHtml(label)}</div><div class="v">${escapeHtml(value)}</div></div>`).join('');
+  const rows = report.details.length
+    ? report.details.slice(0, 60).map(item => `<tr><td>${escapeHtml(item.result)}</td><td>${escapeHtml(item.name)}</td><td>${escapeHtml(item.before)}</td><td>${escapeHtml(item.after)}</td></tr>`).join('')
+    : '<tr><td colspan="4">匹配商品的名称、价格和库存没有发现变化。</td></tr>';
+  els.catalogReconcileDetails.innerHTML = `
+    <table class="order-preview-table">
+      <thead><tr><th>核对结果</th><th>商品</th><th>上次</th><th>本次</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  els.catalogReconcileModal.classList.add('open');
+  els.catalogReconcileModal.setAttribute('aria-hidden','false');
+}
+function finishCatalogReconcile(clearCart){
+  if(!pendingCatalogReconcile) return;
+  const {report, importStatus} = pendingCatalogReconcile;
+  pendingCatalogReconcile = null;
+  if(clearCart) state.selections = {};
+  persistState();
+  refreshAll();
+  els.catalogReconcileModal.classList.remove('open');
+  els.catalogReconcileModal.setAttribute('aria-hidden','true');
+  setStatus(
+    clearCart
+      ? `已清空上次购物车，开始使用 ${escapeHtml(report.currentFile)}。`
+      : `已保留 ${report.matchedCount} 款可匹配商品，${report.missingCount} 款在新清单中不存在。`,
+    clearCart ? 'ok' : 'good'
+  );
+  openImportCheck(importStatus);
+}
 function applyDiagnosticFilter(filter){
   state.filters.diagnostic = cleanString(filter);
   state.filters.priceBins.clear();
@@ -3871,6 +4218,9 @@ function otherTypeRows(){
 function renderTypeAssist(){
   if(!els.typeAssistBox || !els.typeAssistCount || !els.typeAssistList) return;
   renderTypeTargetSelect();
+  if(els.rulePackVersion){
+    els.rulePackVersion.textContent = ` 基础规则 ${RULE_PACK.version || '内置备用版'}。`;
+  }
   const rows = otherTypeRows();
   const customCount = Object.values(state.customTypeRules || {}).reduce((sum, words) => sum + (Array.isArray(words) ? words.length : 0), 0);
   els.typeAssistCount.textContent = rows.length ? `待检查 ${rows.length}` : (state.rows.length ? '分类正常' : '待导入');
@@ -4521,7 +4871,7 @@ function renderShareCard(){
           </div>`;
         }).join('')}
       </div>
-      <div class="share-foot">© 2026 Timins米团子＆ybk · 内购挑选助手</div>
+      <div class="share-foot">© 2026 Timins米团子 · 内购挑选助手</div>
     </div>
   `;
 }
@@ -4673,23 +5023,45 @@ async function confirmOrderPreview(){
 }
 function parseWorkbook(file){
   if(!file) return;
+  if(typeof window.XLSX === 'undefined'){
+    setStatus('Excel 读取组件没有加载成功，请刷新页面后再试。','bad');
+    return;
+  }
+  const previousCatalog = captureCatalogContext();
   const reader = new FileReader();
-  reader.onload = (evt) => {
+  reader.onerror = ()=>{
+    setStatus('读取文件失败，请重新选择清单。','bad');
+  };
+  reader.onload = async (evt) => {
     try{
       const wb = XLSX.read(evt.target.result, {type:'array'});
       const firstSheetName = wb.SheetNames[0];
+      if(!firstSheetName) throw new Error('工作簿中没有可读取的工作表');
       const sheet = wb.Sheets[firstSheetName];
       const rows = XLSX.utils.sheet_to_json(sheet, {defval:'', raw:false});
       state.fileName = file.name;
+      state.catalogMeta = {
+        name:file.name,
+        size:Number(file.size) || 0,
+        lastModified:Number(file.lastModified) || 0,
+        importedAt:Date.now(),
+        fingerprint:makeCatalogFingerprint(file)
+      };
       state.rawRows = rows;
       state.headers = rows.length ? Object.keys(rows[0]) : [];
       state.mapping = detectMapping(state.headers);
       renderMappingSelectors();
       buildRowsFromRaw();
+      const reconcileReport = prepareCatalogReconcile(previousCatalog);
       els.fileChip.textContent = file.name;
       const status = buildImportStatus('已读入');
-      setStatus(`已读入 ${escapeHtml(file.name)}，整理后 ${state.rows.length} 个商品。导入检查已生成。`, status.mode);
-      openImportCheck(status);
+      const saved = await saveLatestCatalog();
+      setStatus(
+        `已读入 ${escapeHtml(file.name)}，整理后 ${state.rows.length} 个商品。${saved ? '已保存到本机，下次打开会自动恢复。' : '当前浏览器未能保存清单。'}`,
+        saved ? status.mode : 'warn'
+      );
+      if(reconcileReport) openCatalogReconcile(reconcileReport, status);
+      else openImportCheck(status);
     }catch(err){
       console.error(err);
       setStatus('读取 Excel 失败，请确认文件格式正确。','bad');
@@ -4708,6 +5080,7 @@ function applyMappingFromSelectors(){
     image: els.mapImage.value
   };
   buildRowsFromRaw();
+  saveLatestCatalog();
   const status = buildImportStatus('列映射已应用');
   setStatus('列映射已应用，导入检查已更新。', status.mode);
   openImportCheck(status);
@@ -4809,10 +5182,11 @@ function toggleCartBrandGroups(){
   cartGroupsCollapsed = !cartGroupsCollapsed;
   renderSideLists();
 }
-function clearLocalData(){
+async function clearLocalData(){
   if(!confirm('确认清理本机保存的数据吗？购物车、候选、预算、主题、常用品牌和自定义分类都会恢复默认。')) return;
   [STORAGE_KEY, FLOAT_POS_KEY, CUSTOM_TYPE_RULES_KEY, THEME_KEY, COLUMN_LAYOUT_KEY, FAVORITE_BRANDS_KEY, CARD_DENSITY_KEY].forEach(key => localStorage.removeItem(key));
   sessionStorage.clear();
+  await clearSavedCatalog();
   location.reload();
 }
 function clearTypeFilters(){
@@ -5266,6 +5640,8 @@ function attachEvents(){
   if(els.closeImportCheckBtn) els.closeImportCheckBtn.addEventListener('click', closeImportCheck);
   if(els.confirmImportCheckBtn) els.confirmImportCheckBtn.addEventListener('click', closeImportCheck);
   if(els.importCheckModal) els.importCheckModal.addEventListener('click', (e)=>{ if(e.target === els.importCheckModal) closeImportCheck(); });
+  if(els.keepCartForNewCatalogBtn) els.keepCartForNewCatalogBtn.addEventListener('click', ()=>finishCatalogReconcile(false));
+  if(els.clearCartForNewCatalogBtn) els.clearCartForNewCatalogBtn.addEventListener('click', ()=>finishCatalogReconcile(true));
   if(els.importCheckDetails) els.importCheckDetails.addEventListener('click', (e)=>{
     const btn = e.target.closest('[data-diagnostic]');
     if(btn) applyDiagnosticFilter(btn.dataset.diagnostic || '');
@@ -5300,11 +5676,12 @@ function attachEvents(){
   els.applyMobileFiltersBtn.addEventListener('click', applyMobileQuickControls);
   els.syncMobileFiltersBtn.addEventListener('click', syncMobileQuickControls);
 }
-function init(){
+async function init(){
   loadPersisted();
   els.budgetInput.value = String(state.budget);
   applyTheme(state.theme);
   applyCardDensity(state.cardDensity);
+  const missingDependencies = verifyRuntimeDependencies();
   state.mapping = detectMapping([]);
   renderMappingSelectors();
   renderFilterLists();
@@ -5318,6 +5695,13 @@ function init(){
   makeBudgetFloatDraggable();
   loadColumnLayout();
   makeColumnsResizable();
+  const restored = await restoreLatestCatalog();
+  if(missingDependencies.length){
+    setStatus(
+      `有组件没有正确加载：${escapeHtml(missingDependencies.join('、'))}。${restored ? '上次清单已恢复，但部分功能暂不可用。' : '请刷新页面后重试。'}`,
+      'bad'
+    );
+  }
   checkForNewVersion();
 }
 async function checkForNewVersion(){
