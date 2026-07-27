@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v61" />
+<meta name="app-version" content="v62" />
 <title>内购挑选助手</title>
 <link rel="icon" href="data:," />
 <script src="./vendor/xlsx.full.min.js"></script>
@@ -2487,7 +2487,7 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
   }
 }
 
-/* v61: visible decision tools */
+/* Decision and export tools */
 .product-heading-row{
   display:flex;
   align-items:flex-start;
@@ -2657,6 +2657,31 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
 .whats-new-item{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:11px}
 .whats-new-item b{display:block;color:var(--text);font-size:13px;margin-bottom:4px}
 .whats-new-item span{font-size:11px;line-height:1.5;color:var(--muted)}
+.order-meta-form{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:12px;
+}
+.order-meta-field{
+  display:grid;
+  gap:5px;
+  min-width:0;
+}
+.order-meta-field label{margin:0}
+.order-meta-note{
+  grid-column:1/-1;
+  font-size:10px;
+  line-height:1.5;
+  color:var(--muted);
+}
+.order-preview-table.order-export-table{min-width:1040px}
+.order-preview-table .merged-meta{
+  vertical-align:middle;
+  text-align:center;
+  font-weight:800;
+  background:rgba(255,255,255,.26);
+}
 html[data-theme="dark"] .official-version{background:#34292c;border-color:#5e4249;color:#efb6c3}
 html[data-theme="dark"] .overview-stat,
 html[data-theme="dark"] .overview-bar-btn,
@@ -2665,6 +2690,7 @@ html[data-theme="dark"] .budget-plan-card,
 html[data-theme="dark"] .duel-choice,
 html[data-theme="dark"] .whats-new-item{background:#292524;border-color:#443b38}
 html[data-theme="dark"] .duel-cover img{background:#211f1e}
+html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
 @media (max-width:760px){
   .product-heading-row{align-items:center}
   .official-version{font-size:9px;padding:4px 7px}
@@ -2674,6 +2700,7 @@ html[data-theme="dark"] .duel-cover img{background:#211f1e}
   .duel-grid{grid-template-columns:1fr}
   .duel-or{padding:0}
   .whats-new-list{grid-template-columns:1fr}
+  .order-meta-form{grid-template-columns:1fr}
 }
 
 </style>
@@ -2683,7 +2710,7 @@ html[data-theme="dark"] .duel-cover img{background:#211f1e}
   <aside class="sidebar panel">
     <div class="product-heading-row">
       <h1>内购挑选助手</h1>
-      <button class="official-version" id="officialVersionBtn" type="button">官方在线版 · v61</button>
+      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v62</button>
     </div>
     <div class="desc">导入本月清单后，可以看图、筛选、算预算、整理订购单。适合自己挑，也适合和同事一起核对。</div>
 
@@ -2885,7 +2912,7 @@ html[data-theme="dark"] .duel-cover img{background:#211f1e}
       </div>
       <div class="toolbar-right">
         <button class="btn primary small" id="openBudgetPlansBtn">预算方案</button>
-        <button class="btn secondary small" id="openWhatsNewBtn">v61 新功能</button>
+        <button class="btn secondary small" id="openWhatsNewBtn">v62 更新说明</button>
         <button class="btn secondary small" id="selectVisibleBtn">本页都加购</button>
         <button class="btn secondary small" id="candidateVisibleBtn">本页先候选</button>
         <button class="btn danger small" id="clearSelectionTopBtn">清空购物车</button>
@@ -3198,19 +3225,19 @@ html[data-theme="dark"] .duel-cover img{background:#211f1e}
   <div class="order-modal-inner" style="width:min(720px,100%)">
     <div class="order-preview-head">
       <div>
-        <div class="panel-title" style="font-size:22px">v61 这次看得见的新功能</div>
-        <div class="mini-stat">官方在线版持续更新</div>
+        <div class="panel-title" style="font-size:22px">v62 更新说明</div>
+        <div class="mini-stat">本次版本优化了订购单填写与导出流程</div>
       </div>
       <button class="btn secondary small" id="closeWhatsNewBtn" type="button">关闭</button>
     </div>
     <div class="whats-new-list">
-      <div class="whats-new-item"><b>预算三套方案</b><span>性价比、品类丰富、偏爱优先，一键采用整套组合。</span></div>
-      <div class="whats-new-item"><b>候选二选一</b><span>让犹豫款逐轮淘汰，最后留下真正更想买的那款。</span></div>
-      <div class="whats-new-item"><b>清单数据总览</b><span>导入后直接看到品牌、类型、价格分布，并可点击筛选。</span></div>
-      <div class="whats-new-item"><b>正式 Excel 订购单</b><span>一键生成整理好的工作簿，交给同事核对更方便。</span></div>
+      <div class="whats-new-item"><b>订购信息填写</b><span>复制或下载前可以填写部门与内购人姓名，填写内容会保存在当前浏览器。</span></div>
+      <div class="whats-new-item"><b>复制表格优化</b><span>粘贴到 Excel 或 WPS 时，总额、部门和姓名会随商品行自动合并。</span></div>
+      <div class="whats-new-item"><b>Excel 导出完善</b><span>导出的工作簿增加总额、部门和内购人姓名，并整理为完整十列表格。</span></div>
+      <div class="whats-new-item"><b>版本标识调整</b><span>页面现在使用“在线版”和“本地版”标识，版本信息更加清晰。</span></div>
     </div>
     <div class="order-preview-actions">
-      <a class="btn secondary" id="officialOnlineLink" href="https://astroloneko.github.io/Purchase-Catculator/" target="_blank" rel="noopener">打开官方在线版</a>
+      <a class="btn secondary" id="officialOnlineLink" href="https://astroloneko.github.io/Purchase-Catculator/" target="_blank" rel="noopener">打开在线版</a>
       <button class="btn primary" id="confirmWhatsNewBtn" type="button">开始挑选</button>
     </div>
   </div>
@@ -3224,6 +3251,17 @@ html[data-theme="dark"] .duel-cover img{background:#211f1e}
         <div class="mini-stat" id="orderPreviewStat">请先核对内容</div>
       </div>
       <button class="btn secondary small" id="closeOrderPreviewBtn">关闭</button>
+    </div>
+    <div class="order-meta-form">
+      <div class="order-meta-field">
+        <label for="orderDepartmentInput">部门</label>
+        <input id="orderDepartmentInput" type="text" autocomplete="organization" placeholder="例如：市场部" />
+      </div>
+      <div class="order-meta-field">
+        <label for="orderBuyerInput">内购人姓名</label>
+        <input id="orderBuyerInput" type="text" autocomplete="name" placeholder="请输入姓名" />
+      </div>
+      <div class="order-meta-note">信息会随复制、Excel 和 CSV 一同导出，并保存在当前浏览器中。</div>
     </div>
     <div class="order-preview-table-wrap" id="orderPreviewTable"></div>
     <div class="order-preview-actions">
@@ -3279,7 +3317,7 @@ html[data-theme="dark"] .duel-cover img{background:#211f1e}
 </footer>
 
 <script>
-const APP_VERSION = 'v61';
+const APP_VERSION = 'v62';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -3291,7 +3329,7 @@ const CATALOG_DB_NAME = 'timins_purchase_picker';
 const CATALOG_DB_VERSION = 1;
 const CATALOG_STORE_NAME = 'catalogs';
 const LATEST_CATALOG_ID = 'latest';
-const WHATS_NEW_KEY = 'timins_picker_whats_new_v61';
+const WHATS_NEW_KEY = 'timins_picker_whats_new_v62';
 const FALLBACK_TYPE_RULES = [
   ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
   ['徽章/胸针', ['徽章','胸针','吧唧','别针','毛绒吧唧']],
@@ -3561,6 +3599,8 @@ const els = {
   orderPreviewModal: document.getElementById('orderPreviewModal'),
   orderPreviewStat: document.getElementById('orderPreviewStat'),
   orderPreviewTable: document.getElementById('orderPreviewTable'),
+  orderDepartmentInput: document.getElementById('orderDepartmentInput'),
+  orderBuyerInput: document.getElementById('orderBuyerInput'),
   closeOrderPreviewBtn: document.getElementById('closeOrderPreviewBtn'),
   cancelOrderPreviewBtn: document.getElementById('cancelOrderPreviewBtn'),
   confirmOrderPreviewBtn: document.getElementById('confirmOrderPreviewBtn'),
@@ -3609,6 +3649,8 @@ const state = {
   compare:{},
   budget:200,
   shareBuyer:'',
+  orderDepartment:'',
+  orderBuyer:'',
   theme:'cream',
   cardDensity:'compact',
   priceBounds:{min:0,max:100,step:1},
@@ -3756,6 +3798,8 @@ function loadPersisted(){
       state.compare = obj.compare && typeof obj.compare==='object' ? obj.compare : {};
       if(Number.isFinite(Number(obj.budget))) state.budget = Math.max(0, Number(obj.budget));
       if(typeof obj.shareBuyer === 'string') state.shareBuyer = obj.shareBuyer.trim();
+      if(typeof obj.orderDepartment === 'string') state.orderDepartment = obj.orderDepartment.trim();
+      if(typeof obj.orderBuyer === 'string') state.orderBuyer = obj.orderBuyer.trim();
     }
   }catch(e){}
   loadCustomTypeRules();
@@ -3769,7 +3813,9 @@ function persistState(){
     candidates:state.candidates,
     compare:state.compare,
     budget:state.budget,
-    shareBuyer:state.shareBuyer
+    shareBuyer:state.shareBuyer,
+    orderDepartment:state.orderDepartment,
+    orderBuyer:state.orderBuyer
   }));
 }
 function loadTheme(){
@@ -3829,6 +3875,8 @@ function resetAppState(){
   state.compare = {};
   state.budget = 200;
   state.shareBuyer = '';
+  state.orderDepartment = '';
+  state.orderBuyer = '';
   state.favoriteBrands = new Set();
   state.customTypeRules = {};
   state.filters.search = '';
@@ -4121,6 +4169,17 @@ function rowMatchesNonPriceFilters(r, summary){
 function getShareBuyer(){
   const v = cleanString(state.shareBuyer || '');
   return v;
+}
+function getOrderIdentity(){
+  return {
+    department:cleanString(state.orderDepartment || ''),
+    buyer:cleanString(state.orderBuyer || '')
+  };
+}
+function syncOrderIdentityFromInputs(){
+  if(els.orderDepartmentInput) state.orderDepartment = cleanString(els.orderDepartmentInput.value);
+  if(els.orderBuyerInput) state.orderBuyer = cleanString(els.orderBuyerInput.value);
+  persistState();
 }
 function setStatus(msg, mode='ok'){
   els.statusBox.className = `status ${mode}`;
@@ -5300,8 +5359,8 @@ function adoptBudgetPlan(index){
 function syncEditionLabel(){
   const localCopy = location.protocol === 'file:';
   if(els.officialVersionBtn){
-    els.officialVersionBtn.textContent = localCopy ? `本地副本 · ${APP_VERSION}` : `官方在线版 · ${APP_VERSION}`;
-    els.officialVersionBtn.title = localCopy ? '点击查看新版功能和官方在线地址' : '点击查看本次更新';
+    els.officialVersionBtn.textContent = localCopy ? `本地版 · ${APP_VERSION}` : `在线版 · ${APP_VERSION}`;
+    els.officialVersionBtn.title = localCopy ? '点击查看版本更新说明和在线地址' : '点击查看版本更新说明';
   }
   if(els.officialOnlineLink) els.officialOnlineLink.hidden = !localCopy;
 }
@@ -5592,6 +5651,7 @@ function renderSummaryAndExport(){
 }
 function buildOrderRows(){
   const s = selectedSummary();
+  const identity = getOrderIdentity();
   const rows = s.rows.map((r, idx) => {
     const q = Math.max(1, Number(getSelection(r.id).qty)||1);
     const subtotal = q * (r.price||0);
@@ -5603,13 +5663,18 @@ function buildOrderRows(){
       Number(r.price||0).toFixed(2),
       q,
       subtotal.toFixed(2),
-      idx === 0 ? s.total.toFixed(2) : ''
+      idx === 0 ? s.total.toFixed(2) : '',
+      idx === 0 ? identity.department : '',
+      idx === 0 ? identity.buyer : ''
     ];
   });
   return rows;
 }
+function getOrderHeaders(){
+  return ['IP名','产品名称','商品编号','规格/尺寸','商品单价','数量','商品总价','总额','部门','内购人名字'];
+}
 function buildOrderOutput(){
-  const header = ['IP名','产品名称','商品编号','规格/尺寸','商品单价','数量','商品总价','总额'];
+  const header = getOrderHeaders();
   const rows = buildOrderRows();
   const all = [header].concat(rows);
   els.orderOutput.value = all.map(r => r.join('\t')).join('\n');
@@ -5619,14 +5684,70 @@ async function copyOrderToClipboard(){
   openOrderPreview('copy');
 }
 async function executeCopyOrderToClipboard(){
+  syncOrderIdentityFromInputs();
+  buildOrderOutput();
+  const html = buildOrderClipboardHtml();
+  const plainText = els.orderOutput.value;
   try{
-    await navigator.clipboard.writeText(els.orderOutput.value);
-    setStatus('订购单已经复制好啦。','good');
+    if(navigator.clipboard && navigator.clipboard.write && typeof ClipboardItem !== 'undefined'){
+      const item = new ClipboardItem({
+        'text/plain':new Blob([plainText], {type:'text/plain'}),
+        'text/html':new Blob([html], {type:'text/html'})
+      });
+      await navigator.clipboard.write([item]);
+      setStatus('订购单已复制，粘贴到 Excel 或 WPS 时会保留合并好的总额、部门和姓名。','good');
+      return;
+    }
   }catch(e){
-    els.orderOutput.select();
-    document.execCommand('copy');
-    setStatus('已尝试复制订购单。','good');
+    // Continue with the document selection fallback below.
   }
+  if(copyRichOrderFallback(html)){
+    setStatus('订购单已复制，粘贴到 Excel 或 WPS 时会保留合并好的总额、部门和姓名。','good');
+    return;
+  }
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(plainText);
+    else{
+      els.orderOutput.select();
+      document.execCommand('copy');
+    }
+    setStatus('订购单已复制；当前浏览器只支持普通表格格式。','warn');
+  }catch(e){
+    setStatus('复制没有成功，请展开导出预览后手动复制。','bad');
+  }
+}
+function buildOrderClipboardHtml(){
+  const header = getOrderHeaders();
+  const rows = buildOrderRows();
+  const rowSpan = Math.max(1, rows.length);
+  const cellStyle = 'border:1px solid #808080;padding:5px 8px;vertical-align:middle;';
+  const headStyle = `${cellStyle}font-weight:700;text-align:center;background:#f3f3f3;`;
+  const body = rows.map((row, index)=>{
+    const itemCells = row.slice(0,7).map(value => `<td style="${cellStyle}">${escapeHtml(value)}</td>`).join('');
+    const mergedCells = index === 0
+      ? row.slice(7,10).map(value => `<td rowspan="${rowSpan}" style="${cellStyle}text-align:center;">${escapeHtml(value)}</td>`).join('')
+      : '';
+    return `<tr>${itemCells}${mergedCells}</tr>`;
+  }).join('');
+  return `<table style="border-collapse:collapse;font-family:Arial,'Microsoft YaHei',sans-serif;font-size:12px;"><thead><tr>${header.map(value => `<th style="${headStyle}">${escapeHtml(value)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`;
+}
+function copyRichOrderFallback(html){
+  const holder = document.createElement('div');
+  holder.contentEditable = 'true';
+  holder.setAttribute('aria-hidden','true');
+  holder.style.cssText = 'position:fixed;left:-10000px;top:0;opacity:0;pointer-events:none;';
+  holder.innerHTML = html;
+  document.body.appendChild(holder);
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(holder);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  let copied = false;
+  try{ copied = document.execCommand('copy'); }catch(e){}
+  selection.removeAllRanges();
+  holder.remove();
+  return copied;
 }
 function downloadOrderCSV(){
   const rows = buildOrderRows();
@@ -5644,7 +5765,8 @@ function safeCsvCell(value){
   return /^[=+\-@]/.test(text) ? `'${text}` : text;
 }
 function executeDownloadOrderCSV(){
-  const header = ['IP名','产品名称','商品编号','规格/尺寸','商品单价','数量','商品总价','总额'];
+  syncOrderIdentityFromInputs();
+  const header = getOrderHeaders();
   const rows = buildOrderRows();
   const csv = [header].concat(rows).map(r => r.map(v => `"${safeCsvCell(v).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob(["\ufeff"+csv], {type:'text/csv;charset=utf-8;'});
@@ -5655,38 +5777,61 @@ function executeDownloadOrderCSV(){
   URL.revokeObjectURL(a.href);
 }
 function executeDownloadOrderXLSX(){
+  syncOrderIdentityFromInputs();
   const s = selectedSummary();
-  const header = ['IP名','产品名称','商品编号','规格/尺寸','商品单价','数量','商品总价','备注'];
-  const dataRows = s.rows.map(r => {
+  const header = getOrderHeaders();
+  const identity = getOrderIdentity();
+  const dataRows = s.rows.map((r, index) => {
     const qty = Math.max(1, Number(getSelection(r.id).qty) || 1);
-    return [r.brand || '', r.name || '', r.code || '', r.spec || '', Number(r.price || 0), qty, Number((qty * (r.price || 0)).toFixed(2)), ''];
+    return [
+      r.brand || '',
+      r.name || '',
+      r.code || '',
+      r.spec || '',
+      Number(r.price || 0),
+      qty,
+      Number((qty * (r.price || 0)).toFixed(2)),
+      index === 0 ? Number(s.total.toFixed(2)) : '',
+      index === 0 ? identity.department : '',
+      index === 0 ? identity.buyer : ''
+    ];
   });
   const now = new Date();
   const dateText = now.toLocaleString('zh-CN', {hour12:false});
-  const buyer = getShareBuyer();
   const aoa = [
-    ['内购订购单','','','','','','',''],
-    [`来源清单：${state.fileName || '未命名清单'}`, '', '', '', `导出时间：${dateText}`, '', '', ''],
-    [buyer ? `选购人：${buyer}` : '选购人：', '', '', '', `预算：${Number(state.budget || 0).toFixed(2)}`, '', '', ''],
+    ['内购订购单','','','','','','','','',''],
+    [`来源清单：${state.fileName || '未命名清单'}`, '', '', '', '', `导出时间：${dateText}`, '', '', '', ''],
+    [`部门：${identity.department}`, '', '', `内购人：${identity.buyer}`, '', '', `预算：${Number(state.budget || 0).toFixed(2)}`, '', '', ''],
     header,
     ...dataRows,
-    ['合计','','','','',s.qty,Number(s.total.toFixed(2)),'']
+    ['合计','','','','',s.qty,Number(s.total.toFixed(2)),'','','']
   ];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   const totalRow = aoa.length;
-  ws['!merges'] = [
-    XLSX.utils.decode_range('A1:H1'),
-    XLSX.utils.decode_range('A2:D2'),
-    XLSX.utils.decode_range('E2:H2'),
-    XLSX.utils.decode_range('A3:D3'),
-    XLSX.utils.decode_range('E3:H3'),
+  const firstDataRow = 5;
+  const lastDataRow = firstDataRow + dataRows.length - 1;
+  const merges = [
+    XLSX.utils.decode_range('A1:J1'),
+    XLSX.utils.decode_range('A2:E2'),
+    XLSX.utils.decode_range('F2:J2'),
+    XLSX.utils.decode_range('A3:C3'),
+    XLSX.utils.decode_range('D3:F3'),
+    XLSX.utils.decode_range('G3:J3'),
     XLSX.utils.decode_range(`A${totalRow}:E${totalRow}`)
   ];
+  if(lastDataRow > firstDataRow){
+    merges.push(
+      XLSX.utils.decode_range(`H${firstDataRow}:H${lastDataRow}`),
+      XLSX.utils.decode_range(`I${firstDataRow}:I${lastDataRow}`),
+      XLSX.utils.decode_range(`J${firstDataRow}:J${lastDataRow}`)
+    );
+  }
+  ws['!merges'] = merges;
   ws['!cols'] = [
-    {wch:16},{wch:42},{wch:18},{wch:20},{wch:12},{wch:9},{wch:14},{wch:18}
+    {wch:16},{wch:42},{wch:18},{wch:20},{wch:12},{wch:9},{wch:14},{wch:14},{wch:16},{wch:16}
   ];
   ws['!rows'] = [{hpt:26},{hpt:20},{hpt:20},{hpt:22}];
-  ws['!autofilter'] = {ref:`A4:H${Math.max(4,totalRow-1)}`};
+  ws['!autofilter'] = {ref:`A4:J${Math.max(4,lastDataRow)}`};
   const wb = XLSX.utils.book_new();
   wb.Props = {Title:'内购订购单', Subject:state.fileName || '', Author:'Timins米团子', CreatedDate:now};
   XLSX.utils.book_append_sheet(wb, ws, '订购单');
@@ -5698,22 +5843,35 @@ function openOrderPreview(action){
   const rows = buildOrderRows();
   if(!rows.length){ setStatus('购物车还空着，暂时没有可以导出的内容。','warn'); return; }
   pendingOrderAction = action;
-  const header = ['IP名','产品名称','商品编号','规格/尺寸','商品单价','数量','商品总价'];
   const s = selectedSummary();
+  const identity = getOrderIdentity();
+  if(els.orderDepartmentInput) els.orderDepartmentInput.value = identity.department;
+  if(els.orderBuyerInput) els.orderBuyerInput.value = identity.buyer;
   els.orderPreviewStat.textContent = `${s.kinds} 款 · ${s.qty} 件 · 合计 ${fmtMoney(s.total)}`;
   els.confirmOrderPreviewBtn.textContent = action === 'xlsx'
     ? '确认下载 Excel'
     : action === 'download'
       ? '确认下载 CSV'
       : '确认复制订购单';
-  els.orderPreviewTable.innerHTML = `
-    <table class="order-preview-table">
-      <thead><tr>${header.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>
-      <tbody>${rows.map(r => `<tr>${r.slice(0,7).map(v => `<td>${escapeHtml(v)}</td>`).join('')}</tr>`).join('')}</tbody>
-      <tfoot><tr><td colspan="6">总额</td><td>${escapeHtml(s.total.toFixed(2))}</td></tr></tfoot>
-    </table>`;
+  renderOrderPreviewTable();
   els.orderPreviewModal.classList.add('open');
   els.orderPreviewModal.setAttribute('aria-hidden','false');
+}
+function renderOrderPreviewTable(){
+  const header = getOrderHeaders();
+  const rows = buildOrderRows();
+  const rowSpan = Math.max(1, rows.length);
+  els.orderPreviewTable.innerHTML = `
+    <table class="order-preview-table order-export-table">
+      <thead><tr>${header.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>
+      <tbody>${rows.map((row, index)=>{
+        const itemCells = row.slice(0,7).map(value => `<td>${escapeHtml(value)}</td>`).join('');
+        const mergedCells = index === 0
+          ? row.slice(7,10).map(value => `<td class="merged-meta" rowspan="${rowSpan}">${escapeHtml(value)}</td>`).join('')
+          : '';
+        return `<tr>${itemCells}${mergedCells}</tr>`;
+      }).join('')}</tbody>
+    </table>`;
 }
 function closeOrderPreview(){
   pendingOrderAction = '';
@@ -6241,6 +6399,13 @@ function attachEvents(){
   if(els.buyerInput) els.buyerInput.addEventListener('input', ()=>{
     state.shareBuyer = cleanString(els.buyerInput.value);
     persistState();
+  });
+  [els.orderDepartmentInput, els.orderBuyerInput].filter(Boolean).forEach(input => {
+    input.addEventListener('input', ()=>{
+      syncOrderIdentityFromInputs();
+      buildOrderOutput();
+      if(els.orderPreviewModal.classList.contains('open')) renderOrderPreviewTable();
+    });
   });
   if(els.themeSelect) els.themeSelect.addEventListener('change', ()=> applyTheme(els.themeSelect.value));
   if(els.cardDensitySelect) els.cardDensitySelect.addEventListener('change', ()=> applyCardDensity(els.cardDensitySelect.value));
