@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v62" />
+<meta name="app-version" content="v63" />
 <title>内购挑选助手</title>
 <link rel="icon" href="data:," />
 <script src="./vendor/xlsx.full.min.js"></script>
@@ -2518,73 +2518,6 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
   background:#7fb377;
   box-shadow:0 0 0 3px rgba(127,179,119,.15);
 }
-.catalog-overview{
-  margin:12px 0 2px;
-  padding:12px 0;
-  border-top:1px solid var(--line);
-  border-bottom:1px solid var(--line);
-}
-.catalog-overview[hidden]{display:none}
-.overview-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:10px;
-}
-.overview-title{font-size:14px;font-weight:900;color:var(--text)}
-.overview-stats{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:8px;
-}
-.overview-stat{
-  min-width:0;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:var(--panel);
-  color:var(--text);
-  padding:9px 10px;
-  text-align:left;
-}
-.overview-stat .k{font-size:10px;color:var(--muted)}
-.overview-stat .v{margin-top:3px;font-size:17px;font-weight:900}
-.overview-chart-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-  margin-top:10px;
-}
-.overview-chart-title{font-size:11px;font-weight:900;color:var(--muted);margin-bottom:6px}
-.overview-bars{display:grid;gap:5px}
-.overview-bar-btn{
-  position:relative;
-  width:100%;
-  min-width:0;
-  overflow:hidden;
-  border:1px solid var(--line);
-  border-radius:9px;
-  background:var(--panel);
-  color:var(--text);
-  padding:6px 8px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  font-size:10px;
-  text-align:left;
-}
-.overview-bar-btn::before{
-  content:"";
-  position:absolute;
-  inset:0 auto 0 0;
-  width:var(--bar-width,0%);
-  background:linear-gradient(90deg,rgba(241,177,194,.2),rgba(220,239,212,.22));
-  pointer-events:none;
-}
-.overview-bar-btn > span{position:relative;z-index:1;min-width:0}
-.overview-bar-btn .label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.overview-bar-btn .count{flex:0 0 auto;font-weight:900}
 .cart-analysis{
   display:grid;
   gap:7px;
@@ -2601,14 +2534,23 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
 .spend-track{grid-column:1/-1;height:5px;border-radius:999px;background:rgba(148,163,184,.18);overflow:hidden}
 .spend-track span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#e7a9b8,#d4e8cb)}
 .analysis-tip{font-size:10px;line-height:1.45;color:var(--muted)}
-.budget-plan-controls{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
+.budget-plan-filter-grid{
+  display:grid;
+  grid-template-columns:1.25fr 1fr 1fr .7fr auto;
+  align-items:end;
+  gap:9px;
   margin:10px 0 12px;
+  padding:11px 0;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
 }
-.budget-plan-controls select{width:auto;min-width:92px}
+.budget-plan-filter-field{display:grid;gap:5px;min-width:0}
+.budget-plan-filter-field label{margin:0;font-size:10px}
+.budget-plan-price-range{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px}
+.budget-plan-price-range span{font-size:10px;color:var(--muted)}
+.budget-plan-filter-grid input,
+.budget-plan-filter-grid select{width:100%;min-width:0}
+.budget-plan-filter-summary{font-size:10px;line-height:1.5;color:var(--muted);margin:-4px 0 10px}
 .budget-plan-grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
@@ -2682,9 +2624,13 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
   font-weight:800;
   background:rgba(255,255,255,.26);
 }
+.order-preview-table .order-code-cell{
+  min-width:170px;
+  white-space:nowrap;
+  font-family:Consolas,"SFMono-Regular",monospace;
+  font-size:11px;
+}
 html[data-theme="dark"] .official-version{background:#34292c;border-color:#5e4249;color:#efb6c3}
-html[data-theme="dark"] .overview-stat,
-html[data-theme="dark"] .overview-bar-btn,
 html[data-theme="dark"] .cart-analysis,
 html[data-theme="dark"] .budget-plan-card,
 html[data-theme="dark"] .duel-choice,
@@ -2694,8 +2640,8 @@ html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
 @media (max-width:760px){
   .product-heading-row{align-items:center}
   .official-version{font-size:9px;padding:4px 7px}
-  .overview-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .overview-chart-grid{grid-template-columns:1fr}
+  .budget-plan-filter-grid{grid-template-columns:1fr 1fr}
+  .budget-plan-filter-grid .budget-plan-regenerate{grid-column:1/-1}
   .budget-plan-grid{grid-template-columns:1fr}
   .duel-grid{grid-template-columns:1fr}
   .duel-or{padding:0}
@@ -2710,7 +2656,7 @@ html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
   <aside class="sidebar panel">
     <div class="product-heading-row">
       <h1>内购挑选助手</h1>
-      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v62</button>
+      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v63</button>
     </div>
     <div class="desc">导入本月清单后，可以看图、筛选、算预算、整理订购单。适合自己挑，也适合和同事一起核对。</div>
 
@@ -2912,7 +2858,7 @@ html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
       </div>
       <div class="toolbar-right">
         <button class="btn primary small" id="openBudgetPlansBtn">预算方案</button>
-        <button class="btn secondary small" id="openWhatsNewBtn">v62 更新说明</button>
+        <button class="btn secondary small" id="openWhatsNewBtn">v63 更新说明</button>
         <button class="btn secondary small" id="selectVisibleBtn">本页都加购</button>
         <button class="btn secondary small" id="candidateVisibleBtn">本页先候选</button>
         <button class="btn danger small" id="clearSelectionTopBtn">清空购物车</button>
@@ -2936,26 +2882,6 @@ html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
     </div>
 
     <div id="statusBox" class="status ok">先导入本月清单。点卡片空白处会直接 +1，暂时不确定的可以先放进候选。</div>
-    <section class="catalog-overview" id="catalogOverview" hidden>
-      <div class="overview-head">
-        <div>
-          <div class="overview-title">本次清单一览</div>
-          <div class="mini-stat" id="catalogOverviewNote">导入后自动整理</div>
-        </div>
-        <button class="btn small secondary" id="clearOverviewFilterBtn" type="button">查看全部</button>
-      </div>
-      <div class="overview-stats" id="overviewStats"></div>
-      <div class="overview-chart-grid">
-        <div>
-          <div class="overview-chart-title">商品类型</div>
-          <div class="overview-bars" id="overviewTypeBars"></div>
-        </div>
-        <div>
-          <div class="overview-chart-title">价格分布</div>
-          <div class="overview-bars" id="overviewPriceBars"></div>
-        </div>
-      </div>
-    </section>
     <div id="cards" class="cards" style="margin-top:16px"></div>
   </main>
 
@@ -3190,19 +3116,34 @@ html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
     <div class="order-preview-head">
       <div>
         <div class="panel-title" style="font-size:22px">预算组合方案</div>
-        <div class="mini-stat" id="budgetPlansStat">按当前预算和筛选范围生成</div>
+        <div class="mini-stat" id="budgetPlansStat">设置条件后实时生成贴近预算的组合</div>
       </div>
       <button class="btn secondary small" id="closeBudgetPlansBtn" type="button">关闭</button>
     </div>
-    <div class="budget-plan-controls">
-      <label for="budgetPlanMaxItems" style="margin:0">最多推荐</label>
-      <select id="budgetPlanMaxItems">
-        <option value="4">4 款</option>
-        <option value="6" selected>6 款</option>
-        <option value="8">8 款</option>
-      </select>
-      <button class="btn small secondary" id="regenerateBudgetPlansBtn" type="button">重新生成</button>
+    <div class="budget-plan-filter-grid">
+      <div class="budget-plan-filter-field">
+        <label>单件价位</label>
+        <div class="budget-plan-price-range">
+          <input id="budgetPlanMinPrice" type="number" min="0" step="1" value="0" aria-label="最低单价" />
+          <span>至</span>
+          <input id="budgetPlanMaxPrice" type="number" min="0" step="1" placeholder="不限" aria-label="最高单价" />
+        </div>
+      </div>
+      <div class="budget-plan-filter-field">
+        <label for="budgetPlanBrandSelect">IP 品牌</label>
+        <select id="budgetPlanBrandSelect"><option value="">全部品牌</option></select>
+      </div>
+      <div class="budget-plan-filter-field">
+        <label for="budgetPlanTypeSelect">商品类型</label>
+        <select id="budgetPlanTypeSelect"><option value="">全部类型</option></select>
+      </div>
+      <div class="budget-plan-filter-field">
+        <label for="budgetPlanMaxItems">最多款数</label>
+        <input id="budgetPlanMaxItems" type="number" min="1" max="30" step="1" value="10" />
+      </div>
+      <button class="btn small secondary budget-plan-regenerate" id="regenerateBudgetPlansBtn" type="button">换一批</button>
     </div>
+    <div class="budget-plan-filter-summary" id="budgetPlanFilterSummary">全部商品均可参与推荐</div>
     <div class="budget-plan-grid" id="budgetPlanGrid"></div>
   </div>
 </div>
@@ -3225,16 +3166,16 @@ html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
   <div class="order-modal-inner" style="width:min(720px,100%)">
     <div class="order-preview-head">
       <div>
-        <div class="panel-title" style="font-size:22px">v62 更新说明</div>
-        <div class="mini-stat">本次版本优化了订购单填写与导出流程</div>
+        <div class="panel-title" style="font-size:22px">v63 更新说明</div>
+        <div class="mini-stat">本次版本完善了预算推荐和订购单细节</div>
       </div>
       <button class="btn secondary small" id="closeWhatsNewBtn" type="button">关闭</button>
     </div>
     <div class="whats-new-list">
-      <div class="whats-new-item"><b>订购信息填写</b><span>复制或下载前可以填写部门与内购人姓名，填写内容会保存在当前浏览器。</span></div>
-      <div class="whats-new-item"><b>复制表格优化</b><span>粘贴到 Excel 或 WPS 时，总额、部门和姓名会随商品行自动合并。</span></div>
-      <div class="whats-new-item"><b>Excel 导出完善</b><span>导出的工作簿增加总额、部门和内购人姓名，并整理为完整十列表格。</span></div>
-      <div class="whats-new-item"><b>版本标识调整</b><span>页面现在使用“在线版”和“本地版”标识，版本信息更加清晰。</span></div>
+      <div class="whats-new-item"><b>推荐条件更细</b><span>可以按单件价位、IP 品牌、商品类型和最多款数实时生成组合。</span></div>
+      <div class="whats-new-item"><b>组合更贴近预算</b><span>新版算法优先缩小剩余额度，再区分贴额、品类和偏爱方案。</span></div>
+      <div class="whats-new-item"><b>订购单更加精简</b><span>Excel 文件直接从表头开始，不再额外添加标题和说明行。</span></div>
+      <div class="whats-new-item"><b>货号完整显示</b><span>复制和 Excel 导出均按文本保留商品编号，避免显示成科学计数法。</span></div>
     </div>
     <div class="order-preview-actions">
       <a class="btn secondary" id="officialOnlineLink" href="https://astroloneko.github.io/Purchase-Catculator/" target="_blank" rel="noopener">打开在线版</a>
@@ -3317,7 +3258,7 @@ html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
 </footer>
 
 <script>
-const APP_VERSION = 'v62';
+const APP_VERSION = 'v63';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -3329,7 +3270,7 @@ const CATALOG_DB_NAME = 'timins_purchase_picker';
 const CATALOG_DB_VERSION = 1;
 const CATALOG_STORE_NAME = 'catalogs';
 const LATEST_CATALOG_ID = 'latest';
-const WHATS_NEW_KEY = 'timins_picker_whats_new_v62';
+const WHATS_NEW_KEY = 'timins_picker_whats_new_v63';
 const FALLBACK_TYPE_RULES = [
   ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
   ['徽章/胸针', ['徽章','胸针','吧唧','别针','毛绒吧唧']],
@@ -3575,15 +3516,14 @@ const els = {
   compareModalStat: document.getElementById('compareModalStat'),
   closeCompareBtn: document.getElementById('closeCompareBtn'),
   clearCompareBtn: document.getElementById('clearCompareBtn'),
-  catalogOverview: document.getElementById('catalogOverview'),
-  catalogOverviewNote: document.getElementById('catalogOverviewNote'),
-  overviewStats: document.getElementById('overviewStats'),
-  overviewTypeBars: document.getElementById('overviewTypeBars'),
-  overviewPriceBars: document.getElementById('overviewPriceBars'),
-  clearOverviewFilterBtn: document.getElementById('clearOverviewFilterBtn'),
   budgetPlansModal: document.getElementById('budgetPlansModal'),
   budgetPlansStat: document.getElementById('budgetPlansStat'),
+  budgetPlanMinPrice: document.getElementById('budgetPlanMinPrice'),
+  budgetPlanMaxPrice: document.getElementById('budgetPlanMaxPrice'),
+  budgetPlanBrandSelect: document.getElementById('budgetPlanBrandSelect'),
+  budgetPlanTypeSelect: document.getElementById('budgetPlanTypeSelect'),
   budgetPlanMaxItems: document.getElementById('budgetPlanMaxItems'),
+  budgetPlanFilterSummary: document.getElementById('budgetPlanFilterSummary'),
   budgetPlanGrid: document.getElementById('budgetPlanGrid'),
   closeBudgetPlansBtn: document.getElementById('closeBudgetPlansBtn'),
   regenerateBudgetPlansBtn: document.getElementById('regenerateBudgetPlansBtn'),
@@ -3669,6 +3609,8 @@ let columnLayout = {left:320,right:320};
 let pendingOrderAction = '';
 let pendingCatalogReconcile = null;
 let currentBudgetPlans = [];
+let budgetPlanGenerationSeed = 0;
+let budgetPlanRefreshTimer = null;
 let duelState = null;
 let cartGroupsCollapsed = false;
 
@@ -4319,63 +4261,6 @@ function buildRowsFromRaw(){
   renderFilterLists();
   applyFilters();
   els.rowChip.textContent = `${state.rows.length} 个商品`;
-}
-function renderCatalogOverview(){
-  if(!els.catalogOverview) return;
-  const rows = state.rows || [];
-  if(!rows.length){
-    els.catalogOverview.hidden = true;
-    return;
-  }
-  els.catalogOverview.hidden = false;
-  const prices = rows.map(r=>Number(r.price)).filter(v=>Number.isFinite(v) && v > 0).sort((a,b)=>a-b);
-  const median = prices.length
-    ? prices.length % 2
-      ? prices[(prices.length-1)/2]
-      : (prices[prices.length/2-1] + prices[prices.length/2]) / 2
-    : 0;
-  const inStock = rows.filter(r => r.stock == null || r.stock > 0).length;
-  els.catalogOverviewNote.textContent = `${state.fileName || '当前清单'} · ${inStock} 款可选`;
-  const stats = [
-    ['商品', rows.length],
-    ['品牌', state.availableBrands.length],
-    ['类型', state.availableTypes.length],
-    ['价格中位数', fmtMoney(median)]
-  ];
-  els.overviewStats.innerHTML = stats.map(([label,value],index)=>`<button class="overview-stat" type="button" data-overview-all="${index===0?'1':''}">
-    <div class="k">${escapeHtml(label)}</div><div class="v">${escapeHtml(value)}</div>
-  </button>`).join('');
-
-  const typeCounts = new Map();
-  rows.forEach(r => typeCounts.set(r.type, (typeCounts.get(r.type)||0)+1));
-  const topTypes = [...typeCounts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);
-  const typePeak = Math.max(1, ...topTypes.map(item=>item[1]));
-  els.overviewTypeBars.innerHTML = topTypes.map(([label,count])=>`<button class="overview-bar-btn" type="button" data-overview-type="${escapeHtml(label)}" style="--bar-width:${Math.round(count/typePeak*100)}%">
-    <span class="label">${escapeHtml(label)}</span><span class="count">${count}</span>
-  </button>`).join('');
-
-  const bins = getCommonPriceBins((state.priceBounds || {max:100}).max);
-  const priceCounts = bins.map(bin => ({
-    ...bin,
-    count:rows.filter(r => Number(r.price) >= bin.start && (bin.end === Infinity || Number(r.price) < bin.end)).length
-  })).filter(bin=>bin.count > 0);
-  const pricePeak = Math.max(1, ...priceCounts.map(bin=>bin.count));
-  els.overviewPriceBars.innerHTML = priceCounts.map(bin=>`<button class="overview-bar-btn" type="button" data-overview-price="${escapeHtml(bin.label)}" style="--bar-width:${Math.round(bin.count/pricePeak*100)}%">
-    <span class="label">${escapeHtml(bin.label)}</span><span class="count">${bin.count}</span>
-  </button>`).join('');
-}
-function applyOverviewFilter(kind, value){
-  els.searchInput.value = '';
-  if(els.searchInputMobile) els.searchInputMobile.value = '';
-  state.filters.diagnostic = '';
-  state.filters.priceBins.clear();
-  state.filters.brands.clear();
-  state.filters.types.clear();
-  if(kind === 'type' && value) state.filters.types.add(value);
-  if(kind === 'price' && value) state.filters.priceBins.add(value);
-  renderFilterLists();
-  applyFilters(false);
-  setStatus(kind === 'type' ? `正在查看类型：${escapeHtml(value)}` : kind === 'price' ? `正在查看价位：${escapeHtml(value)}` : '已恢复查看全部商品。','good');
 }
 function mappedCellIsBlank(raw, key){
   const col = state.mapping && state.mapping[key];
@@ -5244,80 +5129,184 @@ function budgetRecommendations(){
     .slice(0, 5);
   return {fit, over, summary:s};
 }
-function budgetPlanPool(){
-  const source = state.visibleRows.length ? state.visibleRows : state.rows;
-  return source.filter(r => !getSelection(r.id).selected && r.price > 0 && r.stock !== 0);
+function getBudgetPlanFilters(){
+  const minPrice = Math.max(0, parseNumber(els.budgetPlanMinPrice && els.budgetPlanMinPrice.value) || 0);
+  const parsedMax = parseNumber(els.budgetPlanMaxPrice && els.budgetPlanMaxPrice.value);
+  const maxPrice = Number.isFinite(parsedMax) && parsedMax >= 0 ? Math.max(minPrice, parsedMax) : Infinity;
+  return {
+    minPrice,
+    maxPrice,
+    brand:cleanString(els.budgetPlanBrandSelect && els.budgetPlanBrandSelect.value),
+    type:cleanString(els.budgetPlanTypeSelect && els.budgetPlanTypeSelect.value),
+    maxItems:clamp(Math.round(Number(els.budgetPlanMaxItems && els.budgetPlanMaxItems.value) || 10), 1, 30)
+  };
 }
-function pickBudgetPlan(strategy, pool, budget, maxItems){
-  const available = pool.slice();
-  const picked = [];
-  const usedTypes = new Set();
-  let remaining = Math.max(0, budget);
-  while(available.length && picked.length < maxItems && remaining > 0){
-    const slots = Math.max(1, maxItems - picked.length);
-    const affordable = available.filter(r => r.price <= remaining);
-    if(!affordable.length) break;
-    let choice;
-    if(strategy === 'value'){
-      choice = affordable.slice().sort((a,b)=>
-        (a.price||0) - (b.price||0)
-        || Number(isCandidate(b.id)) - Number(isCandidate(a.id))
-        || (Number(b.stock)||0) - (Number(a.stock)||0)
-      )[0];
-    }else if(strategy === 'diverse'){
-      const target = remaining / slots;
-      choice = affordable.slice().sort((a,b)=>{
-        const repeatA = usedTypes.has(a.type) ? 1 : 0;
-        const repeatB = usedTypes.has(b.type) ? 1 : 0;
-        return repeatA - repeatB
-          || Math.abs((a.price||0)-target) - Math.abs((b.price||0)-target)
-          || (a.price||0) - (b.price||0);
-      })[0];
-    }else{
-      const preferenceScore = r =>
-        (isCandidate(r.id) ? 6 : 0)
-        + (state.favoriteBrands.has(r.brand) ? 4 : 0)
-        + (isCompared(r.id) ? 2 : 0)
-        + (usedTypes.has(r.type) ? 0 : 1);
-      const hasPreference = affordable.some(r => preferenceScore(r) > 1);
-      const target = remaining / slots;
-      choice = affordable.slice().sort((a,b)=>{
-        const scoreDiff = preferenceScore(b) - preferenceScore(a);
-        return (hasPreference ? scoreDiff : 0)
-          || Math.abs((a.price||0)-target) - Math.abs((b.price||0)-target)
-          || (a.price||0) - (b.price||0);
-      })[0];
-    }
-    if(!choice) break;
-    picked.push(choice);
-    usedTypes.add(choice.type);
-    remaining -= choice.price || 0;
-    available.splice(available.findIndex(r => r.id === choice.id), 1);
+function budgetPlanPool(filters){
+  return state.rows.filter(r =>
+    !getSelection(r.id).selected
+    && Number(r.price) > 0
+    && r.stock !== 0
+    && Number(r.price) >= filters.minPrice
+    && Number(r.price) <= filters.maxPrice
+    && (!filters.brand || r.brand === filters.brand)
+    && (!filters.type || r.type === filters.type)
+  );
+}
+function populateBudgetPlanFilters(){
+  const fillSelect = (select, values, allLabel)=>{
+    if(!select) return;
+    const current = select.value;
+    select.innerHTML = `<option value="">${escapeHtml(allLabel)}</option>${values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('')}`;
+    select.value = values.includes(current) ? current : '';
+  };
+  fillSelect(els.budgetPlanBrandSelect, sortBrandsForDisplay(state.availableBrands), '全部品牌');
+  fillSelect(els.budgetPlanTypeSelect, state.availableTypes.slice().sort((a,b)=>a.localeCompare(b,'zh')), '全部类型');
+  if(els.budgetPlanMaxPrice) els.budgetPlanMaxPrice.placeholder = `不高于 ${Math.max(0,Math.floor(selectedSummary().remaining))}`;
+}
+function budgetPlanNoise(id, seed){
+  const text = `${id}|${seed}`;
+  let hash = 2166136261;
+  for(let i=0;i<text.length;i++){
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
   }
-  const total = picked.reduce((sum,r)=>sum+(r.price||0),0);
-  return {strategy, rows:picked, total, remaining:Math.max(0,budget-total)};
+  return ((hash >>> 0) % 10000) / 10000;
+}
+function budgetPlanQuality(strategy, rows, avoidIds){
+  const types = new Set(rows.map(r=>r.type).filter(Boolean)).size;
+  const brands = new Set(rows.map(r=>r.brand).filter(Boolean)).size;
+  const overlap = rows.filter(r=>avoidIds.has(r.id)).length;
+  if(strategy === 'diverse') return types * 16 + brands * 4 + rows.length - overlap * 3;
+  if(strategy === 'favorite'){
+    return rows.reduce((score,r)=>score
+      + (isCandidate(r.id) ? 16 : 0)
+      + (state.favoriteBrands.has(r.brand) ? 10 : 0)
+      + (isCompared(r.id) ? 6 : 0), 0) + types * 2 - overlap * 3;
+  }
+  return rows.length * 5 + types * 2 - overlap * 2;
+}
+function betterBudgetPlan(candidate, current, strategy, avoidIds){
+  if(!current) return true;
+  if(Math.abs(candidate.remaining-current.remaining) > 0.005) return candidate.remaining < current.remaining;
+  const scoreA = budgetPlanQuality(strategy, candidate.rows, avoidIds);
+  const scoreB = budgetPlanQuality(strategy, current.rows, avoidIds);
+  if(scoreA !== scoreB) return scoreA > scoreB;
+  return candidate.rows.length > current.rows.length;
+}
+function improveBudgetPlanRows(rows, pool, budget, maxItems, strategy, avoidIds){
+  let picked = rows.slice();
+  let pickedIds = new Set(picked.map(r=>r.id));
+  let total = picked.reduce((sum,r)=>sum+Number(r.price||0),0);
+  while(picked.length < maxItems){
+    const remaining = budget-total;
+    let best = null;
+    pool.forEach(r=>{
+      if(pickedIds.has(r.id) || Number(r.price) > remaining+0.005) return;
+      if(!best || Number(r.price) > Number(best.price)) best = r;
+    });
+    if(!best) break;
+    picked.push(best);
+    pickedIds.add(best.id);
+    total += Number(best.price||0);
+  }
+  for(let round=0;round<2;round++){
+    let swap = null;
+    picked.forEach((oldRow,index)=>{
+      pool.forEach(nextRow=>{
+        if(pickedIds.has(nextRow.id)) return;
+        const nextTotal = total-Number(oldRow.price||0)+Number(nextRow.price||0);
+        if(nextTotal > budget+0.005 || nextTotal <= total+0.005) return;
+        const nextRows = picked.slice();
+        nextRows[index] = nextRow;
+        const candidate = {rows:nextRows,total:nextTotal,remaining:Math.max(0,budget-nextTotal)};
+        const baseline = {rows:picked,total,remaining:Math.max(0,budget-total)};
+        if(betterBudgetPlan(candidate, swap ? swap.plan : baseline, strategy, avoidIds)) swap = {index,oldRow,nextRow,plan:candidate};
+      });
+    });
+    if(!swap) break;
+    pickedIds.delete(swap.oldRow.id);
+    pickedIds.add(swap.nextRow.id);
+    picked = swap.plan.rows;
+    total = swap.plan.total;
+  }
+  return {rows:picked,total,remaining:Math.max(0,budget-total)};
+}
+function pickBudgetPlan(strategy, pool, budget, maxItems, avoidIds, seedOffset){
+  if(!pool.length || budget <= 0) return {strategy,rows:[],total:0,remaining:Math.max(0,budget)};
+  const usable = pool.filter(r=>Number(r.price) <= budget+0.005);
+  const attempts = Math.min(220, Math.max(90, usable.length));
+  let best = null;
+  for(let attempt=0;attempt<attempts;attempt++){
+    const minTarget = Math.min(2,maxItems);
+    const targetSpan = Math.max(1,maxItems-minTarget+1);
+    const targetCount = Math.min(usable.length, minTarget + (attempt % targetSpan));
+    const picked = [];
+    const pickedIds = new Set();
+    const usedTypes = new Set();
+    let total = 0;
+    while(picked.length < targetCount){
+      const remaining = budget-total;
+      const slots = Math.max(1,targetCount-picked.length);
+      const idealPrice = remaining/slots;
+      let choice = null;
+      let choiceScore = -Infinity;
+      usable.forEach(r=>{
+        const price = Number(r.price||0);
+        if(pickedIds.has(r.id) || price > remaining+0.005) return;
+        let score = -Math.abs(price-idealPrice) * 4;
+        if(strategy === 'diverse') score += usedTypes.has(r.type) ? -idealPrice*.8 : idealPrice*.9;
+        if(strategy === 'favorite'){
+          score += isCandidate(r.id) ? idealPrice*.9 : 0;
+          score += state.favoriteBrands.has(r.brand) ? idealPrice*.55 : 0;
+          score += isCompared(r.id) ? idealPrice*.35 : 0;
+        }
+        if(avoidIds.has(r.id)) score -= idealPrice*.18;
+        score += (budgetPlanNoise(r.id, attempt+seedOffset)-.5) * idealPrice*.65;
+        if(score > choiceScore){ choiceScore=score; choice=r; }
+      });
+      if(!choice) break;
+      picked.push(choice);
+      pickedIds.add(choice.id);
+      usedTypes.add(choice.type);
+      total += Number(choice.price||0);
+    }
+    const improved = improveBudgetPlanRows(picked, usable, budget, maxItems, strategy, avoidIds);
+    const candidate = {strategy,...improved};
+    if(betterBudgetPlan(candidate,best,strategy,avoidIds)) best=candidate;
+    if(best && best.remaining < 0.005 && budgetPlanQuality(strategy,best.rows,avoidIds) > 20) break;
+  }
+  return best || {strategy,rows:[],total:0,remaining:Math.max(0,budget)};
 }
 function generateBudgetPlans(){
   const s = selectedSummary();
-  const maxItems = clamp(Number(els.budgetPlanMaxItems && els.budgetPlanMaxItems.value) || 6, 2, 10);
-  const pool = budgetPlanPool();
-  const budget = Math.max(0, s.remaining);
-  currentBudgetPlans = [
-    pickBudgetPlan('value', pool, budget, maxItems),
-    pickBudgetPlan('diverse', pool, budget, maxItems),
-    pickBudgetPlan('favorite', pool, budget, maxItems)
-  ];
+  const filters = getBudgetPlanFilters();
+  const pool = budgetPlanPool(filters);
+  const budget = Math.max(0,s.remaining);
+  const avoidIds = new Set();
+  currentBudgetPlans = ['fit','diverse','favorite'].map((strategy,index)=>{
+    const plan = pickBudgetPlan(strategy,pool,budget,filters.maxItems,avoidIds,budgetPlanGenerationSeed*997+index*313);
+    plan.rows.forEach(r=>avoidIds.add(r.id));
+    return plan;
+  });
+  const priceText = filters.maxPrice === Infinity
+    ? `${fmtMoney(filters.minPrice)} 起`
+    : `${fmtMoney(filters.minPrice)}–${fmtMoney(filters.maxPrice)}`;
+  els.budgetPlanFilterSummary.textContent = `单件 ${priceText} · ${filters.brand || '全部品牌'} · ${filters.type || '全部类型'} · 最多 ${filters.maxItems} 款 · ${pool.length} 款参与计算`;
   renderBudgetPlans();
+}
+function scheduleBudgetPlanRefresh(){
+  clearTimeout(budgetPlanRefreshTimer);
+  budgetPlanRefreshTimer = setTimeout(generateBudgetPlans,120);
 }
 function renderBudgetPlans(){
   if(!els.budgetPlanGrid) return;
   const s = selectedSummary();
   const names = {
-    value:['性价比优先','尽量多选几款，把预算花得更细'],
-    diverse:['品类丰富','优先覆盖不同类型，搭配更均衡'],
-    favorite:['偏爱优先','优先候选、常用品牌和对比商品']
+    fit:['贴额优先','优先把组合总价靠近剩余额度'],
+    diverse:['品类均衡','贴近预算的同时尽量覆盖不同类型'],
+    favorite:['偏爱优先','贴近预算的同时优先候选、常用品牌和对比商品']
   };
-  els.budgetPlansStat.textContent = `已选 ${fmtMoney(s.total)} · 剩余 ${fmtMoney(Math.max(0,s.remaining))} · 使用当前筛选范围`;
+  els.budgetPlansStat.textContent = `已选 ${fmtMoney(s.total)} · 可用额度 ${fmtMoney(Math.max(0,s.remaining))}`;
   els.budgetPlanGrid.innerHTML = currentBudgetPlans.map((plan,index)=>{
     const [title, desc] = names[plan.strategy];
     const finalTotal = s.total + plan.total;
@@ -5339,6 +5328,7 @@ function renderBudgetPlans(){
 function openBudgetPlans(){
   if(!state.rows.length){ setStatus('先导入商品清单，再生成预算方案。','warn'); return; }
   if(selectedSummary().remaining <= 0){ setStatus('当前已经没有剩余预算，可以先从购物车移除一款。','warn'); return; }
+  populateBudgetPlanFilters();
   generateBudgetPlans();
   els.budgetPlansModal.classList.add('open');
   els.budgetPlansModal.setAttribute('aria-hidden','false');
@@ -5354,7 +5344,7 @@ function adoptBudgetPlan(index){
   plan.rows.forEach(r => setQty(r.id, Math.max(1, Number(getSelection(r.id).qty) || 1)));
   closeBudgetPlans();
   refreshAll(true);
-  setStatus(`已采用“${plan.strategy === 'value' ? '性价比优先' : plan.strategy === 'diverse' ? '品类丰富' : '偏爱优先'}”方案，加入 ${plan.rows.length} 款。`,'good');
+  setStatus(`已采用“${plan.strategy === 'fit' ? '贴额优先' : plan.strategy === 'diverse' ? '品类均衡' : '偏爱优先'}”方案，加入 ${plan.rows.length} 款。`,'good');
 }
 function syncEditionLabel(){
   const localCopy = location.protocol === 'file:';
@@ -5721,9 +5711,10 @@ function buildOrderClipboardHtml(){
   const rows = buildOrderRows();
   const rowSpan = Math.max(1, rows.length);
   const cellStyle = 'border:1px solid #808080;padding:5px 8px;vertical-align:middle;';
+  const codeCellStyle = `${cellStyle}mso-number-format:'\\@';white-space:nowrap;`;
   const headStyle = `${cellStyle}font-weight:700;text-align:center;background:#f3f3f3;`;
   const body = rows.map((row, index)=>{
-    const itemCells = row.slice(0,7).map(value => `<td style="${cellStyle}">${escapeHtml(value)}</td>`).join('');
+    const itemCells = row.slice(0,7).map((value,cellIndex) => `<td style="${cellIndex === 2 ? codeCellStyle : cellStyle}">${escapeHtml(value)}</td>`).join('');
     const mergedCells = index === 0
       ? row.slice(7,10).map(value => `<td rowspan="${rowSpan}" style="${cellStyle}text-align:center;">${escapeHtml(value)}</td>`).join('')
       : '';
@@ -5786,7 +5777,7 @@ function executeDownloadOrderXLSX(){
     return [
       r.brand || '',
       r.name || '',
-      r.code || '',
+      String(r.code || ''),
       r.spec || '',
       Number(r.price || 0),
       qty,
@@ -5797,28 +5788,11 @@ function executeDownloadOrderXLSX(){
     ];
   });
   const now = new Date();
-  const dateText = now.toLocaleString('zh-CN', {hour12:false});
-  const aoa = [
-    ['内购订购单','','','','','','','','',''],
-    [`来源清单：${state.fileName || '未命名清单'}`, '', '', '', '', `导出时间：${dateText}`, '', '', '', ''],
-    [`部门：${identity.department}`, '', '', `内购人：${identity.buyer}`, '', '', `预算：${Number(state.budget || 0).toFixed(2)}`, '', '', ''],
-    header,
-    ...dataRows,
-    ['合计','','','','',s.qty,Number(s.total.toFixed(2)),'','','']
-  ];
+  const aoa = [header,...dataRows];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  const totalRow = aoa.length;
-  const firstDataRow = 5;
+  const firstDataRow = 2;
   const lastDataRow = firstDataRow + dataRows.length - 1;
-  const merges = [
-    XLSX.utils.decode_range('A1:J1'),
-    XLSX.utils.decode_range('A2:E2'),
-    XLSX.utils.decode_range('F2:J2'),
-    XLSX.utils.decode_range('A3:C3'),
-    XLSX.utils.decode_range('D3:F3'),
-    XLSX.utils.decode_range('G3:J3'),
-    XLSX.utils.decode_range(`A${totalRow}:E${totalRow}`)
-  ];
+  const merges = [];
   if(lastDataRow > firstDataRow){
     merges.push(
       XLSX.utils.decode_range(`H${firstDataRow}:H${lastDataRow}`),
@@ -5828,12 +5802,19 @@ function executeDownloadOrderXLSX(){
   }
   ws['!merges'] = merges;
   ws['!cols'] = [
-    {wch:16},{wch:42},{wch:18},{wch:20},{wch:12},{wch:9},{wch:14},{wch:14},{wch:16},{wch:16}
+    {wch:16},{wch:42},{wch:22},{wch:20},{wch:12},{wch:9},{wch:14},{wch:14},{wch:16},{wch:16}
   ];
-  ws['!rows'] = [{hpt:26},{hpt:20},{hpt:20},{hpt:22}];
-  ws['!autofilter'] = {ref:`A4:J${Math.max(4,lastDataRow)}`};
+  ws['!rows'] = [{hpt:22}];
+  ws['!autofilter'] = {ref:`A1:J${Math.max(1,lastDataRow)}`};
+  for(let rowNumber=firstDataRow;rowNumber<=lastDataRow;rowNumber++){
+    const codeCell = ws[`C${rowNumber}`];
+    if(!codeCell) continue;
+    codeCell.t = 's';
+    codeCell.v = String(codeCell.v ?? '');
+    codeCell.z = '@';
+  }
   const wb = XLSX.utils.book_new();
-  wb.Props = {Title:'内购订购单', Subject:state.fileName || '', Author:'Timins米团子', CreatedDate:now};
+  wb.Props = {Subject:state.fileName || '', Author:'Timins米团子', CreatedDate:now};
   XLSX.utils.book_append_sheet(wb, ws, '订购单');
   const dateName = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
   XLSX.writeFile(wb, `内购订购单_${dateName}.xlsx`, {compression:true});
@@ -5865,7 +5846,7 @@ function renderOrderPreviewTable(){
     <table class="order-preview-table order-export-table">
       <thead><tr>${header.map(h => `<th>${escapeHtml(h)}</th>`).join('')}</tr></thead>
       <tbody>${rows.map((row, index)=>{
-        const itemCells = row.slice(0,7).map(value => `<td>${escapeHtml(value)}</td>`).join('');
+        const itemCells = row.slice(0,7).map((value,cellIndex) => `<td class="${cellIndex === 2 ? 'order-code-cell' : ''}">${escapeHtml(value)}</td>`).join('');
         const mergedCells = index === 0
           ? row.slice(7,10).map(value => `<td class="merged-meta" rowspan="${rowSpan}">${escapeHtml(value)}</td>`).join('')
           : '';
@@ -5903,7 +5884,7 @@ function parseWorkbook(file){
       const firstSheetName = wb.SheetNames[0];
       if(!firstSheetName) throw new Error('工作簿中没有可读取的工作表');
       const sheet = wb.Sheets[firstSheetName];
-      const rows = XLSX.utils.sheet_to_json(sheet, {defval:'', raw:false});
+      const rows = XLSX.utils.sheet_to_json(sheet, {defval:'', raw:true});
       state.fileName = file.name;
       state.catalogMeta = {
         name:file.name,
@@ -5958,7 +5939,6 @@ function refreshAll(preserveScroll=false, anchorId=''){
     if(anchorBefore) anchorTopBefore = anchorBefore.getBoundingClientRect().top;
   }
   renderSummaryAndExport();
-  renderCatalogOverview();
   renderCards(anchorId, ()=>{
     if(preserveScroll || anchorId) triggerFeedbackPulse(anchorId);
   });
@@ -6326,8 +6306,12 @@ function attachEvents(){
   if(els.whatsNewModal) els.whatsNewModal.addEventListener('click', (e)=>{ if(e.target === els.whatsNewModal) closeWhatsNew(); });
   [els.openBudgetPlansBtn, els.openBudgetPlansBtnSide].filter(Boolean).forEach(btn => btn.addEventListener('click', openBudgetPlans));
   if(els.closeBudgetPlansBtn) els.closeBudgetPlansBtn.addEventListener('click', closeBudgetPlans);
-  if(els.regenerateBudgetPlansBtn) els.regenerateBudgetPlansBtn.addEventListener('click', generateBudgetPlans);
-  if(els.budgetPlanMaxItems) els.budgetPlanMaxItems.addEventListener('change', generateBudgetPlans);
+  if(els.regenerateBudgetPlansBtn) els.regenerateBudgetPlansBtn.addEventListener('click', ()=>{
+    budgetPlanGenerationSeed += 1;
+    generateBudgetPlans();
+  });
+  [els.budgetPlanMinPrice,els.budgetPlanMaxPrice,els.budgetPlanMaxItems].filter(Boolean).forEach(input => input.addEventListener('input', scheduleBudgetPlanRefresh));
+  [els.budgetPlanBrandSelect,els.budgetPlanTypeSelect].filter(Boolean).forEach(select => select.addEventListener('change', generateBudgetPlans));
   if(els.budgetPlanGrid) els.budgetPlanGrid.addEventListener('click', (e)=>{
     const btn = e.target.closest('[data-plan-index]');
     if(btn) adoptBudgetPlan(Number(btn.dataset.planIndex));
@@ -6342,15 +6326,6 @@ function attachEvents(){
     if(e.target.closest('.duel-apply-result')){ applyDuelResult(); return; }
     if(e.target.closest('.duel-cancel-result')) closeCandidateDuel();
   });
-  if(els.catalogOverview) els.catalogOverview.addEventListener('click', (e)=>{
-    const typeBtn = e.target.closest('[data-overview-type]');
-    const priceBtn = e.target.closest('[data-overview-price]');
-    const allBtn = e.target.closest('[data-overview-all="1"]');
-    if(typeBtn) applyOverviewFilter('type', typeBtn.dataset.overviewType || '');
-    else if(priceBtn) applyOverviewFilter('price', priceBtn.dataset.overviewPrice || '');
-    else if(allBtn) applyOverviewFilter('all', '');
-  });
-  if(els.clearOverviewFilterBtn) els.clearOverviewFilterBtn.addEventListener('click', ()=>applyOverviewFilter('all',''));
   els.applyMappingBtn.addEventListener('click', applyMappingFromSelectors);
   if(els.resetFiltersBtn) els.resetFiltersBtn.addEventListener('click', resetFilters);
   if(els.resetLayoutBtn) els.resetLayoutBtn.addEventListener('click', resetColumnLayout);
