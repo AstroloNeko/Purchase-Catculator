@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v64" />
+<meta name="app-version" content="v65" />
 <title>内购挑选助手</title>
 <link rel="icon" href="data:," />
 <script src="./vendor/xlsx.full.min.js"></script>
@@ -2620,6 +2620,118 @@ html[data-theme="dark"] .fold-title{color:#f4eee8}
 .budget-plan-item span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .budget-plan-foot{padding:10px;border-top:1px solid var(--line);display:grid;gap:8px}
 .budget-plan-total{font-size:12px;font-weight:900;color:var(--text)}
+.luck-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin:10px 0 14px;
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:rgba(255,255,255,.24);
+}
+.luck-tab{
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:var(--muted);
+  padding:8px 10px;
+  font-size:11px;
+  font-weight:900;
+}
+.luck-tab.active{background:var(--pink-soft);color:#a65f70;box-shadow:0 4px 12px rgba(166,95,112,.1)}
+.luck-panel[hidden]{display:none}
+.luck-controls{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr)) auto;
+  align-items:end;
+  gap:9px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--line);
+}
+.luck-controls.two{grid-template-columns:1fr 1fr auto}
+.luck-field{display:grid;gap:5px;min-width:0}
+.luck-field label{margin:0;font-size:10px}
+.luck-inline-check{
+  min-height:34px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 9px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--panel);
+  color:var(--text);
+  font-size:11px;
+}
+.luck-inline-check input{width:15px;height:15px}
+.luck-result{min-height:220px;padding-top:12px}
+.luck-empty{
+  min-height:200px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px dashed var(--line);
+  border-radius:12px;
+  color:var(--muted);
+  font-size:12px;
+  text-align:center;
+  padding:20px;
+}
+.luck-product{
+  display:grid;
+  grid-template-columns:180px minmax(0,1fr);
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--panel);
+  overflow:hidden;
+  animation:luck-reveal .22s ease both;
+}
+.luck-product-media{
+  min-height:190px;
+  background:var(--blue-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+.luck-product-media img{width:100%;height:100%;object-fit:contain;background:#fff}
+.luck-product-media span{color:var(--muted);font-size:11px}
+.luck-product-body{display:flex;flex-direction:column;gap:8px;padding:14px;min-width:0}
+.luck-kicker{font-size:10px;font-weight:900;color:#a65f70}
+.luck-product-name{font-size:17px;font-weight:900;line-height:1.45;color:var(--text)}
+.luck-product-meta{font-size:11px;line-height:1.6;color:var(--muted)}
+.luck-product-price{font-size:23px;font-weight:950;color:var(--text)}
+.luck-product-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.luck-profile{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-bottom:10px;
+}
+.luck-profile-item{border:1px solid var(--line);border-radius:10px;padding:8px 9px;background:rgba(255,255,255,.24)}
+.luck-profile-item span{display:block;font-size:9px;color:var(--muted)}
+.luck-profile-item b{display:block;margin-top:3px;font-size:12px;color:var(--text)}
+.luck-capsule-list{display:grid;gap:7px}
+.luck-capsule-item{
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) auto;
+  align-items:center;
+  gap:9px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:7px;
+  background:var(--panel);
+  animation:luck-reveal .28s ease both;
+}
+.luck-capsule-thumb{width:42px;height:42px;border-radius:8px;background:var(--blue-soft);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.luck-capsule-thumb img{width:100%;height:100%;object-fit:contain;background:#fff}
+.luck-capsule-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:800;color:var(--text)}
+.luck-capsule-meta{font-size:9px;color:var(--muted);margin-top:2px}
+.luck-capsule-price{font-size:12px;font-weight:900;color:var(--text)}
+.luck-capsule-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.luck-capsule-total{font-size:12px;font-weight:900;color:var(--text)}
+@keyframes luck-reveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 .duel-progress{height:7px;border-radius:999px;background:rgba(148,163,184,.18);overflow:hidden;margin:10px 0 14px}
 .duel-progress span{display:block;height:100%;background:linear-gradient(90deg,#e8a7b7,#f1cf9b,#bcdcb3);transition:width .2s ease}
 .duel-grid{display:grid;grid-template-columns:1fr auto 1fr;align-items:stretch;gap:12px}
@@ -2686,6 +2798,13 @@ html[data-theme="dark"] .duel-cover img{background:#211f1e}
 html[data-theme="dark"] .order-preview-table .merged-meta{background:#292524}
 html[data-theme="dark"] .budget-multi-picker summary,
 html[data-theme="dark"] .budget-multi-menu{background:#292524;border-color:#443b38}
+html[data-theme="dark"] .luck-tabs,
+html[data-theme="dark"] .luck-inline-check,
+html[data-theme="dark"] .luck-product,
+html[data-theme="dark"] .luck-profile-item,
+html[data-theme="dark"] .luck-capsule-item{background:#292524;border-color:#443b38}
+html[data-theme="dark"] .luck-product-media img,
+html[data-theme="dark"] .luck-capsule-thumb img{background:#211f1e}
 @media (max-width:760px){
   .product-heading-row{align-items:center}
   .official-version{font-size:9px;padding:4px 7px}
@@ -2693,6 +2812,11 @@ html[data-theme="dark"] .budget-multi-menu{background:#292524;border-color:#443b
   .budget-plan-filter-grid .budget-plan-regenerate{grid-column:1/-1}
   .budget-multi-menu{width:100%}
   .budget-plan-grid{grid-template-columns:1fr}
+  .luck-controls,.luck-controls.two{grid-template-columns:1fr 1fr}
+  .luck-controls .luck-action{grid-column:1/-1}
+  .luck-product{grid-template-columns:1fr}
+  .luck-product-media{min-height:160px;max-height:220px}
+  .luck-profile{grid-template-columns:1fr}
   .duel-grid{grid-template-columns:1fr}
   .duel-or{padding:0}
   .whats-new-list{grid-template-columns:1fr}
@@ -2706,7 +2830,7 @@ html[data-theme="dark"] .budget-multi-menu{background:#292524;border-color:#443b
   <aside class="sidebar panel">
     <div class="product-heading-row">
       <h1>内购挑选助手</h1>
-      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v64</button>
+      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v65</button>
     </div>
     <div class="desc">导入本月清单后，可以看图、筛选、算预算、整理订购单。适合自己挑，也适合和同事一起核对。</div>
 
@@ -2908,7 +3032,8 @@ html[data-theme="dark"] .budget-multi-menu{background:#292524;border-color:#443b
       </div>
       <div class="toolbar-right">
         <button class="btn primary small" id="openBudgetPlansBtn">预算方案</button>
-        <button class="btn secondary small" id="openWhatsNewBtn">v64 更新说明</button>
+        <button class="btn secondary small" id="openLuckBtn">试试手气</button>
+        <button class="btn secondary small" id="openWhatsNewBtn">v65 更新说明</button>
         <button class="btn secondary small" id="selectVisibleBtn">本页都加购</button>
         <button class="btn secondary small" id="candidateVisibleBtn">本页先候选</button>
         <button class="btn danger small" id="clearSelectionTopBtn">清空购物车</button>
@@ -3203,6 +3328,82 @@ html[data-theme="dark"] .budget-multi-menu{background:#292524;border-color:#443b
   </div>
 </div>
 
+<div id="luckModal" class="order-modal" aria-hidden="true">
+  <div class="order-modal-inner" style="width:min(820px,100%)">
+    <div class="order-preview-head">
+      <div>
+        <div class="panel-title" style="font-size:22px">试试手气</div>
+        <div class="mini-stat">挑不出来的时候，把一小部分决定交给运气</div>
+      </div>
+      <button class="btn secondary small" id="closeLuckBtn" type="button">关闭</button>
+    </div>
+    <div class="luck-tabs" role="tablist">
+      <button class="luck-tab active" type="button" data-luck-tab="roll">随机 Roll</button>
+      <button class="luck-tab" type="button" data-luck-tab="lucky">本月幸运</button>
+      <button class="luck-tab" type="button" data-luck-tab="capsule">预算扭蛋</button>
+    </div>
+
+    <section class="luck-panel" data-luck-panel="roll">
+      <div class="luck-controls">
+        <div class="luck-field">
+          <label for="luckRollScope">抽取范围</label>
+          <select id="luckRollScope">
+            <option value="visible">当前筛选结果</option>
+            <option value="all">全部商品</option>
+            <option value="candidate">候选清单</option>
+          </select>
+        </div>
+        <div class="luck-field">
+          <label>预算限制</label>
+          <label class="luck-inline-check"><input id="luckRollAffordable" type="checkbox" checked />只抽剩余预算内</label>
+        </div>
+        <div class="luck-field">
+          <label>重复限制</label>
+          <label class="luck-inline-check"><input id="luckRollExcludeSelected" type="checkbox" checked />排除购物车商品</label>
+        </div>
+        <button class="btn primary luck-action" id="rollLuckBtn" type="button">开始 Roll</button>
+      </div>
+      <div class="luck-result" id="luckRollResult">
+        <div class="luck-empty">设置抽取范围，然后看看这次会落到哪一件。</div>
+      </div>
+    </section>
+
+    <section class="luck-panel" data-luck-panel="lucky" hidden>
+      <div class="luck-controls two">
+        <div class="luck-field">
+          <label for="luckBirthMonth">生日月份</label>
+          <input id="luckBirthMonth" type="number" min="1" max="12" step="1" placeholder="1–12" />
+        </div>
+        <div class="luck-field">
+          <label for="luckBirthDay">生日日期</label>
+          <input id="luckBirthDay" type="number" min="1" max="31" step="1" placeholder="1–31" />
+        </div>
+        <button class="btn primary luck-action" id="findLuckyProductBtn" type="button">查看本月幸运商品</button>
+      </div>
+      <div class="luck-result" id="luckyProductResult">
+        <div class="luck-empty">生日只用于本次计算，不会保存。每个月都会得到新的幸运商品。</div>
+      </div>
+    </section>
+
+    <section class="luck-panel" data-luck-panel="capsule" hidden>
+      <div class="luck-controls two">
+        <div class="luck-field">
+          <label for="luckCapsuleBudget">交给运气的金额</label>
+          <input id="luckCapsuleBudget" type="number" min="1" step="1" value="50" />
+        </div>
+        <div class="luck-field">
+          <label for="luckCapsuleCount">想抽几件</label>
+          <input id="luckCapsuleCount" type="number" min="1" max="5" step="1" value="3" />
+        </div>
+        <button class="btn primary luck-action" id="drawCapsuleBtn" type="button">开始扭蛋</button>
+      </div>
+      <div class="luck-result" id="luckCapsuleResult">
+        <div class="luck-empty">设定金额和件数，随机揭晓一套不超预算的组合。</div>
+      </div>
+    </section>
+  </div>
+</div>
+
 <div id="duelModal" class="order-modal" aria-hidden="true">
   <div class="order-modal-inner">
     <div class="order-preview-head">
@@ -3221,16 +3422,16 @@ html[data-theme="dark"] .budget-multi-menu{background:#292524;border-color:#443b
   <div class="order-modal-inner" style="width:min(720px,100%)">
     <div class="order-preview-head">
       <div>
-        <div class="panel-title" style="font-size:22px">v64 更新说明</div>
-        <div class="mini-stat">本次版本完善了预算方案的筛选方式</div>
+        <div class="panel-title" style="font-size:22px">v65 更新说明</div>
+        <div class="mini-stat">本次版本加入了三种轻松一点的选品玩法</div>
       </div>
       <button class="btn secondary small" id="closeWhatsNewBtn" type="button">关闭</button>
     </div>
     <div class="whats-new-list">
-      <div class="whats-new-item"><b>推荐条件支持多选</b><span>单件价位、IP 品牌和商品类型都可以同时勾选多个选项。</span></div>
-      <div class="whats-new-item"><b>组合更贴近预算</b><span>新版算法优先缩小剩余额度，再区分贴额、品类和偏爱方案。</span></div>
-      <div class="whats-new-item"><b>订购单更加精简</b><span>Excel 文件直接从表头开始，不再额外添加标题和说明行。</span></div>
-      <div class="whats-new-item"><b>货号完整显示</b><span>复制和 Excel 导出均按文本保留商品编号，避免显示成科学计数法。</span></div>
+      <div class="whats-new-item"><b>随机 Roll</b><span>可以从当前结果、全部商品或候选清单中随机抽取一件。</span></div>
+      <div class="whats-new-item"><b>本月幸运商品</b><span>根据生日月日和本月清单，生成固定的星座幸运商品。</span></div>
+      <div class="whats-new-item"><b>预算扭蛋</b><span>设置金额和件数，随机揭晓一套不超过预算的商品组合。</span></div>
+      <div class="whats-new-item"><b>本地即时计算</b><span>生日不会保存或上传，三种玩法都只在当前浏览器中运行。</span></div>
     </div>
     <div class="order-preview-actions">
       <a class="btn secondary" id="officialOnlineLink" href="https://astroloneko.github.io/Purchase-Catculator/" target="_blank" rel="noopener">打开在线版</a>
@@ -3313,7 +3514,7 @@ html[data-theme="dark"] .budget-multi-menu{background:#292524;border-color:#443b
 </footer>
 
 <script>
-const APP_VERSION = 'v64';
+const APP_VERSION = 'v65';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -3325,7 +3526,7 @@ const CATALOG_DB_NAME = 'timins_purchase_picker';
 const CATALOG_DB_VERSION = 1;
 const CATALOG_STORE_NAME = 'catalogs';
 const LATEST_CATALOG_ID = 'latest';
-const WHATS_NEW_KEY = 'timins_picker_whats_new_v64';
+const WHATS_NEW_KEY = 'timins_picker_whats_new_v65';
 const FALLBACK_TYPE_RULES = [
   ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
   ['徽章/胸针', ['徽章','胸针','吧唧','别针','毛绒吧唧']],
@@ -3547,6 +3748,7 @@ const els = {
   openCompareBtnMobile: document.getElementById('openCompareBtnMobile'),
   openBudgetPlansBtn: document.getElementById('openBudgetPlansBtn'),
   openBudgetPlansBtnSide: document.getElementById('openBudgetPlansBtnSide'),
+  openLuckBtn: document.getElementById('openLuckBtn'),
   openWhatsNewBtn: document.getElementById('openWhatsNewBtn'),
   startDuelBtn: document.getElementById('startDuelBtn'),
   startDuelBtnMobile: document.getElementById('startDuelBtnMobile'),
@@ -3587,6 +3789,21 @@ const els = {
   budgetPlanGrid: document.getElementById('budgetPlanGrid'),
   closeBudgetPlansBtn: document.getElementById('closeBudgetPlansBtn'),
   regenerateBudgetPlansBtn: document.getElementById('regenerateBudgetPlansBtn'),
+  luckModal: document.getElementById('luckModal'),
+  closeLuckBtn: document.getElementById('closeLuckBtn'),
+  luckRollScope: document.getElementById('luckRollScope'),
+  luckRollAffordable: document.getElementById('luckRollAffordable'),
+  luckRollExcludeSelected: document.getElementById('luckRollExcludeSelected'),
+  rollLuckBtn: document.getElementById('rollLuckBtn'),
+  luckRollResult: document.getElementById('luckRollResult'),
+  luckBirthMonth: document.getElementById('luckBirthMonth'),
+  luckBirthDay: document.getElementById('luckBirthDay'),
+  findLuckyProductBtn: document.getElementById('findLuckyProductBtn'),
+  luckyProductResult: document.getElementById('luckyProductResult'),
+  luckCapsuleBudget: document.getElementById('luckCapsuleBudget'),
+  luckCapsuleCount: document.getElementById('luckCapsuleCount'),
+  drawCapsuleBtn: document.getElementById('drawCapsuleBtn'),
+  luckCapsuleResult: document.getElementById('luckCapsuleResult'),
   duelModal: document.getElementById('duelModal'),
   duelStat: document.getElementById('duelStat'),
   duelProgressBar: document.getElementById('duelProgressBar'),
@@ -3671,6 +3888,10 @@ let pendingCatalogReconcile = null;
 let currentBudgetPlans = [];
 let budgetPlanGenerationSeed = 0;
 let budgetPlanRefreshTimer = null;
+let currentLuckRollRow = null;
+let currentLuckyRow = null;
+let currentCapsuleRows = [];
+let luckRollToken = 0;
 let duelState = null;
 let cartGroupsCollapsed = false;
 
@@ -5425,6 +5646,243 @@ function adoptBudgetPlan(index){
   refreshAll(true);
   setStatus(`已采用“${plan.strategy === 'fit' ? '贴额优先' : plan.strategy === 'diverse' ? '品类均衡' : '偏爱优先'}”方案，加入 ${plan.rows.length} 款。`,'good');
 }
+function randomUnit(){
+  if(window.crypto && window.crypto.getRandomValues){
+    const value = new Uint32Array(1);
+    window.crypto.getRandomValues(value);
+    return value[0] / 4294967296;
+  }
+  return Math.random();
+}
+function randomItem(rows){
+  return rows.length ? rows[Math.floor(randomUnit()*rows.length)] : null;
+}
+function waitMs(ms){ return new Promise(resolve=>setTimeout(resolve,ms)); }
+function luckProductHtml(row,kicker,detail='',showActions=true){
+  if(!row) return '<div class="luck-empty">当前条件下没有可以抽取的商品。</div>';
+  const image = row.image
+    ? `<img src="${escapeHtml(row.image)}" alt="${escapeHtml(row.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`
+    : '<span>暂时没有图片</span>';
+  const stockText = Number.isFinite(Number(row.stock)) ? `库存 ${Math.max(0,Number(row.stock))}` : '库存未知';
+  return `<div class="luck-product">
+    <div class="luck-product-media">${image}</div>
+    <div class="luck-product-body">
+      <div class="luck-kicker">${escapeHtml(kicker)}</div>
+      <div class="luck-product-name">${escapeHtml(row.name)}</div>
+      <div class="luck-product-meta">${escapeHtml(row.brand || '未标品牌')} · ${escapeHtml(row.type || '其他')} · ${escapeHtml(stockText)}<br>商品编号：${escapeHtml(row.code || '—')}${detail ? `<br>${escapeHtml(detail)}` : ''}</div>
+      <div class="luck-product-price">${escapeHtml(fmtMoney(row.price))}</div>
+      ${showActions ? `<div class="luck-product-actions">
+        <button class="btn primary" type="button" data-luck-cart="${escapeHtml(row.id)}">加入购物车</button>
+        <button class="btn secondary" type="button" data-luck-candidate="${escapeHtml(row.id)}">${isCandidate(row.id)?'已在候选':'放进候选'}</button>
+      </div>` : ''}
+    </div>
+  </div>`;
+}
+function switchLuckTab(tab){
+  const next = ['roll','lucky','capsule'].includes(tab) ? tab : 'roll';
+  els.luckModal.querySelectorAll('[data-luck-tab]').forEach(btn=>btn.classList.toggle('active',btn.dataset.luckTab===next));
+  els.luckModal.querySelectorAll('[data-luck-panel]').forEach(panel=>{panel.hidden=panel.dataset.luckPanel!==next;});
+}
+function openLuckModal(){
+  if(!state.rows.length){setStatus('先导入商品清单，再来试试手气。','warn');return;}
+  closeDrawers();
+  const remaining = Math.max(1,Math.floor(selectedSummary().remaining));
+  if(els.luckCapsuleBudget) els.luckCapsuleBudget.value=String(Math.min(50,remaining));
+  els.luckModal.classList.add('open');
+  els.luckModal.setAttribute('aria-hidden','false');
+}
+function closeLuckModal(){
+  luckRollToken += 1;
+  els.luckModal.classList.remove('open');
+  els.luckModal.setAttribute('aria-hidden','true');
+  if(els.rollLuckBtn) els.rollLuckBtn.disabled=false;
+}
+function luckRollPool(){
+  let pool;
+  if(els.luckRollScope.value==='candidate') pool=candidateRows();
+  else if(els.luckRollScope.value==='all') pool=state.rows.slice();
+  else pool=state.visibleRows.slice();
+  const remaining=Math.max(0,selectedSummary().remaining);
+  return pool.filter(r=>
+    Number(r.price)>0
+    && r.stock!==0
+    && (!els.luckRollAffordable.checked || Number(r.price)<=remaining+0.005)
+    && (!els.luckRollExcludeSelected.checked || !getSelection(r.id).selected)
+  );
+}
+async function runLuckRoll(){
+  const pool=luckRollPool();
+  if(!pool.length){
+    els.luckRollResult.innerHTML='<div class="luck-empty">当前范围里没有符合条件的商品，可以放宽预算限制或换一个抽取范围。</div>';
+    return;
+  }
+  const token=++luckRollToken;
+  els.rollLuckBtn.disabled=true;
+  for(let i=0;i<9;i++){
+    if(token!==luckRollToken)return;
+    const passing=randomItem(pool);
+    els.luckRollResult.innerHTML=luckProductHtml(passing,'正在 Roll…','结果还没有停稳',false);
+    await waitMs(55+i*9);
+  }
+  if(token!==luckRollToken)return;
+  currentLuckRollRow=randomItem(pool);
+  els.luckRollResult.innerHTML=luckProductHtml(currentLuckRollRow,'本次 Roll 到了它',`从 ${pool.length} 款符合条件的商品中抽出`);
+  els.rollLuckBtn.disabled=false;
+}
+const ZODIAC_PROFILES = {
+  '白羊座':{types:['摆件','手办','积木','车载'],colors:['活力红','亮橙'],keywords:['行动力','新鲜感'],reason:'适合挑一件看见就会立刻心动的商品。'},
+  '金牛座':{types:['杯具','餐厨','家居','收纳'],colors:['青草绿','奶油白'],keywords:['舒适感','实用派'],reason:'本月更适合把预算花在每天都能用上的东西。'},
+  '双子座':{types:['文具','纸品','数码','贴纸'],colors:['明亮黄','天空蓝'],keywords:['灵感','有趣'],reason:'轻巧、有变化感的小物更容易带来好心情。'},
+  '巨蟹座':{types:['毛绒','公仔','盲盒','家居'],colors:['月光白','柔粉'],keywords:['陪伴感','柔软'],reason:'能让工位或房间更舒服的商品会比较合拍。'},
+  '狮子座':{types:['徽章','胸针','摆件','饰品'],colors:['金色','正红'],keywords:['存在感','闪亮'],reason:'本月幸运款适合有一点醒目，也有一点特别。'},
+  '处女座':{types:['收纳','文具','办公','杯具'],colors:['净白','鼠尾草绿'],keywords:['整洁','效率'],reason:'兼顾好看与秩序感的商品更容易成为长期爱用款。'},
+  '天秤座':{types:['饰品','贴纸','包袋','杯具'],colors:['雾粉','浅蓝'],keywords:['平衡感','审美'],reason:'外观协调、细节耐看的商品更适合本月手气。'},
+  '天蝎座':{types:['徽章','盲盒','摆件','数码'],colors:['深红','曜石黑'],keywords:['神秘感','收藏欲'],reason:'略带隐藏感或收藏属性的商品更容易抽中。'},
+  '射手座':{types:['车载','包袋','摆件','玩具'],colors:['宝石蓝','紫红'],keywords:['探索','自由'],reason:'带一点出行感或新奇玩法的商品更有缘分。'},
+  '摩羯座':{types:['办公','数码','收纳','杯具'],colors:['深绿','石墨灰'],keywords:['耐用','稳妥'],reason:'本月适合选择实用、耐看且不容易闲置的商品。'},
+  '水瓶座':{types:['数码','创意','摆件','文具'],colors:['电光蓝','银色'],keywords:['特别','脑洞'],reason:'不太常规、能让人多看一眼的商品更符合本月气场。'},
+  '双鱼座':{types:['毛绒','贴纸','纸品','盲盒'],colors:['海盐蓝','淡紫'],keywords:['想象力','治愈感'],reason:'柔和、有故事感的小物会带来更好的本月手气。'}
+};
+function zodiacForDate(month,day){
+  const key=month*100+day;
+  const boundaries=[
+    [120,'水瓶座'],[219,'双鱼座'],[321,'白羊座'],[420,'金牛座'],[521,'双子座'],[622,'巨蟹座'],
+    [723,'狮子座'],[823,'处女座'],[923,'天秤座'],[1024,'天蝎座'],[1123,'射手座'],[1222,'摩羯座']
+  ];
+  let zodiac='摩羯座';
+  boundaries.forEach(([start,name])=>{if(key>=start)zodiac=name;});
+  return zodiac;
+}
+function validBirthday(month,day){
+  if(!Number.isInteger(month)||!Number.isInteger(day)||month<1||month>12||day<1)return false;
+  const date=new Date(2024,month-1,day);
+  return date.getMonth()===month-1&&date.getDate()===day;
+}
+function stableHash(text){
+  let hash=2166136261;
+  for(let i=0;i<text.length;i++){hash^=text.charCodeAt(i);hash=Math.imul(hash,16777619);}
+  return hash>>>0;
+}
+function findMonthlyLuckyProduct(){
+  const month=Math.round(Number(els.luckBirthMonth.value));
+  const day=Math.round(Number(els.luckBirthDay.value));
+  if(!validBirthday(month,day)){
+    els.luckyProductResult.innerHTML='<div class="luck-empty">请填写有效的生日月日，例如 5 月 21 日。</div>';
+    return;
+  }
+  const zodiac=zodiacForDate(month,day);
+  const profile=ZODIAC_PROFILES[zodiac];
+  const all=state.rows.filter(r=>Number(r.price)>0&&r.stock!==0);
+  const preferred=all.filter(r=>profile.types.some(key=>cleanString(r.type).includes(key)));
+  const pool=preferred.length?preferred:all;
+  if(!pool.length){
+    els.luckyProductResult.innerHTML='<div class="luck-empty">当前清单里没有可抽取的在售商品。</div>';
+    return;
+  }
+  const now=new Date();
+  const catalogKey=`${state.fileName}|${state.rows.length}|${state.rows[0]?.code||''}|${state.rows[state.rows.length-1]?.code||''}`;
+  const hash=stableHash(`${month}-${day}|${now.getFullYear()}-${now.getMonth()+1}|${catalogKey}`);
+  currentLuckyRow=pool[hash%pool.length];
+  const color=profile.colors[hash%profile.colors.length];
+  const keyword=profile.keywords[Math.floor(hash/profile.colors.length)%profile.keywords.length];
+  const priceBin=getCommonPriceBins(Math.max(Number(currentLuckyRow.price),100)).find(bin=>Number(currentLuckyRow.price)>=bin.start&&Number(currentLuckyRow.price)<bin.end);
+  els.luckyProductResult.innerHTML=`<div class="luck-profile">
+    <div class="luck-profile-item"><span>本月星座</span><b>${escapeHtml(zodiac)}</b></div>
+    <div class="luck-profile-item"><span>幸运色</span><b>${escapeHtml(color)}</b></div>
+    <div class="luck-profile-item"><span>幸运价位</span><b>${escapeHtml(priceBin?priceBin.label:'不限')}</b></div>
+  </div>${luckProductHtml(currentLuckyRow,`${now.getMonth()+1} 月幸运关键词：${keyword}`,profile.reason)}`;
+}
+function buildCapsuleDraw(budget,count){
+  const pool=state.rows.filter(r=>!getSelection(r.id).selected&&Number(r.price)>0&&Number(r.price)<=budget+0.005&&r.stock!==0);
+  if(!pool.length)return [];
+  let best=[];
+  let bestTotal=0;
+  for(let attempt=0;attempt<180;attempt++){
+    const picked=[];
+    const pickedIds=new Set();
+    let total=0;
+    while(picked.length<count){
+      const remaining=budget-total;
+      const slots=Math.max(1,count-picked.length);
+      const ideal=remaining/slots;
+      const choices=pool
+        .filter(r=>!pickedIds.has(r.id)&&Number(r.price)<=remaining+0.005)
+        .map(r=>({row:r,score:Math.abs(Number(r.price)-ideal)+randomUnit()*Math.max(1,ideal)*.9}))
+        .sort((a,b)=>a.score-b.score)
+        .slice(0,Math.min(12,pool.length));
+      if(!choices.length)break;
+      const choice=choices[Math.floor(randomUnit()*Math.min(4,choices.length))].row;
+      picked.push(choice);
+      pickedIds.add(choice.id);
+      total+=Number(choice.price);
+    }
+    if(picked.length>best.length||(picked.length===best.length&&total>bestTotal)){
+      best=picked;
+      bestTotal=total;
+    }
+  }
+  return best;
+}
+function renderCapsuleResult(rows,budget){
+  if(!rows.length){
+    els.luckCapsuleResult.innerHTML='<div class="luck-empty">这个金额暂时抽不到商品，可以提高金额或减少件数。</div>';
+    return;
+  }
+  const total=rows.reduce((sum,r)=>sum+Number(r.price||0),0);
+  els.luckCapsuleResult.innerHTML=`<div class="luck-capsule-list">${rows.map((r,index)=>{
+    const thumb=r.image?`<img src="${escapeHtml(r.image)}" alt="" loading="lazy" onerror="this.remove()">`:'';
+    return `<div class="luck-capsule-item" style="animation-delay:${index*70}ms">
+      <div class="luck-capsule-thumb">${thumb}</div>
+      <div><div class="luck-capsule-name">${escapeHtml(r.name)}</div><div class="luck-capsule-meta">${escapeHtml(r.brand||'未标品牌')} · ${escapeHtml(r.type||'其他')}</div></div>
+      <div class="luck-capsule-price">${escapeHtml(fmtMoney(r.price))}</div>
+    </div>`;
+  }).join('')}</div>
+  <div class="luck-capsule-foot">
+    <div class="luck-capsule-total">${rows.length} 件 · 合计 ${fmtMoney(total)} · 还剩 ${fmtMoney(Math.max(0,budget-total))}</div>
+    <div class="row wrap">
+      <button class="btn secondary" type="button" data-capsule-reroll>再扭一次</button>
+      <button class="btn primary" type="button" data-capsule-add>整套加入购物车</button>
+    </div>
+  </div>`;
+}
+async function drawBudgetCapsule(){
+  const budget=Math.max(1,Number(els.luckCapsuleBudget.value)||1);
+  const count=clamp(Math.round(Number(els.luckCapsuleCount.value)||1),1,5);
+  els.luckCapsuleBudget.value=String(budget);
+  els.luckCapsuleCount.value=String(count);
+  els.drawCapsuleBtn.disabled=true;
+  els.luckCapsuleResult.innerHTML='<div class="luck-empty">扭蛋正在滚动，马上揭晓。</div>';
+  await waitMs(420);
+  currentCapsuleRows=buildCapsuleDraw(budget,count);
+  renderCapsuleResult(currentCapsuleRows,budget);
+  els.drawCapsuleBtn.disabled=false;
+}
+function addLuckProductToCart(id){
+  const row=getRowById(id);
+  if(!row)return;
+  pushHistory();
+  setQty(id,Math.max(1,Number(getSelection(id).qty)||1));
+  refreshAll(true);
+  setStatus(`“${escapeHtml(row.name)}”已加入购物车。`,'good');
+}
+function addLuckProductToCandidate(id){
+  const row=getRowById(id);
+  if(!row)return;
+  if(!isCandidate(id)){
+    pushHistory();
+    state.candidates[id]=true;
+    persistState();
+    refreshAll(true);
+  }
+  setStatus(`“${escapeHtml(row.name)}”已放进候选清单。`,'good');
+}
+function addCapsuleToCart(){
+  if(!currentCapsuleRows.length)return;
+  pushHistory();
+  currentCapsuleRows.forEach(row=>setQty(row.id,Math.max(1,Number(getSelection(row.id).qty)||1)));
+  refreshAll(true);
+  setStatus(`预算扭蛋的 ${currentCapsuleRows.length} 款商品已加入购物车。`,'good');
+}
 function syncEditionLabel(){
   const localCopy = location.protocol === 'file:';
   if(els.officialVersionBtn){
@@ -6412,6 +6870,22 @@ function attachEvents(){
     if(btn) adoptBudgetPlan(Number(btn.dataset.planIndex));
   });
   if(els.budgetPlansModal) els.budgetPlansModal.addEventListener('click', (e)=>{ if(e.target === els.budgetPlansModal) closeBudgetPlans(); });
+  if(els.openLuckBtn) els.openLuckBtn.addEventListener('click',openLuckModal);
+  if(els.closeLuckBtn) els.closeLuckBtn.addEventListener('click',closeLuckModal);
+  if(els.rollLuckBtn) els.rollLuckBtn.addEventListener('click',runLuckRoll);
+  if(els.findLuckyProductBtn) els.findLuckyProductBtn.addEventListener('click',findMonthlyLuckyProduct);
+  if(els.drawCapsuleBtn) els.drawCapsuleBtn.addEventListener('click',drawBudgetCapsule);
+  if(els.luckModal) els.luckModal.addEventListener('click',(e)=>{
+    if(e.target===els.luckModal){closeLuckModal();return;}
+    const tab=e.target.closest('[data-luck-tab]');
+    if(tab){switchLuckTab(tab.dataset.luckTab);return;}
+    const cart=e.target.closest('[data-luck-cart]');
+    if(cart){addLuckProductToCart(cart.dataset.luckCart);return;}
+    const candidate=e.target.closest('[data-luck-candidate]');
+    if(candidate){addLuckProductToCandidate(candidate.dataset.luckCandidate);return;}
+    if(e.target.closest('[data-capsule-reroll]')){drawBudgetCapsule();return;}
+    if(e.target.closest('[data-capsule-add]'))addCapsuleToCart();
+  });
   [els.startDuelBtn, els.startDuelBtnMobile].filter(Boolean).forEach(btn => btn.addEventListener('click', startCandidateDuel));
   if(els.closeDuelBtn) els.closeDuelBtn.addEventListener('click', closeCandidateDuel);
   if(els.duelModal) els.duelModal.addEventListener('click', (e)=>{ if(e.target === els.duelModal) closeCandidateDuel(); });
@@ -6597,6 +7071,7 @@ function attachEvents(){
   els.lightbox.addEventListener('click', (e)=>{ if(e.target === els.lightbox) closeLightbox(); });
   document.addEventListener('keydown', (e)=>{
     if(els.whatsNewModal && els.whatsNewModal.classList.contains('open') && e.key === 'Escape'){ closeWhatsNew(); return; }
+    if(els.luckModal && els.luckModal.classList.contains('open') && e.key === 'Escape'){ closeLuckModal(); return; }
     if(els.budgetPlansModal && els.budgetPlansModal.classList.contains('open') && e.key === 'Escape'){ closeBudgetPlans(); return; }
     if(els.duelModal && els.duelModal.classList.contains('open') && e.key === 'Escape'){ closeCandidateDuel(); return; }
     if(els.orderPreviewModal && els.orderPreviewModal.classList.contains('open') && e.key === 'Escape'){ closeOrderPreview(); }
