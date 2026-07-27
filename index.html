@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v65" />
+<meta name="app-version" content="v66" />
 <title>内购挑选助手</title>
 <link rel="icon" href="data:," />
 <script src="./vendor/xlsx.full.min.js"></script>
@@ -2805,6 +2805,79 @@ html[data-theme="dark"] .luck-profile-item,
 html[data-theme="dark"] .luck-capsule-item{background:#292524;border-color:#443b38}
 html[data-theme="dark"] .luck-product-media img,
 html[data-theme="dark"] .luck-capsule-thumb img{background:#211f1e}
+
+/* v66: first-use guided tour */
+.tour-overlay{
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  visibility:hidden;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .16s ease,visibility .16s ease;
+}
+.tour-overlay.open{
+  visibility:visible;
+  opacity:1;
+  pointer-events:auto;
+}
+.tour-overlay.no-target{background:rgba(34,27,27,.64)}
+.tour-spotlight{
+  position:fixed;
+  left:0;
+  top:0;
+  width:0;
+  height:0;
+  border:2px solid rgba(255,255,255,.96);
+  border-radius:14px;
+  box-shadow:0 0 0 9999px rgba(34,27,27,.64),0 0 0 5px rgba(232,151,171,.28);
+  pointer-events:none;
+  transition:left .18s ease,top .18s ease,width .18s ease,height .18s ease;
+}
+.tour-overlay.no-target .tour-spotlight{display:none}
+.tour-tooltip{
+  position:fixed;
+  width:min(360px,calc(100vw - 24px));
+  max-height:calc(100vh - 24px);
+  overflow:auto;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:var(--panel);
+  color:var(--text);
+  box-shadow:0 22px 60px rgba(40,29,30,.28);
+}
+.tour-progress{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+  margin-bottom:7px;
+}
+.tour-title{
+  font-size:18px;
+  font-weight:900;
+  line-height:1.35;
+}
+.tour-text{
+  margin-top:7px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.7;
+}
+.tour-actions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-top:14px;
+}
+.tour-actions .tour-skip{margin-right:auto}
+.tour-actions .btn{min-width:0}
+body.tour-open{overscroll-behavior:none}
+html[data-theme="dark"] .tour-tooltip{
+  background:#292524;
+  border-color:#504441;
+  box-shadow:0 22px 60px rgba(0,0,0,.5);
+}
 @media (max-width:760px){
   .product-heading-row{align-items:center}
   .official-version{font-size:9px;padding:4px 7px}
@@ -2830,7 +2903,7 @@ html[data-theme="dark"] .luck-capsule-thumb img{background:#211f1e}
   <aside class="sidebar panel">
     <div class="product-heading-row">
       <h1>内购挑选助手</h1>
-      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v65</button>
+      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v66</button>
     </div>
     <div class="desc">导入本月清单后，可以看图、筛选、算预算、整理订购单。适合自己挑，也适合和同事一起核对。</div>
 
@@ -3018,6 +3091,7 @@ html[data-theme="dark"] .luck-capsule-thumb img{background:#211f1e}
         </div>
       </details>
       <div class="row wrap" style="margin-top:10px">
+        <button class="btn small secondary" id="startTourBtn" type="button">使用教程</button>
         <button class="btn small danger" id="clearLocalDataBtn" type="button">清理本机数据</button>
       </div>
     </div>
@@ -3033,7 +3107,7 @@ html[data-theme="dark"] .luck-capsule-thumb img{background:#211f1e}
       <div class="toolbar-right">
         <button class="btn primary small" id="openBudgetPlansBtn">预算方案</button>
         <button class="btn secondary small" id="openLuckBtn">试试手气</button>
-        <button class="btn secondary small" id="openWhatsNewBtn">v65 更新说明</button>
+        <button class="btn secondary small" id="openWhatsNewBtn">v66 更新说明</button>
         <button class="btn secondary small" id="selectVisibleBtn">本页都加购</button>
         <button class="btn secondary small" id="candidateVisibleBtn">本页先候选</button>
         <button class="btn danger small" id="clearSelectionTopBtn">清空购物车</button>
@@ -3422,20 +3496,35 @@ html[data-theme="dark"] .luck-capsule-thumb img{background:#211f1e}
   <div class="order-modal-inner" style="width:min(720px,100%)">
     <div class="order-preview-head">
       <div>
-        <div class="panel-title" style="font-size:22px">v65 更新说明</div>
-        <div class="mini-stat">本次版本加入了三种轻松一点的选品玩法</div>
+        <div class="panel-title" style="font-size:22px">v66 更新说明</div>
+        <div class="mini-stat">本次版本加入首次使用引导，功能多了也不怕迷路</div>
       </div>
       <button class="btn secondary small" id="closeWhatsNewBtn" type="button">关闭</button>
     </div>
     <div class="whats-new-list">
-      <div class="whats-new-item"><b>随机 Roll</b><span>可以从当前结果、全部商品或候选清单中随机抽取一件。</span></div>
-      <div class="whats-new-item"><b>本月幸运商品</b><span>根据生日月日和本月清单，生成固定的星座幸运商品。</span></div>
-      <div class="whats-new-item"><b>预算扭蛋</b><span>设置金额和件数，随机揭晓一套不超过预算的商品组合。</span></div>
-      <div class="whats-new-item"><b>本地即时计算</b><span>生日不会保存或上传，三种玩法都只在当前浏览器中运行。</span></div>
+      <div class="whats-new-item"><b>首次打开自动引导</b><span>第一次使用时会按顺序介绍导入、筛选、挑选与导出流程。</span></div>
+      <div class="whats-new-item"><b>聚光讲解关键入口</b><span>当前步骤会高亮对应区域，页面也会自动滚到合适位置。</span></div>
+      <div class="whats-new-item"><b>适配桌面与窄屏</b><span>三栏、两栏和手机底部快捷栏会使用各自合适的讲解目标。</span></div>
+      <div class="whats-new-item"><b>随时重新查看</b><span>可以从“其他操作”或本弹窗重新启动教程。</span></div>
     </div>
     <div class="order-preview-actions">
       <a class="btn secondary" id="officialOnlineLink" href="https://astroloneko.github.io/Purchase-Catculator/" target="_blank" rel="noopener">打开在线版</a>
+      <button class="btn secondary" id="startTourFromWhatsNewBtn" type="button">查看使用教程</button>
       <button class="btn primary" id="confirmWhatsNewBtn" type="button">开始挑选</button>
+    </div>
+  </div>
+</div>
+
+<div id="tourOverlay" class="tour-overlay" aria-hidden="true">
+  <div id="tourSpotlight" class="tour-spotlight" aria-hidden="true"></div>
+  <div id="tourTooltip" class="tour-tooltip" role="dialog" aria-modal="true" aria-labelledby="tourTitle" aria-describedby="tourText">
+    <div class="tour-progress" id="tourProgress">第 1 步，共 8 步</div>
+    <div class="tour-title" id="tourTitle">导入本月清单</div>
+    <div class="tour-text" id="tourText">从这里选择本月的 Excel 或 CSV 商品清单。</div>
+    <div class="tour-actions">
+      <button class="btn small secondary tour-skip" id="tourSkipBtn" type="button">跳过</button>
+      <button class="btn small secondary" id="tourPrevBtn" type="button">上一步</button>
+      <button class="btn small primary" id="tourNextBtn" type="button">下一步</button>
     </div>
   </div>
 </div>
@@ -3514,7 +3603,7 @@ html[data-theme="dark"] .luck-capsule-thumb img{background:#211f1e}
 </footer>
 
 <script>
-const APP_VERSION = 'v65';
+const APP_VERSION = 'v66';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -3526,7 +3615,8 @@ const CATALOG_DB_NAME = 'timins_purchase_picker';
 const CATALOG_DB_VERSION = 1;
 const CATALOG_STORE_NAME = 'catalogs';
 const LATEST_CATALOG_ID = 'latest';
-const WHATS_NEW_KEY = 'timins_picker_whats_new_v65';
+const WHATS_NEW_KEY = 'timins_picker_whats_new_v66';
+const TOUR_SEEN_KEY = 'timins_picker_tour_seen_v1';
 const FALLBACK_TYPE_RULES = [
   ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
   ['徽章/胸针', ['徽章','胸针','吧唧','别针','毛绒吧唧']],
@@ -3643,6 +3733,7 @@ const els = {
   applyMappingBtn: document.getElementById('applyMappingBtn'),
   resetFiltersBtn: document.getElementById('resetFiltersBtn'),
   resetLayoutBtn: document.getElementById('resetLayoutBtn'),
+  startTourBtn: document.getElementById('startTourBtn'),
   clearLocalDataBtn: document.getElementById('clearLocalDataBtn'),
   clearSelectionBtn: document.getElementById('clearSelectionBtn'),
   clearSelectionBtn3: document.getElementById('clearSelectionBtn3'),
@@ -3812,7 +3903,17 @@ const els = {
   whatsNewModal: document.getElementById('whatsNewModal'),
   closeWhatsNewBtn: document.getElementById('closeWhatsNewBtn'),
   confirmWhatsNewBtn: document.getElementById('confirmWhatsNewBtn'),
+  startTourFromWhatsNewBtn: document.getElementById('startTourFromWhatsNewBtn'),
   officialOnlineLink: document.getElementById('officialOnlineLink'),
+  tourOverlay: document.getElementById('tourOverlay'),
+  tourSpotlight: document.getElementById('tourSpotlight'),
+  tourTooltip: document.getElementById('tourTooltip'),
+  tourProgress: document.getElementById('tourProgress'),
+  tourTitle: document.getElementById('tourTitle'),
+  tourText: document.getElementById('tourText'),
+  tourSkipBtn: document.getElementById('tourSkipBtn'),
+  tourPrevBtn: document.getElementById('tourPrevBtn'),
+  tourNextBtn: document.getElementById('tourNextBtn'),
   orderPreviewModal: document.getElementById('orderPreviewModal'),
   orderPreviewStat: document.getElementById('orderPreviewStat'),
   orderPreviewTable: document.getElementById('orderPreviewTable'),
@@ -3881,6 +3982,12 @@ const state = {
 let budgetFloatMobileExpanded = false;
 let budgetFloatCollapsed = true;
 let budgetFloatSuppressClick = false;
+let tourActive = false;
+let tourIndex = 0;
+let tourSteps = [];
+let tourPositionFrame = 0;
+let tourResizeTimer = 0;
+let tourPreviousFocus = null;
 let lastBudgetFloatIsMobile = null;
 let columnLayout = {left:320,right:320};
 let pendingOrderAction = '';
@@ -5911,6 +6018,206 @@ function maybeOpenWhatsNew(){
     if(!anotherModalOpen) openWhatsNew();
   }, 450);
 }
+function buildTourSteps(){
+  const compactLayout = window.matchMedia('(max-width: 1380px)').matches;
+  const selectionTarget = compactLayout
+    ? document.querySelector('.mobile-actions')
+    : document.querySelector('.rightbar .cart-panel');
+  return [
+    {
+      target:()=>els.fileInput?.closest('.block'),
+      title:'导入本月清单',
+      text:'从这里选择本月的 Excel 或 CSV。系统会自动识别列、合并重复商品，并在导入后检查常见异常。'
+    },
+    {
+      target:()=>els.budgetInput?.closest('.settings-card'),
+      title:'先定预算，再慢慢筛',
+      text:'填写本次预算后，还可以继续按价位、品牌、类型、排序和浏览模式缩小范围。'
+    },
+    {
+      target:()=>document.querySelector('.main-search-box'),
+      title:'用关键词快速搜索',
+      text:'支持同时输入多个关键词，也能用减号排除内容，例如“徽章 不鸭 -贴纸”。'
+    },
+    {
+      target:()=>els.cards?.querySelector('.card') || els.statusBox,
+      title:'挑选商品',
+      text:'导入后，商品会显示在这里。点卡片空白处直接加购，也可以先放候选、加入对比或调整数量。'
+    },
+    {
+      target:()=>els.openBudgetPlansBtn,
+      title:'让工具帮你做决定',
+      text:'“预算方案”会组合出贴近额度的选项；旁边的“试试手气”还能随机 Roll、看幸运商品或抽预算扭蛋。'
+    },
+    {
+      target:()=>selectionTarget,
+      title:compactLayout ? '底部快捷入口' : '购物车与候选清单',
+      text:compactLayout
+        ? '在窄屏上，从这里随时打开挑选条件、购物车、候选清单和商品对比。'
+        : '右侧会集中显示购物车、候选清单、预算建议和对比入口，核对时不用来回找。'
+    },
+    {
+      target:()=>els.copyOrderBtn?.closest('.row'),
+      title:'确认并导出订购单',
+      text:'选好后可以复制订购单，或下载 Excel、CSV。导出前还能填写部门和姓名，直接交表更省事。'
+    },
+    {
+      target:()=>els.startTourBtn?.closest('.row'),
+      title:'以后也能重新查看',
+      text:'教程只会自动出现一次。需要复习时，在“其他操作”点“使用教程”，或从版本说明里重新打开。'
+    }
+  ].filter(step=>resolveTourTarget(step));
+}
+function resolveTourTarget(step){
+  const target = typeof step?.target === 'function' ? step.target() : step?.target;
+  if(!target || !target.isConnected) return null;
+  const style = getComputedStyle(target);
+  if(style.display === 'none' || style.visibility === 'hidden') return null;
+  return target;
+}
+function scheduleTourPosition(){
+  if(!tourActive) return;
+  cancelAnimationFrame(tourPositionFrame);
+  tourPositionFrame = requestAnimationFrame(positionTourElements);
+}
+function refreshTourLayout(){
+  if(!tourActive) return;
+  clearTimeout(tourResizeTimer);
+  tourResizeTimer = setTimeout(()=>{
+    const currentTitle = tourSteps[tourIndex]?.title;
+    const refreshedSteps = buildTourSteps();
+    if(!refreshedSteps.length) return;
+    tourSteps = refreshedSteps;
+    const matchingIndex = tourSteps.findIndex(step=>step.title === currentTitle);
+    showTourStep(matchingIndex >= 0 ? matchingIndex : Math.min(tourIndex,tourSteps.length-1));
+  }, 120);
+}
+function positionTourElements(){
+  if(!tourActive || !els.tourOverlay || !els.tourTooltip) return;
+  const step = tourSteps[tourIndex];
+  const target = resolveTourTarget(step);
+  const viewportWidth = document.documentElement.clientWidth;
+  const viewportHeight = window.innerHeight;
+  const edge = 12;
+  const gap = 14;
+  if(!target){
+    els.tourOverlay.classList.add('no-target');
+    const tipWidth = els.tourTooltip.offsetWidth;
+    const tipHeight = els.tourTooltip.offsetHeight;
+    els.tourTooltip.style.left = `${Math.max(edge,(viewportWidth-tipWidth)/2)}px`;
+    els.tourTooltip.style.top = `${Math.max(edge,(viewportHeight-tipHeight)/2)}px`;
+    return;
+  }
+  els.tourOverlay.classList.remove('no-target');
+  const raw = target.getBoundingClientRect();
+  const padding = 7;
+  const left = clamp(raw.left-padding, 7, viewportWidth-7);
+  const right = clamp(raw.right+padding, 7, viewportWidth-7);
+  const top = clamp(raw.top-padding, 7, viewportHeight-7);
+  const bottom = clamp(raw.bottom+padding, 7, viewportHeight-7);
+  els.tourSpotlight.style.left = `${left}px`;
+  els.tourSpotlight.style.top = `${top}px`;
+  els.tourSpotlight.style.width = `${Math.max(2,right-left)}px`;
+  els.tourSpotlight.style.height = `${Math.max(2,bottom-top)}px`;
+
+  const tipWidth = els.tourTooltip.offsetWidth;
+  const tipHeight = els.tourTooltip.offsetHeight;
+  const centeredLeft = clamp((left+right-tipWidth)/2, edge, viewportWidth-tipWidth-edge);
+  const centeredTop = clamp((top+bottom-tipHeight)/2, edge, viewportHeight-tipHeight-edge);
+  const candidates = [
+    {left:centeredLeft,top:bottom+gap},
+    {left:centeredLeft,top:top-tipHeight-gap},
+    {left:right+gap,top:centeredTop},
+    {left:left-tipWidth-gap,top:centeredTop}
+  ];
+  const placement = candidates.find(pos=>
+    pos.left >= edge &&
+    pos.top >= edge &&
+    pos.left + tipWidth <= viewportWidth-edge &&
+    pos.top + tipHeight <= viewportHeight-edge
+  ) || {
+    left:centeredLeft,
+    top:clamp(bottom+gap, edge, viewportHeight-tipHeight-edge)
+  };
+  els.tourTooltip.style.left = `${placement.left}px`;
+  els.tourTooltip.style.top = `${placement.top}px`;
+}
+function showTourStep(nextIndex){
+  if(!tourActive || !tourSteps.length) return;
+  tourIndex = clamp(nextIndex, 0, tourSteps.length-1);
+  const step = tourSteps[tourIndex];
+  const target = resolveTourTarget(step);
+  els.tourProgress.textContent = `第 ${tourIndex+1} 步，共 ${tourSteps.length} 步`;
+  els.tourTitle.textContent = step.title;
+  els.tourText.textContent = step.text;
+  els.tourPrevBtn.disabled = tourIndex === 0;
+  els.tourNextBtn.textContent = tourIndex === tourSteps.length-1 ? '完成' : '下一步';
+  if(target){
+    target.scrollIntoView({block:'center',inline:'nearest',behavior:'auto'});
+  }
+  scheduleTourPosition();
+  setTimeout(scheduleTourPosition, 80);
+  setTimeout(scheduleTourPosition, 240);
+  try{ els.tourNextBtn.focus({preventScroll:true}); }catch(e){ els.tourNextBtn.focus(); }
+}
+function startTour(){
+  if(!els.tourOverlay) return;
+  const requestedFocus = document.activeElement;
+  const startedFromUpdate = Boolean(els.whatsNewModal?.classList.contains('open'));
+  closeDrawers();
+  if(startedFromUpdate) closeWhatsNew();
+  tourSteps = buildTourSteps();
+  if(!tourSteps.length) return;
+  tourPreviousFocus = startedFromUpdate ? els.officialVersionBtn : requestedFocus;
+  tourActive = true;
+  tourIndex = 0;
+  document.body.classList.add('tour-open');
+  els.tourOverlay.classList.add('open');
+  els.tourOverlay.setAttribute('aria-hidden','false');
+  showTourStep(0);
+}
+function finishTour(){
+  if(!tourActive) return;
+  tourActive = false;
+  cancelAnimationFrame(tourPositionFrame);
+  clearTimeout(tourResizeTimer);
+  document.body.classList.remove('tour-open');
+  els.tourOverlay.classList.remove('open','no-target');
+  els.tourOverlay.setAttribute('aria-hidden','true');
+  try{ localStorage.setItem(TOUR_SEEN_KEY, '1'); }catch(e){}
+  if(tourPreviousFocus && tourPreviousFocus.isConnected){
+    try{ tourPreviousFocus.focus({preventScroll:true}); }catch(e){}
+  }
+  tourPreviousFocus = null;
+}
+function moveTour(direction){
+  if(!tourActive) return;
+  if(direction > 0 && tourIndex === tourSteps.length-1){
+    finishTour();
+    setStatus('使用教程已完成。之后可以在“其他操作”里重新查看。','good');
+    return;
+  }
+  showTourStep(tourIndex + direction);
+}
+function maybeStartTour(){
+  let seen = false;
+  try{ seen = localStorage.getItem(TOUR_SEEN_KEY) === '1'; }catch(e){}
+  if(seen) return false;
+  try{ localStorage.setItem(WHATS_NEW_KEY, '1'); }catch(e){}
+  let attempts = 0;
+  const tryStart = ()=>{
+    if(tourActive) return;
+    const anotherModalOpen = document.querySelector('.order-modal.open,.compare-modal.open,.lightbox.open');
+    if(anotherModalOpen && attempts < 12){
+      attempts += 1;
+      setTimeout(tryStart, 500);
+      return;
+    }
+    if(!anotherModalOpen) startTour();
+  };
+  setTimeout(tryStart, 550);
+  return true;
+}
 function renderRecommendations(){
   const {fit, over, summary:s} = budgetRecommendations();
   const blocks = [];
@@ -6567,7 +6874,7 @@ function toggleCartBrandGroups(){
 }
 async function clearLocalData(){
   if(!confirm('确认清理本机保存的数据吗？购物车、候选、预算、主题、常用品牌和自定义分类都会恢复默认。')) return;
-  [STORAGE_KEY, FLOAT_POS_KEY, CUSTOM_TYPE_RULES_KEY, THEME_KEY, COLUMN_LAYOUT_KEY, FAVORITE_BRANDS_KEY, CARD_DENSITY_KEY, WHATS_NEW_KEY].forEach(key => localStorage.removeItem(key));
+  [STORAGE_KEY, FLOAT_POS_KEY, CUSTOM_TYPE_RULES_KEY, THEME_KEY, COLUMN_LAYOUT_KEY, FAVORITE_BRANDS_KEY, CARD_DENSITY_KEY, WHATS_NEW_KEY, TOUR_SEEN_KEY].forEach(key => localStorage.removeItem(key));
   sessionStorage.clear();
   await clearSavedCatalog();
   location.reload();
@@ -6840,6 +7147,13 @@ function attachEvents(){
   if(els.openWhatsNewBtn) els.openWhatsNewBtn.addEventListener('click', openWhatsNew);
   if(els.closeWhatsNewBtn) els.closeWhatsNewBtn.addEventListener('click', closeWhatsNew);
   if(els.confirmWhatsNewBtn) els.confirmWhatsNewBtn.addEventListener('click', closeWhatsNew);
+  if(els.startTourBtn) els.startTourBtn.addEventListener('click', startTour);
+  if(els.startTourFromWhatsNewBtn) els.startTourFromWhatsNewBtn.addEventListener('click', startTour);
+  if(els.tourSkipBtn) els.tourSkipBtn.addEventListener('click', finishTour);
+  if(els.tourPrevBtn) els.tourPrevBtn.addEventListener('click', ()=>moveTour(-1));
+  if(els.tourNextBtn) els.tourNextBtn.addEventListener('click', ()=>moveTour(1));
+  window.addEventListener('resize', refreshTourLayout);
+  document.addEventListener('scroll', scheduleTourPosition, true);
   if(els.whatsNewModal) els.whatsNewModal.addEventListener('click', (e)=>{ if(e.target === els.whatsNewModal) closeWhatsNew(); });
   [els.openBudgetPlansBtn, els.openBudgetPlansBtnSide].filter(Boolean).forEach(btn => btn.addEventListener('click', openBudgetPlans));
   if(els.closeBudgetPlansBtn) els.closeBudgetPlansBtn.addEventListener('click', closeBudgetPlans);
@@ -7070,6 +7384,21 @@ function attachEvents(){
   });
   els.lightbox.addEventListener('click', (e)=>{ if(e.target === els.lightbox) closeLightbox(); });
   document.addEventListener('keydown', (e)=>{
+    if(tourActive){
+      if(e.key === 'Escape'){ e.preventDefault(); finishTour(); return; }
+      if(e.key === 'ArrowLeft'){ e.preventDefault(); moveTour(-1); return; }
+      if(e.key === 'ArrowRight' || e.key === 'Enter'){ e.preventDefault(); moveTour(1); return; }
+      if(e.key === 'Tab'){
+        const focusables = [els.tourSkipBtn,els.tourPrevBtn,els.tourNextBtn].filter(btn=>btn && !btn.disabled);
+        const current = focusables.indexOf(document.activeElement);
+        const next = e.shiftKey
+          ? (current <= 0 ? focusables.length-1 : current-1)
+          : (current === focusables.length-1 ? 0 : current+1);
+        e.preventDefault();
+        focusables[next]?.focus();
+      }
+      return;
+    }
     if(els.whatsNewModal && els.whatsNewModal.classList.contains('open') && e.key === 'Escape'){ closeWhatsNew(); return; }
     if(els.luckModal && els.luckModal.classList.contains('open') && e.key === 'Escape'){ closeLuckModal(); return; }
     if(els.budgetPlansModal && els.budgetPlansModal.classList.contains('open') && e.key === 'Escape'){ closeBudgetPlans(); return; }
@@ -7157,7 +7486,7 @@ async function init(){
       'bad'
     );
   }
-  maybeOpenWhatsNew();
+  if(!maybeStartTour()) maybeOpenWhatsNew();
   checkForNewVersion();
 }
 async function checkForNewVersion(){
