@@ -35,18 +35,20 @@ async function waitCards(page, count) {
 }
 
 async function run() {
+  const html = await fs.readFile(path.join(root, 'index.html'), 'utf8');
+  const version = html.match(/<meta name="app-version" content="([^"]+)"/)[1];
   await fs.mkdir(screenshots, { recursive: true });
   const browser = await chromium.launch({ channel: 'msedge', headless: true });
   try {
     for (const width of [1600, 1250, 390].filter(value => !process.env.SIDEBAR_TEST_WIDTH || value === Number(process.env.SIDEBAR_TEST_WIDTH))) {
       const context = await browser.newContext({ viewport: { width, height: 900 } });
-      await context.addInitScript(testWidth => {
+      await context.addInitScript(({ testWidth, version }) => {
         localStorage.setItem('timins_picker_tour_seen_v1', '1');
-        localStorage.setItem('timins_picker_whats_new_v67', '1');
+        localStorage.setItem(`timins_picker_whats_new_${version}`, '1');
         if (testWidth === 1250) {
           localStorage.setItem('timins_picker_columns_v1', JSON.stringify({ left: 260, right: 320 }));
         }
-      }, width);
+      }, { testWidth: width, version });
       const page = await context.newPage();
       const errors = [];
       page.on('pageerror', error => errors.push(error.message));

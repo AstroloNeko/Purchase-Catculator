@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v67" />
+<meta name="app-version" content="v68" />
 <title>内购挑选助手</title>
 <link rel="icon" href="data:," />
 <script src="./vendor/xlsx.full.min.js"></script>
@@ -3013,6 +3013,154 @@ html[data-theme="dark"] .sidebar .sidebar-price,
 html[data-theme="dark"] .sidebar .sidebar-price > summary,
 html[data-theme="dark"] .sidebar .sidebar-price .price-range-pill,
 html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:transparent !important}
+/* v68: compact rightbar sections and stable item actions */
+.rightbar.panel .rightbar-section{
+  margin:0;
+  padding:14px 0;
+  border:0;
+  border-bottom:1px solid var(--line);
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.rightbar .rightbar-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.rightbar .rightbar-heading h2{margin:0;font-size:13px;color:var(--text)}
+.rightbar .mini-stat{font-size:10px;line-height:1.5;min-width:0;overflow-wrap:anywhere}
+.rightbar.panel .rightbar-total{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:baseline;
+  gap:5px 8px;
+  margin:0 0 10px;
+  padding:10px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:transparent;
+  box-shadow:none;
+}
+.rightbar .rightbar-total .big{margin:0;font-size:22px;overflow-wrap:anywhere}
+.rightbar .rightbar-total .tiny{grid-column:1 / -1;font-size:11px;line-height:1.5}
+.rightbar .rightbar-total[data-budget-state="good"] .tiny{color:var(--green)}
+.rightbar .rightbar-total[data-budget-state="bad"] .tiny{color:var(--red)}
+.rightbar-cart-actions,.rightbar-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.rightbar-cart-actions .cartGroupsToggleBtn{margin-right:auto}
+.rightbar .rightbar-disclosure > summary{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) 9px;
+  align-items:center;
+  gap:8px;
+  min-height:36px;
+  padding:7px 0;
+  font-size:11px;
+  font-weight:700;
+  color:var(--text);
+  list-style:none;
+  cursor:pointer;
+}
+.rightbar .rightbar-disclosure > summary::-webkit-details-marker{display:none}
+.rightbar .rightbar-disclosure > summary::after{
+  content:"";
+  grid-column:3;
+  width:6px;
+  height:6px;
+  border-right:1.5px solid var(--muted);
+  border-bottom:1.5px solid var(--muted);
+  transform:rotate(45deg);
+}
+.rightbar .rightbar-disclosure[open] > summary::after{transform:rotate(225deg)}
+.rightbar summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.rightbar .rightbar-disclosure > summary .mini-stat{text-align:right;font-weight:400}
+.rightbar .rightbar-fold-title{font-size:12px}
+.rightbar.panel details.rightbar-section{padding:4px 0}
+.rightbar-disclosure-body{padding:4px 0 8px;min-width:0}
+.rightbar .side-list{max-height:none;overflow:visible;gap:8px}
+.rightbar.panel .side-empty,.rightbar.panel .compare-empty{padding:10px 0;border:0;border-radius:0;background:transparent;text-align:left;font-size:11px;line-height:1.6}
+.rightbar.panel .cart-brand-group{
+  border:0;
+  border-radius:0;
+  background:transparent;
+  overflow:visible;
+}
+.rightbar .cart-brand-group > summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 9px;
+  gap:3px 8px;
+  padding:8px 0;
+  border:0;
+  border-bottom:1px dashed var(--line);
+  background:transparent;
+  font-size:11px;
+}
+.rightbar .cart-brand-group > summary > span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rightbar .cart-brand-meta{grid-row:2;grid-column:1 / -1;font-size:10px;font-weight:400;white-space:normal;overflow-wrap:anywhere}
+.rightbar .cart-brand-group > summary::after{
+  content:"";
+  grid-column:2;
+  grid-row:1;
+  align-self:center;
+  width:6px;
+  height:6px;
+  border-right:1.5px solid var(--muted);
+  border-bottom:1.5px solid var(--muted);
+  transform:rotate(45deg);
+}
+.rightbar .cart-brand-group[open] > summary::after{transform:rotate(225deg)}
+.rightbar .cart-brand-items{padding:8px 0 0;gap:8px}
+.rightbar.panel .side-item,.drawer .side-item{
+  display:grid;
+  grid-template-columns:40px minmax(0,1fr);
+  align-items:start;
+  gap:8px;
+  padding:8px;
+  border-radius:8px;
+}
+.rightbar .side-item .side-thumb,.drawer .side-item .side-thumb{display:flex;width:40px;height:40px;align-items:center;justify-content:center;border-radius:6px;color:var(--muted);font-size:10px}
+.side-details{min-width:0}
+.rightbar .side-item .side-name,.drawer .side-item .side-name{font-size:12px;line-height:1.5;-webkit-line-clamp:2}
+.rightbar .side-item .side-meta,.drawer .side-item .side-meta{font-size:10px;line-height:1.6;overflow-wrap:anywhere}
+.rightbar .side-item .side-actions,.drawer .side-item .side-actions{
+  display:flex;
+  grid-column:1 / -1;
+  justify-content:flex-end;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  width:100%;
+}
+.rightbar .side-item .side-actions .qty-wrap,.drawer .side-item .side-actions .qty-wrap{
+  display:grid;
+  grid-template-columns:24px minmax(0,1fr) 24px;
+  flex:0 0 112px;
+  width:112px;
+  max-width:100%;
+  margin-right:auto;
+  gap:3px;
+  padding:3px;
+  border-radius:8px;
+}
+.rightbar .side-item .qty-wrap input,.drawer .side-item .qty-wrap input{width:100%;min-width:0;padding:4px 0;text-align:center}
+.rightbar .side-item .qty-wrap .btn,.drawer .side-item .qty-wrap .btn{padding:4px 0;min-width:0;border-radius:5px}
+.rightbar .side-item .side-actions .side-remove-selection,.rightbar .side-item .side-actions .side-remove-candidate{flex:0 0 auto}
+.rightbar.panel .cart-analysis{margin:0;padding:0 0 6px;border:0;border-radius:0;background:transparent;box-shadow:none}
+.rightbar-analysis{margin-top:8px}
+.rightbar .cart-analysis-title{display:none}
+.rightbar.panel .rec-item,.rightbar.panel .compare-item{grid-template-columns:minmax(0,1fr);gap:7px;padding:8px;border-radius:8px}
+.rightbar .rec-item > div,.rightbar .compare-item > div{min-width:0}
+.rightbar .rec-name,.rightbar .compare-name{font-size:12px;overflow-wrap:anywhere}
+.rightbar .rec-meta,.rightbar .compare-meta{font-size:10px;line-height:1.6;overflow-wrap:anywhere}
+.rightbar .rec-item .compare-actions,.rightbar .compare-item .compare-actions{justify-content:flex-end;gap:6px}
+.rightbar .desktop-copyright{margin-top:12px;padding-top:0}
+.rightbar .desktop-copyright .copyright-inner{border-top:0;padding-top:0}
+html[data-theme="dark"] .rightbar .side-thumb,
+html[data-theme="dark"] .drawer .side-thumb{background:#1e1c1b}
+html[data-theme="dark"] .rightbar .cart-brand-group > summary{background:transparent}
+.drawer-analysis{margin-top:8px}
+.drawer-analysis > summary{display:flex;align-items:center;justify-content:space-between;min-height:36px;padding:7px 0;list-style:none;color:var(--text);font-size:11px;font-weight:700;cursor:pointer}
+.drawer-analysis > summary::-webkit-details-marker{display:none}
+.drawer-analysis > summary::after{content:"";width:6px;height:6px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);margin-right:4px}
+.drawer-analysis[open] > summary::after{transform:rotate(225deg)}
+.drawer .drawer-analysis .cart-analysis{margin:0;padding:0 0 8px;border:0;border-radius:0;background:transparent;box-shadow:none}
+.drawer-analysis .cart-analysis-title{display:none}
 </style>
 </head>
 <body>
@@ -3020,7 +3168,7 @@ html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:tra
   <aside class="sidebar panel">
     <div class="product-heading-row">
       <h1>内购挑选助手</h1>
-      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v67</button>
+      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v68</button>
     </div>
     <div class="desc">每月选购，轻松整理。</div>
 
@@ -3227,7 +3375,7 @@ html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:tra
       <div class="toolbar-right">
         <button class="btn primary small" id="openBudgetPlansBtn">预算方案</button>
         <button class="btn secondary small" id="openLuckBtn">试试手气</button>
-        <button class="btn secondary small" id="openWhatsNewBtn">v67 更新说明</button>
+        <button class="btn secondary small" id="openWhatsNewBtn">v68 更新说明</button>
         <button class="btn secondary small" id="selectVisibleBtn">本页都加购</button>
         <button class="btn secondary small" id="candidateVisibleBtn">本页先候选</button>
         <button class="btn danger small" id="clearSelectionTopBtn">清空购物车</button>
@@ -3255,66 +3403,60 @@ html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:tra
   </main>
 
   <aside class="rightbar panel">
-    <div class="cart-panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">确定要买</div>
-          <div class="mini-stat" id="cartMiniStat">0 个商品 · 0 件</div>
-        </div>
-        <div class="btn-group">
-          <button class="btn small secondary cartGroupsToggleBtn" type="button">折叠品牌</button>
-          <button class="btn small secondary" id="cartUndoBtn">撤销</button>
-          <button class="btn small danger" id="clearSelectionBtn3">清空</button>
-        </div>
+    <section class="cart-panel rightbar-section" aria-labelledby="cartHeading">
+      <div class="rightbar-heading">
+        <h2 id="cartHeading">购物车</h2>
+        <span class="mini-stat" id="cartMiniStat">0 个商品 · 0 件</span>
       </div>
-      <div class="cart-total-box">
-        <div class="mini-stat">总价</div>
+      <div class="cart-total-box rightbar-total">
+        <div class="mini-stat">合计</div>
         <div class="big" id="cartTotalBig">¥0</div>
         <div class="tiny" id="budgetHint">还可以慢慢挑。</div>
       </div>
-      <div class="cart-analysis" id="cartAnalysis"></div>
-      <div class="side-list" id="cartList" style="margin-top:10px"></div>
-    </div>
-
-    <div class="cand-panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">候选清单</div>
-          <div class="mini-stat" id="candidateMiniStat">0 个待考虑</div>
-        </div>
-        <div class="btn-group">
-          <button class="btn small primary" id="startDuelBtn">二选一</button>
-          <button class="btn small secondary" id="moveAllCandidatesBtn">全部加购</button>
-          <button class="btn small danger" id="clearCandidatesBtn">清空</button>
-        </div>
+      <div class="rightbar-cart-actions">
+        <button class="btn small secondary cartGroupsToggleBtn" type="button">折叠品牌</button>
+        <button class="btn small secondary" id="cartUndoBtn" type="button">撤销</button>
+        <button class="btn small danger" id="clearSelectionBtn3" type="button">清空</button>
       </div>
-      <div class="side-list" id="candidateList"></div>
-    </div>
+      <div class="side-list" id="cartList"></div>
+      <details class="rightbar-disclosure rightbar-analysis" id="cartAnalysisSection">
+        <summary><span>预算分析</span></summary>
+        <div class="cart-analysis" id="cartAnalysis"></div>
+      </details>
+    </section>
 
-    <div class="recommend-panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">预算小建议</div>
-          <div class="mini-stat" id="recommendMiniStat">凑预算 / 回预算</div>
+    <details class="cand-panel rightbar-section rightbar-disclosure" id="candidateSection">
+      <summary><span class="rightbar-fold-title">候选清单</span><span class="mini-stat" id="candidateMiniStat">0 个待考虑</span></summary>
+      <div class="rightbar-disclosure-body">
+        <div class="rightbar-actions">
+          <button class="btn small primary" id="startDuelBtn" type="button">二选一</button>
+          <button class="btn small secondary" id="moveAllCandidatesBtn" type="button">全部加购</button>
+          <button class="btn small danger" id="clearCandidatesBtn" type="button">清空</button>
         </div>
-        <button class="btn small primary" id="openBudgetPlansBtnSide" type="button">生成方案</button>
+        <div class="side-list" id="candidateList"></div>
       </div>
-      <div class="recommend-list" id="recommendList"></div>
-    </div>
+    </details>
 
-    <div class="compare-panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">对比小桌</div>
-          <div class="mini-stat" id="compareMiniStat">0 个待对比</div>
-        </div>
-        <div class="btn-group">
+    <details class="compare-panel rightbar-section rightbar-disclosure" id="compareSection">
+      <summary><span class="rightbar-fold-title">商品对比</span><span class="mini-stat" id="compareMiniStat">0 个待对比</span></summary>
+      <div class="rightbar-disclosure-body">
+        <div class="rightbar-actions">
           <button class="btn small secondary" id="openCompareBtn">打开对比</button>
           <button class="btn small danger" id="clearCompareBtn">清空</button>
         </div>
+        <div class="compare-list" id="compareList"></div>
       </div>
-      <div class="compare-list" id="compareList"></div>
-    </div>
+    </details>
+
+    <details class="recommend-panel rightbar-section rightbar-disclosure" id="recommendSection">
+      <summary><span class="rightbar-fold-title">预算建议</span><span class="mini-stat" id="recommendMiniStat">还剩 ¥200</span></summary>
+      <div class="rightbar-disclosure-body">
+        <div class="rightbar-actions">
+          <button class="btn small primary" id="openBudgetPlansBtnSide" type="button">生成预算方案</button>
+        </div>
+        <div class="recommend-list" id="recommendList"></div>
+      </div>
+    </details>
 
     <div class="desktop-copyright">
       <div class="copyright-inner">
@@ -3391,7 +3533,7 @@ html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:tra
 <div class="drawer" id="cartDrawer">
   <div class="drawer-head">
     <div>
-      <div class="panel-title">确定要买</div>
+      <div class="panel-title">购物车</div>
       <div class="mini-stat" id="cartMiniStatMobile">0 个商品 · 0 件</div>
     </div>
     <div class="row wrap">
@@ -3406,7 +3548,10 @@ html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:tra
     <div class="big" id="cartTotalBigMobile">¥0</div>
     <div class="tiny" id="budgetHintMobile">还可以慢慢挑。</div>
   </div>
-  <div class="cart-analysis" id="cartAnalysisMobile"></div>
+  <details class="drawer-analysis" id="cartAnalysisSectionMobile">
+    <summary>预算分析</summary>
+    <div class="cart-analysis" id="cartAnalysisMobile"></div>
+  </details>
   <div class="drawer-list" id="cartListMobile" style="margin-top:10px"></div>
 </div>
 <div class="drawer" id="candDrawer">
@@ -3616,16 +3761,16 @@ html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:tra
   <div class="order-modal-inner" style="width:min(720px,100%)">
     <div class="order-preview-head">
       <div>
-        <div class="panel-title" style="font-size:22px">v67 更新说明</div>
-        <div class="mini-stat">左侧操作栏结构与层级优化</div>
+        <div class="panel-title" style="font-size:22px">v68 更新说明</div>
+        <div class="mini-stat">右侧购物车与辅助选购区域整理</div>
       </div>
       <button class="btn secondary small" id="closeWhatsNewBtn" type="button">关闭</button>
     </div>
     <div class="whats-new-list">
-      <div class="whats-new-item"><b>按选购流程排列</b><span>从导入清单、设置预算与筛选，到导出订单，主要操作依次排列。</span></div>
-      <div class="whats-new-item"><b>筛选按需展开</b><span>品牌、类型和价位独立展开，收起后仍能查看已选条件。</span></div>
-      <div class="whats-new-item"><b>设置集中收纳</b><span>外观设置与高级设置移至底部，列映射、分类维护和本机数据集中管理。</span></div>
-      <div class="whats-new-item"><b>简化视觉层级</b><span>减少重复边框与嵌套，分享图和订单文本预览分别收起，教程入口独立显示。</span></div>
+      <div class="whats-new-item"><b>购物车优先显示</b><span>合计、剩余预算与已选商品集中显示，预算分析可按需展开。</span></div>
+      <div class="whats-new-item"><b>候选与对比按需展开</b><span>收起时保留数量提示，首次加入商品时自动展开，手动收起后保持当前选择。</span></div>
+      <div class="whats-new-item"><b>商品操作统一排列</b><span>商品信息与操作分行显示，数量和移除按钮在窄栏中保持整齐。</span></div>
+      <div class="whats-new-item"><b>左右栏风格统一</b><span>使用分隔线整理层级，减少嵌套边框与空白占位，预算建议集中在底部。</span></div>
     </div>
     <div class="order-preview-actions">
       <a class="btn secondary" id="officialOnlineLink" href="https://astroloneko.github.io/Purchase-Catculator/" target="_blank" rel="noopener">打开在线版</a>
@@ -3723,7 +3868,7 @@ html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:tra
 </footer>
 
 <script>
-const APP_VERSION = 'v67';
+const APP_VERSION = 'v68';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -3735,7 +3880,7 @@ const CATALOG_DB_NAME = 'timins_purchase_picker';
 const CATALOG_DB_VERSION = 1;
 const CATALOG_STORE_NAME = 'catalogs';
 const LATEST_CATALOG_ID = 'latest';
-const WHATS_NEW_KEY = 'timins_picker_whats_new_v67';
+const WHATS_NEW_KEY = 'timins_picker_whats_new_v68';
 const TOUR_SEEN_KEY = 'timins_picker_tour_seen_v1';
 const FALLBACK_TYPE_RULES = [
   ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
@@ -5508,6 +5653,14 @@ function triggerFeedbackPulse(anchorId=''){
     }
   }
 }
+function syncRightbarDisclosure(sectionId, count){
+  const section = document.getElementById(sectionId);
+  if(!section) return;
+  const previousCount = Number(section.dataset.itemCount) || 0;
+  if(count > 0 && previousCount === 0) section.open = true;
+  else if(count === 0) section.open = false;
+  section.dataset.itemCount = String(count);
+}
 function renderSideLists(){
   const s = selectedSummary();
   const cartRows = s.rows;
@@ -5520,9 +5673,9 @@ function renderSideLists(){
     const actions = kind === 'cart'
       ? `<div class="side-actions">
            <div class="qty-wrap">
-             <button class="btn small secondary side-minus" data-id="${escapeHtml(r.id)}">－</button>
-             <input class="qty-input side-qty" data-id="${escapeHtml(r.id)}" type="number" min="0" value="${qty}" />
-             <button class="btn small secondary side-plus" data-id="${escapeHtml(r.id)}">＋</button>
+             <button class="btn small secondary side-minus" data-id="${escapeHtml(r.id)}" type="button" aria-label="减少数量：${escapeHtml(r.name)}">－</button>
+             <input class="qty-input side-qty" data-id="${escapeHtml(r.id)}" type="number" min="0" value="${qty}" aria-label="数量：${escapeHtml(r.name)}" />
+             <button class="btn small secondary side-plus" data-id="${escapeHtml(r.id)}" type="button" aria-label="增加数量：${escapeHtml(r.name)}">＋</button>
            </div>
            <button class="btn small danger side-remove-selection" data-id="${escapeHtml(r.id)}">删除</button>
          </div>`
@@ -5531,9 +5684,9 @@ function renderSideLists(){
            <button class="btn small danger side-remove-candidate" data-id="${escapeHtml(r.id)}">移出</button>
          </div>`;
     return `<div class="side-item">
-      <div class="side-thumb">${thumb}</div>
-      <div>
-        <div class="side-name">${escapeHtml(r.name)}</div>
+      <div class="side-thumb">${thumb || '<span aria-hidden="true">无图</span>'}</div>
+      <div class="side-details">
+        <div class="side-name" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</div>
         <div class="side-meta">${escapeHtml(r.brand)} · ${escapeHtml(r.type)}<br>${escapeHtml(fmtMoney(r.price))}${kind==='cart' ? ` · 小计 ${escapeHtml(fmtMoney(qty*r.price))}`:''}</div>
       </div>
       ${actions}
@@ -5555,7 +5708,7 @@ function renderSideLists(){
         total += q * (r.price || 0);
       });
       return `<details class="cart-brand-group" ${cartGroupsCollapsed ? '' : 'open'}>
-        <summary>
+        <summary title="${escapeHtml(brand)}">
           <span>${escapeHtml(brand)}</span>
           <span class="cart-brand-meta">${list.length} 款 · ${qty} 件 · ${escapeHtml(fmtMoney(total))}</span>
         </summary>
@@ -5575,6 +5728,7 @@ function renderSideLists(){
   els.cartMiniStatMobile.textContent = cartStat;
   els.candidateMiniStat.textContent = candStat;
   els.candidateMiniStatMobile.textContent = candStat;
+  syncRightbarDisclosure('candidateSection', candRows.length);
   els.cartTotalBig.textContent = fmtMoney(s.total);
   els.cartTotalBigMobile.textContent = fmtMoney(s.total);
 
@@ -5583,8 +5737,14 @@ function renderSideLists(){
     : s.remaining >= 0
       ? `还剩 ${fmtMoney(s.remaining)}，可以优先看更贴合预算的款。`
       : `已超出 ${fmtMoney(Math.abs(s.remaining))}，先撤掉一件高价款会轻松点。`;
-  els.budgetHint.textContent = hint;
+  els.budgetHint.textContent = s.remaining >= 0
+    ? `预算 ${fmtMoney(state.budget)} · 还剩 ${fmtMoney(s.remaining)}`
+    : `预算 ${fmtMoney(state.budget)} · 已超 ${fmtMoney(Math.abs(s.remaining))}`;
+  els.budgetHint.closest('.rightbar-total').dataset.budgetState = s.remaining >= 0 ? 'good' : 'bad';
   els.budgetHintMobile.textContent = hint;
+  document.getElementById('cartAnalysisSection').hidden = !cartRows.length;
+  document.getElementById('cartAnalysisSectionMobile').hidden = !cartRows.length;
+  document.querySelector('.rightbar-cart-actions').classList.toggle('hidden', !cartRows.length);
   renderCartAnalysis(s);
   document.querySelectorAll('.cartGroupsToggleBtn').forEach(btn => {
     btn.textContent = cartGroupsCollapsed ? '展开品牌' : '折叠品牌';
@@ -5594,6 +5754,7 @@ function renderSideLists(){
 function renderComparePanel(){
   const rows = comparedRows();
   els.compareMiniStat.textContent = `${rows.length} 个待对比`;
+  syncRightbarDisclosure('compareSection', rows.length);
   if(!rows.length){
     els.compareList.innerHTML = '<div class="compare-empty">把犹豫款放进这里，再一起对比。</div>';
     els.compareGrid.innerHTML = '<div class="compare-empty">对比小桌还空着。商品卡片里点“加入对比”即可。</div>';
@@ -6185,7 +6346,7 @@ function buildTourSteps(){
       title:compactLayout ? '底部快捷入口' : '购物车与候选清单',
       text:compactLayout
         ? '在窄屏上，从这里随时打开挑选条件、购物车、候选清单和商品对比。'
-        : '右侧会集中显示购物车、候选清单、预算建议和对比入口，核对时不用来回找。'
+        : '右侧先显示购物车；候选清单、商品对比和预算建议可按需展开。首次加入候选或对比商品时，对应区域会自动打开。'
     },
     {
       target:()=>els.copyOrderBtn?.closest('.row'),
@@ -6353,7 +6514,7 @@ function renderRecommendations(){
   const {fit, over, summary:s} = budgetRecommendations();
   const blocks = [];
   if(s.remaining >= 0){
-    els.recommendMiniStat.textContent = `还剩 ${fmtMoney(s.remaining)} 可以挑`;
+    els.recommendMiniStat.textContent = `还剩 ${fmtMoney(s.remaining)}`;
     if(fit.length){
       blocks.push(...fit.map(r => `
         <div class="rec-item">
@@ -7601,6 +7762,7 @@ async function init(){
   renderMappingSelectors();
   renderFilterLists();
   renderSummaryAndExport();
+  renderSideLists();
   renderRecommendations();
   renderComparePanel();
   syncMobileQuickControls();
