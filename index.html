@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v66" />
+<meta name="app-version" content="v67" />
 <title>内购挑选助手</title>
 <link rel="icon" href="data:," />
 <script src="./vendor/xlsx.full.min.js"></script>
@@ -2896,6 +2896,123 @@ html[data-theme="dark"] .tour-tooltip{
   .order-meta-form{grid-template-columns:1fr}
 }
 
+/* v67: task-first sidebar with one level of disclosure */
+.sidebar.panel .block.sidebar-section{
+  margin:0;
+  padding:14px 0;
+  border:0;
+  border-bottom:1px solid var(--line);
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.sidebar .sidebar-section h2{margin:0 0 10px;color:var(--text);font-size:13px;line-height:1.4}
+.sidebar .product-heading-row{flex-wrap:wrap;align-items:center;gap:8px}
+.sidebar .product-heading-row h1{font-size:20px;white-space:nowrap}
+.sidebar .desc{margin:6px 0 2px;font-size:11px}
+.sidebar .settings-panel label{color:var(--muted)}
+.sidebar.panel .settings-card.sidebar-budget{
+  display:grid;
+  grid-template-columns:68px minmax(0,1fr);
+  align-items:center;
+  gap:8px;
+  padding:0 0 8px;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.sidebar-budget label{margin:0}
+.sidebar .sidebar-disclosure > summary{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) 9px;
+  align-items:center;
+  gap:8px;
+  min-height:36px;
+  padding:7px 0;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  cursor:pointer;
+  list-style:none;
+}
+.sidebar .sidebar-disclosure > summary::-webkit-details-marker{display:none}
+.sidebar .sidebar-disclosure > summary::after{
+  content:"";
+  grid-column:3;
+  width:6px;
+  height:6px;
+  margin-right:2px;
+  border-right:1.5px solid var(--muted);
+  border-bottom:1.5px solid var(--muted);
+  transform:rotate(45deg);
+}
+.sidebar .sidebar-disclosure[open] > summary::after{transform:rotate(225deg)}
+.sidebar summary:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.sidebar-filter{border-bottom:1px solid var(--line)}
+.sidebar-filter-value{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  text-align:right;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:400;
+}
+.sidebar-filter-value[data-active="true"]{color:var(--blue);font-weight:700}
+.sidebar-disclosure-body{padding:3px 0 10px;min-width:0}
+.sidebar-filter .filter-heading-actions{justify-content:flex-end;margin-bottom:6px}
+.sidebar .sidebar-filter .filters-list{height:auto;min-height:0;max-height:148px;border-radius:8px}
+.sidebar.panel .block.sidebar-section .sidebar-price{
+  margin:0;
+  border:0;
+  border-bottom:1px solid var(--line);
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.sidebar.panel .settings-panel .sidebar-price > summary{
+  min-height:36px;
+  padding:7px 0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.sidebar.panel .settings-panel .sidebar-price .price-range-pill{
+  max-width:140px;
+  padding:0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:400;
+  box-shadow:none;
+}
+.sidebar .sidebar-price .price-summary-title{color:var(--text);font-size:12px}
+.sidebar .sidebar-price .price-summary-arrow{color:var(--muted);font-size:10px}
+.sidebar .sidebar-price .price-filter-box{padding:8px 0;border:0;border-radius:0}
+.sidebar-view-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.sidebar-view-options > div{min-width:0}
+.sidebar-view-options select{min-width:0;max-width:100%;text-overflow:ellipsis}
+.sidebar-export-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:5px}
+.sidebar-export-actions #copyOrderBtn{grid-column:1 / -1}
+.sidebar-export-actions .btn{min-width:0;padding:7px 8px;font-size:11px;border-radius:8px}
+.sidebar.panel .block.sidebar-section.sidebar-utility{padding:4px 0}
+.sidebar-utility .fold-title{font-size:12px;font-weight:700}
+.sidebar-utility .sidebar-disclosure-body{padding-top:8px}
+.sidebar-maintenance + .sidebar-maintenance{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.sidebar-maintenance h3{margin:0 0 8px;color:var(--text);font-size:12px}
+.sidebar-maintenance .mapping-note{margin:0 0 8px}
+.sidebar.panel .sidebar-maintenance .type-assist-box{padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.sidebar-help{padding-top:12px}
+.sidebar-help .btn{border-radius:8px}
+html[data-theme="dark"] .sidebar .sidebar-price,
+html[data-theme="dark"] .sidebar .sidebar-price > summary,
+html[data-theme="dark"] .sidebar .sidebar-price .price-range-pill,
+html[data-theme="dark"] .sidebar .sidebar-price .price-filter-box{background:transparent !important}
 </style>
 </head>
 <body>
@@ -2903,12 +3020,12 @@ html[data-theme="dark"] .tour-tooltip{
   <aside class="sidebar panel">
     <div class="product-heading-row">
       <h1>内购挑选助手</h1>
-      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v66</button>
+      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v67</button>
     </div>
-    <div class="desc">导入本月清单后，可以看图、筛选、算预算、整理订购单。适合自己挑，也适合和同事一起核对。</div>
+    <div class="desc">每月选购，轻松整理。</div>
 
-    <div class="block">
-      <h2>1. 导入本月清单</h2>
+    <section class="block sidebar-section" aria-labelledby="importHeading">
+      <h2 id="importHeading">导入清单</h2>
       <input id="fileInput" type="file" accept=".xlsx,.xls,.csv" />
       <details class="inline-fold">
         <summary>导入说明</summary>
@@ -2918,72 +3035,58 @@ html[data-theme="dark"] .tour-tooltip{
         </div>
         <div class="tiny" style="margin-top:8px;">图片是否能显示取决于原图链接；重复商品会自动合并，方便后续核对。</div>
       </details>
-    </div>
+    </section>
 
-    <details class="block fold-block">
-      <summary><span class="fold-title">2. 外观</span><span class="tiny">配色 / 密度</span></summary>
-      <div class="fold-body">
-      <div class="theme-switch-card">
-        <label for="themeSelect">配色风格</label>
-        <div class="theme-switch-row">
-          <select id="themeSelect">
-            <option value="cream">奶油柔和</option>
-            <option value="light">浅色清爽</option>
-            <option value="dark">深色模式</option>
-          </select>
-          <div class="theme-preview" aria-hidden="true">
-            <span class="theme-dot a"></span>
-            <span class="theme-dot b"></span>
-            <span class="theme-dot c"></span>
+    <section class="block sidebar-section settings-panel" aria-labelledby="filtersHeading">
+      <h2 id="filtersHeading">预算与筛选</h2>
+      <div class="settings-card compact sidebar-budget">
+        <label for="budgetInput">本次预算</label>
+        <input id="budgetInput" type="number" min="0" step="1" value="200" />
+      </div>
+
+      <details class="sidebar-disclosure sidebar-filter" id="brandFilterSection">
+        <summary><span>品牌</span><span class="sidebar-filter-value" id="brandCount">全部品牌</span></summary>
+        <div class="sidebar-disclosure-body">
+          <div class="row wrap filter-heading-actions">
+            <button class="btn small secondary" id="clearBrandFiltersBtn" type="button">清空品牌</button>
+            <button class="btn small secondary" id="clearPinnedBrandsBtn" type="button">清空置顶</button>
           </div>
+          <div id="brandFilters" class="filters-list"></div>
         </div>
-      </div>
-      <div class="theme-switch-card" style="margin-top:10px">
-        <label for="cardDensitySelect">卡片密度</label>
-        <select id="cardDensitySelect">
-          <option value="compact">紧凑</option>
-          <option value="comfy">舒适</option>
-          <option value="large">大图</option>
-        </select>
-      </div>
-      <div class="row wrap" style="margin-top:10px">
-        <button class="btn small secondary" id="resetLayoutBtn">重置布局</button>
-      </div>
-      </div>
-    </details>
+      </details>
 
-    <div class="block settings-panel">
-      <h2>3. 预算和筛选</h2>
-      <div class="settings-subgrid">
-        <div class="settings-card compact">
-          <label for="budgetInput">本次预算</label>
-          <input id="budgetInput" type="number" min="0" step="1" value="200" />
+      <details class="sidebar-disclosure sidebar-filter" id="typeFilterSection">
+        <summary><span>类型</span><span class="sidebar-filter-value" id="typeCount">全部类型</span></summary>
+        <div class="sidebar-disclosure-body">
+          <div class="row wrap filter-heading-actions">
+            <button class="btn small secondary" id="clearTypeFiltersBtn" type="button">清空类型</button>
+          </div>
+          <div id="typeFilters" class="filters-list"></div>
         </div>
-        <div class="full-span settings-card">
-          <details class="price-filter-section" id="priceFilterSection">
-            <summary class="price-filter-summary">
-              <div class="price-summary-left">
-                <span class="price-summary-title">按价位挑</span>
-                <span class="price-summary-note">可以多选几个价位</span>
-              </div>
-              <div class="price-summary-right">
-                <div class="price-range-pill" id="priceRangeLabel">全部价位</div>
-                <span class="price-summary-arrow">▾</span>
-              </div>
-            </summary>
-            <div class="price-filter-box">
-              <div class="price-filter-head">
-                <div class="tiny">点选想看的价位段，可以多选；不选时默认显示全部。</div>
-              </div>
-              <div class="price-histogram-scroll"><div id="priceHistogram" class="price-histogram"></div></div>
-              <div id="priceBinGrid" class="price-bin-grid"></div>
-              <div class="price-filter-tip">再点一次就取消啦～</div>
-            </div>
-          </details>
+      </details>
+
+      <details class="price-filter-section sidebar-price" id="priceFilterSection">
+        <summary class="price-filter-summary">
+          <div class="price-summary-left">
+            <span class="price-summary-title">价位</span>
+          </div>
+          <div class="price-summary-right">
+            <div class="price-range-pill" id="priceRangeLabel">全部价位</div>
+            <span class="price-summary-arrow">▾</span>
+          </div>
+        </summary>
+        <div class="price-filter-box">
+          <div class="price-filter-head">
+            <div class="tiny">点选想看的价位段，可以多选；不选时默认显示全部。</div>
+          </div>
+          <div class="price-histogram-scroll"><div id="priceHistogram" class="price-histogram"></div></div>
+          <div id="priceBinGrid" class="price-bin-grid"></div>
+          <div class="price-filter-tip">再次点击取消选择</div>
         </div>
-      </div>
-      <div class="settings-subgrid" style="margin-top:10px">
-        <div class="settings-card compact">
+      </details>
+
+      <div class="sidebar-view-options">
+        <div>
           <label for="sortSelect">排序方式</label>
           <select id="sortSelect">
             <option value="default">默认顺序</option>
@@ -2995,7 +3098,7 @@ html[data-theme="dark"] .tour-tooltip{
             <option value="candidateFirst">候选优先</option>
           </select>
         </div>
-        <div class="settings-card compact">
+        <div>
           <label for="viewModeSelect">浏览模式</label>
           <select id="viewModeSelect">
             <option value="all">全部商品</option>
@@ -3004,56 +3107,73 @@ html[data-theme="dark"] .tour-tooltip{
           </select>
         </div>
       </div>
-      <div class="filter-section">
-        <div class="row wrap" style="justify-content:space-between;margin-bottom:6px">
-          <label style="margin:0">品牌筛选 <span class="count-badge" id="brandCount"></span></label>
-          <div class="filter-heading-actions">
-            <button class="btn small secondary" id="clearPinnedBrandsBtn" type="button">清空置顶</button>
-            <button class="btn small secondary" id="clearBrandFiltersBtn" type="button">清空品牌</button>
-          </div>
-        </div>
-        <div id="brandFilters" class="filters-list"></div>
-      </div>
+    </section>
 
-      <div class="filter-section">
-        <div class="row wrap" style="justify-content:space-between;margin-bottom:6px">
-          <label style="margin:0">类型筛选 <span class="count-badge" id="typeCount"></span></label>
-          <button class="btn small secondary" id="clearTypeFiltersBtn" type="button">清空类型</button>
-        </div>
-        <div id="typeFilters" class="filters-list"></div>
-      </div>
-    </div>
-
-    <div class="block">
-      <h2>4. 输出清单</h2>
-      <div class="row wrap">
+    <section class="block sidebar-section" aria-labelledby="exportHeading">
+      <h2 id="exportHeading">导出订单</h2>
+      <div class="row wrap sidebar-export-actions">
         <button class="btn success" id="copyOrderBtn">复制订购单</button>
         <button class="btn primary" id="downloadXlsxBtn">下载 Excel</button>
         <button class="btn warn" id="downloadOrderBtn">下载 CSV</button>
       </div>
-      <details class="mapping-box output-fold" style="margin-top:10px">
-        <summary>分享图和导出预览 <span class="tiny">需要时再打开</span></summary>
-        <div class="mapping-inner">
-          <div class="settings-card compact">
+      <details class="sidebar-disclosure output-fold">
+        <summary><span>分享图</span></summary>
+        <div class="sidebar-disclosure-body">
+          <div>
             <label for="buyerInput">分享图署名</label>
             <input id="buyerInput" type="text" placeholder="可留空" />
           </div>
           <div class="row wrap" style="margin-top:8px">
             <button class="btn secondary" id="exportJpgBtn">导出分享图</button>
           </div>
-          <div class="output-box">
-            <label for="orderOutput">导出预览</label>
-            <textarea id="orderOutput" placeholder="选好之后，这里会生成可以直接复制的订购单内容。"></textarea>
-          </div>
         </div>
       </details>
-    </div>
+      <details class="sidebar-disclosure output-fold">
+        <summary><span>订单文本预览</span></summary>
+        <div class="sidebar-disclosure-body">
+          <label for="orderOutput">导出预览</label>
+          <textarea id="orderOutput" placeholder="选好之后，这里会生成可以直接复制的订购单内容。"></textarea>
+        </div>
+      </details>
+    </section>
 
-    <div class="block">
-      <h2>5. 其他操作</h2>
-      <details class="mapping-box">
-        <summary>列映射设置 <span class="tiny">表头变了再打开</span></summary>
-        <div class="mapping-inner">
+    <details class="block sidebar-section sidebar-disclosure sidebar-utility" id="appearanceSettings">
+      <summary><span class="fold-title">外观设置</span></summary>
+      <div class="sidebar-disclosure-body">
+        <div class="theme-switch-card">
+          <label for="themeSelect">配色风格</label>
+          <div class="theme-switch-row">
+            <select id="themeSelect">
+              <option value="cream">奶油柔和</option>
+              <option value="light">浅色清爽</option>
+              <option value="dark">深色模式</option>
+            </select>
+            <div class="theme-preview" aria-hidden="true">
+              <span class="theme-dot a"></span>
+              <span class="theme-dot b"></span>
+              <span class="theme-dot c"></span>
+            </div>
+          </div>
+        </div>
+        <div class="theme-switch-card" style="margin-top:10px">
+          <label for="cardDensitySelect">卡片密度</label>
+          <select id="cardDensitySelect">
+            <option value="compact">紧凑</option>
+            <option value="comfy">舒适</option>
+            <option value="large">大图</option>
+          </select>
+        </div>
+        <div class="row wrap" style="margin-top:10px">
+          <button class="btn small secondary" id="resetLayoutBtn" type="button">重置布局</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="block sidebar-section sidebar-disclosure sidebar-utility" id="advancedSettings">
+      <summary><span class="fold-title">高级设置</span></summary>
+      <div class="sidebar-disclosure-body">
+        <section class="sidebar-maintenance" aria-labelledby="mappingHeading">
+          <h3 id="mappingHeading">列映射设置</h3>
           <p class="mapping-note">这里是告诉网页：Excel 里哪一列对应商品名、品牌、价格和图片。平时不用管，清单表头变了再调整。</p>
           <div class="mapping-grid">
             <div><label>商品编号列</label><select id="mapCode"></select></div>
@@ -3067,14 +3187,11 @@ html[data-theme="dark"] .tour-tooltip{
           <div class="row wrap" style="margin-top:10px">
             <button class="btn small primary" id="applyMappingBtn">应用映射</button>
           </div>
-        </div>
-      </details>
-      <details class="mapping-box" style="margin-top:10px">
-        <summary>分类维护 <span class="tiny">少数未识别商品再打开</span></summary>
-        <div class="mapping-inner">
+        </section>
+        <section class="sidebar-maintenance" aria-labelledby="classificationHeading">
+          <h3 id="classificationHeading">分类维护</h3>
           <div class="type-assist-box" id="typeAssistBox">
             <div class="type-assist-head">
-              <div class="type-assist-title">分类维护</div>
               <div class="type-assist-count" id="typeAssistCount">待检查 0</div>
             </div>
             <div class="tiny">导入后如果有商品落到“其他”，可以在这里补一个关键词。关键词会保存在本机，下次导入继续生效。<span id="rulePackVersion"></span></div>
@@ -3088,12 +3205,15 @@ html[data-theme="dark"] .tour-tooltip{
               </div>
             </div>
           </div>
-        </div>
-      </details>
-      <div class="row wrap" style="margin-top:10px">
-        <button class="btn small secondary" id="startTourBtn" type="button">使用教程</button>
-        <button class="btn small danger" id="clearLocalDataBtn" type="button">清理本机数据</button>
+        </section>
+        <section class="sidebar-maintenance" aria-labelledby="localDataHeading">
+          <h3 id="localDataHeading">本机数据</h3>
+          <button class="btn small danger" id="clearLocalDataBtn" type="button">清理本机数据</button>
+        </section>
       </div>
+    </details>
+    <div class="row wrap sidebar-help">
+      <button class="btn small secondary" id="startTourBtn" type="button">使用教程</button>
     </div>
   </aside>
 
@@ -3107,7 +3227,7 @@ html[data-theme="dark"] .tour-tooltip{
       <div class="toolbar-right">
         <button class="btn primary small" id="openBudgetPlansBtn">预算方案</button>
         <button class="btn secondary small" id="openLuckBtn">试试手气</button>
-        <button class="btn secondary small" id="openWhatsNewBtn">v66 更新说明</button>
+        <button class="btn secondary small" id="openWhatsNewBtn">v67 更新说明</button>
         <button class="btn secondary small" id="selectVisibleBtn">本页都加购</button>
         <button class="btn secondary small" id="candidateVisibleBtn">本页先候选</button>
         <button class="btn danger small" id="clearSelectionTopBtn">清空购物车</button>
@@ -3496,16 +3616,16 @@ html[data-theme="dark"] .tour-tooltip{
   <div class="order-modal-inner" style="width:min(720px,100%)">
     <div class="order-preview-head">
       <div>
-        <div class="panel-title" style="font-size:22px">v66 更新说明</div>
-        <div class="mini-stat">本次版本加入首次使用引导，功能多了也不怕迷路</div>
+        <div class="panel-title" style="font-size:22px">v67 更新说明</div>
+        <div class="mini-stat">左侧操作栏结构与层级优化</div>
       </div>
       <button class="btn secondary small" id="closeWhatsNewBtn" type="button">关闭</button>
     </div>
     <div class="whats-new-list">
-      <div class="whats-new-item"><b>首次打开自动引导</b><span>第一次使用时会按顺序介绍导入、筛选、挑选与导出流程。</span></div>
-      <div class="whats-new-item"><b>聚光讲解关键入口</b><span>当前步骤会高亮对应区域，页面也会自动滚到合适位置。</span></div>
-      <div class="whats-new-item"><b>适配桌面与窄屏</b><span>三栏、两栏和手机底部快捷栏会使用各自合适的讲解目标。</span></div>
-      <div class="whats-new-item"><b>随时重新查看</b><span>可以从“其他操作”或本弹窗重新启动教程。</span></div>
+      <div class="whats-new-item"><b>按选购流程排列</b><span>从导入清单、设置预算与筛选，到导出订单，主要操作依次排列。</span></div>
+      <div class="whats-new-item"><b>筛选按需展开</b><span>品牌、类型和价位独立展开，收起后仍能查看已选条件。</span></div>
+      <div class="whats-new-item"><b>设置集中收纳</b><span>外观设置与高级设置移至底部，列映射、分类维护和本机数据集中管理。</span></div>
+      <div class="whats-new-item"><b>简化视觉层级</b><span>减少重复边框与嵌套，分享图和订单文本预览分别收起，教程入口独立显示。</span></div>
     </div>
     <div class="order-preview-actions">
       <a class="btn secondary" id="officialOnlineLink" href="https://astroloneko.github.io/Purchase-Catculator/" target="_blank" rel="noopener">打开在线版</a>
@@ -3603,7 +3723,7 @@ html[data-theme="dark"] .tour-tooltip{
 </footer>
 
 <script>
-const APP_VERSION = 'v66';
+const APP_VERSION = 'v67';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -3615,7 +3735,7 @@ const CATALOG_DB_NAME = 'timins_purchase_picker';
 const CATALOG_DB_VERSION = 1;
 const CATALOG_STORE_NAME = 'catalogs';
 const LATEST_CATALOG_ID = 'latest';
-const WHATS_NEW_KEY = 'timins_picker_whats_new_v66';
+const WHATS_NEW_KEY = 'timins_picker_whats_new_v67';
 const TOUR_SEEN_KEY = 'timins_picker_tour_seen_v1';
 const FALLBACK_TYPE_RULES = [
   ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
@@ -4413,6 +4533,7 @@ function updatePriceFilterUI(baseRows){
   if(els.priceRangeLabel){
     const selectedLabels = bins.filter(bin => selectedKeys.has(bin.label)).map(bin => bin.label);
     els.priceRangeLabel.textContent = hasSelection ? selectedLabels.join(' / ') : '全部价位';
+    els.priceRangeLabel.title = els.priceRangeLabel.textContent;
   }
   const counts = bins.map(() => 0);
   sourceRows.forEach(r => {
@@ -4902,8 +5023,18 @@ function renderFilterLists(){
   renderBrandFilterList();
   renderFilterList(els.typeFilters, state.availableTypes, state.filters.types);
   const pinnedCount = [...state.favoriteBrands].filter(b => state.availableBrands.includes(b)).length;
-  els.brandCount.textContent = state.filters.brands.size ? `已选 ${state.filters.brands.size}` : (pinnedCount ? `置顶 ${pinnedCount}` : '');
-  els.typeCount.textContent = state.filters.types.size ? `已选 ${state.filters.types.size}` : '';
+  const selectedBrands = [...state.filters.brands];
+  const selectedTypes = [...state.filters.types];
+  els.brandCount.textContent = selectedBrands.length
+    ? (selectedBrands.length === 1 ? selectedBrands[0] : `已选 ${selectedBrands.length} 个品牌`)
+    : (pinnedCount ? `全部品牌 · 置顶 ${pinnedCount}` : '全部品牌');
+  els.typeCount.textContent = selectedTypes.length
+    ? (selectedTypes.length === 1 ? selectedTypes[0] : `已选 ${selectedTypes.length} 个类型`)
+    : '全部类型';
+  els.brandCount.title = selectedBrands.join('、') || els.brandCount.textContent;
+  els.typeCount.title = selectedTypes.join('、') || els.typeCount.textContent;
+  els.brandCount.dataset.active = String(selectedBrands.length > 0);
+  els.typeCount.dataset.active = String(selectedTypes.length > 0);
   renderTypeAssist();
 }
 function renderTypeTargetSelect(){
@@ -6032,7 +6163,7 @@ function buildTourSteps(){
     {
       target:()=>els.budgetInput?.closest('.settings-card'),
       title:'先定预算，再慢慢筛',
-      text:'填写本次预算后，还可以继续按价位、品牌、类型、排序和浏览模式缩小范围。'
+      text:'填写本次预算后，依次展开品牌、类型和价位进行多选。下方可以调整排序和浏览模式；收起筛选时也能看到已选条件。'
     },
     {
       target:()=>document.querySelector('.main-search-box'),
@@ -6064,7 +6195,7 @@ function buildTourSteps(){
     {
       target:()=>els.startTourBtn?.closest('.row'),
       title:'以后也能重新查看',
-      text:'教程只会自动出现一次。需要复习时，在“其他操作”点“使用教程”，或从版本说明里重新打开。'
+      text:'教程只会自动出现一次。需要复习时，在左栏底部点“使用教程”，或从版本说明里重新打开。'
     }
   ].filter(step=>resolveTourTarget(step));
 }
@@ -6194,7 +6325,7 @@ function moveTour(direction){
   if(!tourActive) return;
   if(direction > 0 && tourIndex === tourSteps.length-1){
     finishTour();
-    setStatus('使用教程已完成。之后可以在“其他操作”里重新查看。','good');
+    setStatus('使用教程已完成。之后可以在左栏底部重新查看。','good');
     return;
   }
   showTourStep(tourIndex + direction);
