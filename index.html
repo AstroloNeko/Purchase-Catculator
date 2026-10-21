@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
-<meta name="app-version" content="v68" />
+<meta name="app-version" content="v69" />
 <title>内购挑选助手</title>
 <link rel="icon" href="data:," />
 <script src="./vendor/xlsx.full.min.js"></script>
@@ -3161,6 +3161,70 @@ html[data-theme="dark"] .rightbar .cart-brand-group > summary{background:transpa
 .drawer-analysis[open] > summary::after{transform:rotate(225deg)}
 .drawer .drawer-analysis .cart-analysis{margin:0;padding:0 0 8px;border:0;border-radius:0;background:transparent;box-shadow:none}
 .drawer-analysis .cart-analysis-title{display:none}
+/* v69: compact sticky catalog controls and contextual feedback */
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.main{container-type:inline-size;container-name:catalog}
+.catalog-header{position:sticky;top:0;z-index:30;padding:10px 0 8px;background:var(--bg);border-bottom:1px solid var(--line)}
+.main .catalog-meta{justify-content:flex-start;align-items:center;gap:5px 12px;flex-wrap:wrap;margin:0 0 8px;color:var(--muted);font-size:10px;line-height:1.5}
+.catalog-meta #fileChip{min-width:0;max-width:min(100%,260px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.catalog-meta #showChip{margin-left:auto;white-space:nowrap;color:var(--text)}
+.main .catalog-search-row{display:grid;grid-template-columns:minmax(140px,1fr) auto;align-items:center;gap:8px;margin:0 0 8px}
+.main .catalog-search-row .main-search-box{min-width:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.main .catalog-search-row input{height:34px;min-width:0;padding:7px 10px;font-size:13px;border-radius:8px}
+.catalog-tools{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;min-width:0}
+.catalog-tools .btn{min-height:30px;font-size:11px;border-radius:8px}
+.batch-menu{position:relative;flex:0 0 auto;margin-left:auto}
+.batch-menu > summary{display:flex;align-items:center;gap:7px;list-style:none;user-select:none;cursor:pointer}
+.batch-menu > summary::-webkit-details-marker{display:none}
+.batch-menu > summary::after{content:"";width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);margin-top:-2px}
+.batch-menu[open] > summary::after{transform:rotate(225deg);margin-top:3px}
+.batch-menu-items{position:absolute;top:calc(100% + 6px);right:0;z-index:40;display:grid;gap:6px;min-width:190px;max-width:calc(100vw - 32px);padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);box-shadow:0 8px 24px rgba(0,0,0,.14)}
+.batch-menu-items .btn{text-align:left;white-space:normal}
+.active-filters{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px;margin:2px 0 8px}
+.active-filter-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap;max-height:72px;overflow:auto;min-width:0;padding:2px}
+.filter-tag{display:inline-flex;align-items:center;gap:7px;max-width:210px;min-width:0;padding:3px 7px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--text);font-size:11px;line-height:1.5;cursor:pointer}
+.filter-tag > span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filter-tag > span:last-child{flex:0 0 auto;font-size:13px;color:var(--muted)}
+.filter-tag:hover{border-color:var(--blue)}
+.main .compact-summary{display:flex;flex-wrap:wrap;align-items:center;gap:5px 16px;margin:0;padding:7px 0 0;border-top:1px solid var(--line)}
+.main.panel .compact-summary .item{display:inline-flex;align-items:baseline;gap:4px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;min-width:0;overflow:visible}
+.main .compact-summary .item::before,.main .compact-summary .item::after{display:none}
+.main .compact-summary .k{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+.main .compact-summary .v{font-size:13px;line-height:1.5;font-weight:800;color:var(--text)}
+.main .compact-summary [data-negative="true"]{color:var(--red)}
+.main #statusBox{margin-top:10px;font-size:11px;padding:8px 10px}
+.add-feedback{position:fixed;z-index:1300;display:flex;align-items:center;gap:8px;width:max-content;max-width:calc(100vw - 24px);padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--text);box-shadow:0 8px 28px rgba(0,0,0,.16);font-size:12px}
+.feedback-close{display:flex;align-items:center;justify-content:center;width:24px;height:24px;padding:0;border:0;border-radius:4px;background:transparent;color:var(--muted);font-size:18px;cursor:pointer}
+.feedback-close:hover{color:var(--text)}
+.batch-modal-inner{width:min(700px,100%)}
+#batchModal{z-index:1400}
+.batch-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 18px;padding:12px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.batch-metric{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 10px;min-width:0;font-size:12px;color:var(--muted)}
+.batch-metric strong{color:var(--text);overflow-wrap:anywhere}
+.batch-metric.negative strong{color:var(--red)}
+.batch-note{font-size:12px;color:var(--muted);line-height:1.6;margin:10px 0}
+#batchPreview{max-height:32vh;overflow:auto;overscroll-behavior:contain}
+#batchPreview .order-preview-table{width:100%;min-width:0;table-layout:fixed}
+#batchPreview th:first-child{width:50%}
+#batchPreview th:nth-child(2){width:30%}
+#batchPreview th:last-child{width:20%}
+#batchPreview th,#batchPreview td{padding:7px 8px;font-size:11px;overflow-wrap:anywhere}
+#batchPreview th:last-child,#batchPreview td:last-child{text-align:right}
+@media (min-width:1101px){.catalog-header{top:-14px}}
+@media (max-width:1100px){body{overflow:visible !important}}
+@media (max-width:760px){
+  .main .catalog-search-row{grid-template-columns:minmax(0,1fr);gap:7px}
+  .catalog-tools{justify-content:flex-start}
+  .main .compact-summary{gap:4px 12px}
+  .catalog-meta #fileChip{max-width:160px}
+  .filter-tag{max-width:180px}
+  .batch-metrics{gap:9px 12px}
+  .add-feedback{font-size:11px;gap:6px;padding:7px 8px}
+}
+@container catalog (max-width:540px){
+  .main .catalog-search-row{grid-template-columns:minmax(0,1fr);gap:7px}
+  .catalog-tools{justify-content:flex-start}
+}
 </style>
 </head>
 <body>
@@ -3168,7 +3232,7 @@ html[data-theme="dark"] .rightbar .cart-brand-group > summary{background:transpa
   <aside class="sidebar panel">
     <div class="product-heading-row">
       <h1>内购挑选助手</h1>
-      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v68</button>
+      <button class="official-version" id="officialVersionBtn" type="button">在线版 · v69</button>
     </div>
     <div class="desc">每月选购，轻松整理。</div>
 
@@ -3362,40 +3426,46 @@ html[data-theme="dark"] .rightbar .cart-brand-group > summary{background:transpa
     </details>
     <div class="row wrap sidebar-help">
       <button class="btn small secondary" id="startTourBtn" type="button">使用教程</button>
+      <button class="btn small secondary" id="openWhatsNewBtn" type="button">v69 更新说明</button>
     </div>
   </aside>
 
   <main class="main panel">
-    <div class="toolbar">
-      <div class="toolbar-left">
-        <span class="chip" id="fileChip">还没放清单</span>
-        <span class="chip" id="rowChip">0 个商品</span>
-        <span class="chip" id="showChip">当前显示 0 个</span>
+    <div class="catalog-header" id="catalogHeader">
+      <div class="toolbar catalog-meta">
+        <span id="fileChip">还没放清单</span>
+        <span id="rowChip">0 个商品</span>
+        <span id="showChip" aria-live="polite">当前显示 0 个</span>
       </div>
-      <div class="toolbar-right">
-        <button class="btn primary small" id="openBudgetPlansBtn">预算方案</button>
-        <button class="btn secondary small" id="openLuckBtn">试试手气</button>
-        <button class="btn secondary small" id="openWhatsNewBtn">v68 更新说明</button>
-        <button class="btn secondary small" id="selectVisibleBtn">本页都加购</button>
-        <button class="btn secondary small" id="candidateVisibleBtn">本页先候选</button>
-        <button class="btn danger small" id="clearSelectionTopBtn">清空购物车</button>
+      <div class="main-search-row catalog-search-row">
+        <div class="main-search-box">
+          <label class="visually-hidden" for="searchInput">搜索商品</label>
+          <input id="searchInput" type="text" placeholder="搜索商品 / 品牌 / 编号" />
+        </div>
+        <div class="catalog-tools">
+          <button class="btn primary small" id="openBudgetPlansBtn" type="button">预算方案</button>
+          <button class="btn secondary small" id="openLuckBtn" type="button">试试手气</button>
+          <details class="batch-menu" id="batchMenu">
+            <summary class="btn small secondary" id="batchMenuSummary">批量操作</summary>
+            <div class="batch-menu-items">
+              <button class="btn small secondary" id="selectVisibleBtn" type="button">当前结果全部加购</button>
+              <button class="btn small secondary" id="candidateVisibleBtn" type="button">当前结果全部候选</button>
+              <button class="btn small danger" id="clearSelectionTopBtn" type="button">清空购物车</button>
+            </div>
+          </details>
+        </div>
       </div>
-    </div>
-
-    <div class="main-search-row">
-      <div class="main-search-box">
-        <label for="searchInput">搜索商品</label>
-        <input id="searchInput" type="text" placeholder="多关键词搜索，例如：徽章 不鸭 -贴纸" />
+      <div class="active-filters hidden" id="activeFilters" aria-label="当前筛选条件">
+        <div class="active-filter-tags" id="activeFilterTags"></div>
+        <button class="btn small secondary" id="clearActiveFiltersBtn" type="button">清除筛选</button>
       </div>
-    </div>
-
-    <div class="summary">
-      <div class="item"><div class="k">已选款数</div><div class="v" id="selectedKinds">0</div></div>
-      <div class="item"><div class="k">已选件数</div><div class="v" id="selectedQty">0</div></div>
-      <div class="item"><div class="k">候选数量</div><div class="v" id="candidateKinds">0</div></div>
-      <div class="item"><div class="k">现在合计</div><div class="v" id="selectedTotal">¥0</div></div>
-      <div class="item"><div class="k">预算上限</div><div class="v sm" id="budgetShow">¥200</div></div>
-      <div class="item"><div class="k">还剩</div><div class="v" id="remainingShow">¥200</div></div>
+      <div class="summary compact-summary" aria-label="选购统计">
+        <div class="item"><span class="k">已选</span><span class="v" id="selectedKinds">0</span><span class="k">款</span><span class="v" id="selectedQty">0</span><span class="k">件</span></div>
+        <div class="item"><span class="k">候选</span><span class="v" id="candidateKinds">0</span></div>
+        <div class="item"><span class="k">合计</span><span class="v" id="selectedTotal">¥0</span></div>
+        <div class="item"><span class="k">预算</span><span class="v" id="budgetShow">¥200</span></div>
+        <div class="item"><span class="k">剩余</span><span class="v" id="remainingShow">¥200</span></div>
+      </div>
     </div>
 
     <div id="statusBox" class="status ok">先导入本月清单。点卡片空白处会直接 +1，暂时不确定的可以先放进候选。</div>
@@ -3761,16 +3831,16 @@ html[data-theme="dark"] .rightbar .cart-brand-group > summary{background:transpa
   <div class="order-modal-inner" style="width:min(720px,100%)">
     <div class="order-preview-head">
       <div>
-        <div class="panel-title" style="font-size:22px">v68 更新说明</div>
-        <div class="mini-stat">右侧购物车与辅助选购区域整理</div>
+        <div class="panel-title" style="font-size:22px">v69 更新说明</div>
+        <div class="mini-stat">中间商品区与选购操作体验优化</div>
       </div>
       <button class="btn secondary small" id="closeWhatsNewBtn" type="button">关闭</button>
     </div>
     <div class="whats-new-list">
-      <div class="whats-new-item"><b>购物车优先显示</b><span>合计、剩余预算与已选商品集中显示，预算分析可按需展开。</span></div>
-      <div class="whats-new-item"><b>候选与对比按需展开</b><span>收起时保留数量提示，首次加入商品时自动展开，手动收起后保持当前选择。</span></div>
-      <div class="whats-new-item"><b>商品操作统一排列</b><span>商品信息与操作分行显示，数量和移除按钮在窄栏中保持整齐。</span></div>
-      <div class="whats-new-item"><b>左右栏风格统一</b><span>使用分隔线整理层级，减少嵌套边框与空白占位，预算建议集中在底部。</span></div>
+      <div class="whats-new-item"><b>紧凑吸顶工具栏</b><span>搜索和简短统计随商品区滚动保持可见，批量操作统一收入菜单。</span></div>
+      <div class="whats-new-item"><b>筛选条件直接可见</b><span>搜索词、品牌、类型和价位以标签显示，可以逐项移除或清除筛选。</span></div>
+      <div class="whats-new-item"><b>加购后即时反馈</b><span>商品附近显示当前数量，可以立即撤销这一次加购。</span></div>
+      <div class="whats-new-item"><b>批量操作先核对范围</b><span>执行前确认全部筛选结果、新增款数和预计总额，取消不会改变购物车。</span></div>
     </div>
     <div class="order-preview-actions">
       <a class="btn secondary" id="officialOnlineLink" href="https://astroloneko.github.io/Purchase-Catculator/" target="_blank" rel="noopener">打开在线版</a>
@@ -3790,6 +3860,31 @@ html[data-theme="dark"] .rightbar .cart-brand-group > summary{background:transpa
       <button class="btn small secondary tour-skip" id="tourSkipBtn" type="button">跳过</button>
       <button class="btn small secondary" id="tourPrevBtn" type="button">上一步</button>
       <button class="btn small primary" id="tourNextBtn" type="button">下一步</button>
+    </div>
+  </div>
+</div>
+
+<div id="addFeedback" class="add-feedback hidden" role="status" aria-live="polite">
+  <span id="addFeedbackMessage"></span>
+  <button class="btn small secondary" id="undoAddFeedbackBtn" type="button">撤销</button>
+  <button class="feedback-close" id="closeAddFeedbackBtn" type="button" aria-label="关闭加购提示">×</button>
+</div>
+
+<div id="batchModal" class="order-modal" aria-hidden="true">
+  <div class="order-modal-inner batch-modal-inner" role="dialog" aria-modal="true" aria-labelledby="batchTitle" aria-describedby="batchScope">
+    <div class="order-preview-head">
+      <div>
+        <div class="panel-title" id="batchTitle">确认批量操作</div>
+        <div class="mini-stat" id="batchScope"></div>
+      </div>
+      <button class="btn small secondary" id="closeBatchBtn" type="button">关闭</button>
+    </div>
+    <div class="batch-metrics" id="batchMetrics"></div>
+    <p class="batch-note" id="batchNote"></p>
+    <div class="order-preview-table-wrap" id="batchPreview"></div>
+    <div class="order-preview-actions">
+      <button class="btn secondary" id="cancelBatchBtn" type="button">取消</button>
+      <button class="btn primary" id="confirmBatchBtn" type="button">确认</button>
     </div>
   </div>
 </div>
@@ -3868,7 +3963,7 @@ html[data-theme="dark"] .rightbar .cart-brand-group > summary{background:transpa
 </footer>
 
 <script>
-const APP_VERSION = 'v68';
+const APP_VERSION = 'v69';
 const STORAGE_KEY = 'timins_picker_state_v10';
 const FLOAT_POS_KEY = 'timins_budget_float_pos_v2';
 const CUSTOM_TYPE_RULES_KEY = 'timins_custom_type_rules_v1';
@@ -3880,7 +3975,7 @@ const CATALOG_DB_NAME = 'timins_purchase_picker';
 const CATALOG_DB_VERSION = 1;
 const CATALOG_STORE_NAME = 'catalogs';
 const LATEST_CATALOG_ID = 'latest';
-const WHATS_NEW_KEY = 'timins_picker_whats_new_v68';
+const WHATS_NEW_KEY = 'timins_picker_whats_new_v69';
 const TOUR_SEEN_KEY = 'timins_picker_tour_seen_v1';
 const FALLBACK_TYPE_RULES = [
   ['挂件/钥匙扣', ['钥匙扣','钥匙链','钥匙圈','钥匙挂件','毛绒挂件','亚克力挂件','滴胶钥匙扣','手绳扣','挂件','吊卡','吊坠','挂饰','车挂','树挂','伸缩钥匙扣']],
@@ -3983,6 +4078,25 @@ const QUICK_TYPE_BY_SEGMENT = RULE_PACK.quickTypeBySegment && typeof RULE_PACK.q
   ? RULE_PACK.quickTypeBySegment
   : FALLBACK_QUICK_TYPE_BY_SEGMENT;
 const els = {
+  catalogHeader: document.getElementById('catalogHeader'),
+  activeFilters: document.getElementById('activeFilters'),
+  activeFilterTags: document.getElementById('activeFilterTags'),
+  clearActiveFiltersBtn: document.getElementById('clearActiveFiltersBtn'),
+  batchMenu: document.getElementById('batchMenu'),
+  batchMenuSummary: document.getElementById('batchMenuSummary'),
+  batchModal: document.getElementById('batchModal'),
+  batchTitle: document.getElementById('batchTitle'),
+  batchScope: document.getElementById('batchScope'),
+  batchMetrics: document.getElementById('batchMetrics'),
+  batchNote: document.getElementById('batchNote'),
+  batchPreview: document.getElementById('batchPreview'),
+  closeBatchBtn: document.getElementById('closeBatchBtn'),
+  cancelBatchBtn: document.getElementById('cancelBatchBtn'),
+  confirmBatchBtn: document.getElementById('confirmBatchBtn'),
+  addFeedback: document.getElementById('addFeedback'),
+  addFeedbackMessage: document.getElementById('addFeedbackMessage'),
+  undoAddFeedbackBtn: document.getElementById('undoAddFeedbackBtn'),
+  closeAddFeedbackBtn: document.getElementById('closeAddFeedbackBtn'),
   appShell: document.getElementById('appShell'),
   officialVersionBtn: document.getElementById('officialVersionBtn'),
   leftResizer: document.getElementById('leftResizer'),
@@ -4266,6 +4380,10 @@ let currentCapsuleRows = [];
 let luckRollToken = 0;
 let duelState = null;
 let cartGroupsCollapsed = false;
+let pendingBatchAction = null;
+let addFeedbackState = null;
+let addFeedbackTimer = 0;
+let scrollRestoreToken = 0;
 
 function openCatalogDb(){
   return new Promise((resolve, reject)=>{
@@ -4584,6 +4702,7 @@ function snapshot(){
   };
 }
 function pushHistory(){
+  hideAddFeedback();
   state.undoStack.push(snapshot());
   if(state.undoStack.length>60) state.undoStack.shift();
   state.redoStack = [];
@@ -4601,6 +4720,7 @@ function applySnapshot(snap){
   refreshAll();
 }
 function undoAction(){
+  hideAddFeedback();
   if(!state.undoStack.length){ setStatus('还没有可以撤销的操作。','warn'); return; }
   state.redoStack.push(snapshot());
   const snap = state.undoStack.pop();
@@ -4608,6 +4728,7 @@ function undoAction(){
   setStatus('已撤销上一步。','good');
 }
 function redoAction(){
+  hideAddFeedback();
   if(!state.redoStack.length){ setStatus('还没有可以恢复的操作。','warn'); return; }
   state.undoStack.push(snapshot());
   const snap = state.redoStack.pop();
@@ -4780,6 +4901,156 @@ function syncOrderIdentityFromInputs(){
 function setStatus(msg, mode='ok'){
   els.statusBox.className = `status ${mode}`;
   els.statusBox.innerHTML = msg;
+}
+function renderActiveFilters(){
+  els.fileChip.title = state.fileName || els.fileChip.textContent;
+  const tags = [];
+  const add = (kind,value,label)=>tags.push({kind,value,label});
+  cleanString(els.searchInput.value).split(/\s+/).filter(Boolean).forEach((term,index)=>{
+    add('search',String(index),term.startsWith('-') ? `排除：${term.slice(1)}` : `搜索：${term}`);
+  });
+  state.filters.brands.forEach(value=>add('brand',value,`品牌：${value}`));
+  state.filters.types.forEach(value=>add('type',value,`类型：${value}`));
+  state.filters.priceBins.forEach(value=>add('price',value,`价位：${value}`));
+  if(state.filters.viewMode !== 'all') add('view','',els.viewModeSelect.selectedOptions[0]?.textContent || '浏览模式');
+  if(state.filters.sortBy !== 'default') add('sort','',els.sortSelect.selectedOptions[0]?.textContent || '排序方式');
+  if(state.filters.diagnostic){
+    const labels = {missingBrand:'缺品牌',missingPrice:'价格异常',missingImage:'没有图片',stockUnknown:'库存未知',otherType:'分类为其他'};
+    add('diagnostic','',`检查：${labels[state.filters.diagnostic] || '异常商品'}`);
+  }
+  els.activeFilters.classList.toggle('hidden', !tags.length);
+  els.activeFilterTags.innerHTML = tags.map(tag=>`<button class="filter-tag" type="button" data-filter-kind="${tag.kind}" data-filter-value="${escapeHtml(tag.value)}" title="${escapeHtml(tag.label)}" aria-label="移除${escapeHtml(tag.label)}"><span>${escapeHtml(tag.label)}</span><span aria-hidden="true">×</span></button>`).join('');
+}
+function removeActiveFilter(kind,value){
+  if(kind === 'search'){
+    const terms = cleanString(els.searchInput.value).split(/\s+/).filter(Boolean);
+    terms.splice(Number(value),1);
+    els.searchInput.value = terms.join(' ');
+  }else if(kind === 'brand') state.filters.brands.delete(value);
+  else if(kind === 'type') state.filters.types.delete(value);
+  else if(kind === 'price') state.filters.priceBins.delete(value);
+  else if(kind === 'view') els.viewModeSelect.value = 'all';
+  else if(kind === 'sort') els.sortSelect.value = 'default';
+  else if(kind === 'diagnostic') state.filters.diagnostic = '';
+  renderFilterLists();
+  applyFilters();
+}
+function hideAddFeedback(){
+  clearTimeout(addFeedbackTimer);
+  addFeedbackState = null;
+  els.addFeedback.classList.add('hidden');
+}
+function placeAddFeedback(){
+  if(!addFeedbackState) return;
+  const row = addFeedbackState.row;
+  const selector = `[data-id="${CSS.escape(row.id)}"]`;
+  const anchor = els.lightbox.classList.contains('open') ? els.lightboxAddBtn
+    : els.compareModal.classList.contains('open') ? els.compareGrid.querySelector(`.compare-add-cart${selector}`)
+    : els.cards.querySelector(`.card${selector}`);
+  const width = document.documentElement.clientWidth;
+  const height = window.innerHeight;
+  const feedbackWidth = els.addFeedback.offsetWidth;
+  const feedbackHeight = els.addFeedback.offsetHeight;
+  const bottomLimit = height - (width <= 1380 ? 80 : 14);
+  const rect = anchor?.getBoundingClientRect();
+  const visible = rect && rect.bottom > 0 && rect.top < bottomLimit && rect.right > 0 && rect.left < width;
+  const left = visible ? rect.left + (rect.width-feedbackWidth)/2 : (width-feedbackWidth)/2;
+  const top = visible
+    ? (rect.bottom+8+feedbackHeight <= bottomLimit ? rect.bottom+8 : Math.max(12,rect.top-feedbackHeight-8))
+    : bottomLimit-feedbackHeight;
+  els.addFeedback.style.left = `${clamp(left,12,Math.max(12,width-feedbackWidth-12))}px`;
+  els.addFeedback.style.top = `${clamp(top,12,Math.max(12,bottomLimit-feedbackHeight))}px`;
+}
+function showAddFeedback(row,previous){
+  hideAddFeedback();
+  addFeedbackState = {row,previous,qty:Number(getSelection(row.id).qty)||1};
+  els.addFeedbackMessage.textContent = `已加购 · 现有 ${addFeedbackState.qty} 件`;
+  els.addFeedback.classList.remove('hidden');
+  placeAddFeedback();
+  requestAnimationFrame(placeAddFeedback);
+  addFeedbackTimer = setTimeout(hideAddFeedback,6000);
+}
+function undoFeedbackAddition(){
+  const feedback = addFeedbackState;
+  if(!feedback) return;
+  const selection = getSelection(feedback.row.id);
+  if(getRowById(feedback.row.id) !== feedback.row || !selection.selected || Number(selection.qty) !== feedback.qty){
+    hideAddFeedback();
+    return;
+  }
+  pushHistory();
+  if(feedback.previous?.selected) setQty(feedback.row.id,feedback.previous.qty);
+  else removeSelection(feedback.row.id);
+  refreshAfterSelectionChange(feedback.row.id);
+  setStatus('已撤销这次加购。','good');
+}
+function closeBatchAction(){
+  pendingBatchAction = null;
+  els.batchModal.classList.remove('open');
+  els.batchModal.setAttribute('aria-hidden','true');
+  els.batchMenuSummary.focus({preventScroll:true});
+}
+function openBatchAction(action){
+  els.batchMenu.open = false;
+  hideAddFeedback();
+  const current = selectedSummary();
+  const rows = (action === 'clear' ? current.rows : state.visibleRows).slice();
+  if(!rows.length){ setStatus(action === 'clear' ? '购物车已经是空的。' : '当前筛选没有商品可以批量操作。','warn'); return; }
+  const newRows = rows.filter(row=>action === 'candidate' ? !isCandidate(row.id) : !getSelection(row.id).selected);
+  const totalAfter = action === 'clear' ? 0 : action === 'cart'
+    ? current.total + newRows.reduce((sum,row)=>sum + (Number(row.price)||0),0) : current.total;
+  const remainingAfter = state.budget-totalAfter;
+  pendingBatchAction = {action,rows,budget:state.budget,selections:JSON.stringify(state.selections),candidates:JSON.stringify(state.candidates)};
+  els.batchTitle.textContent = action === 'cart' ? '确认批量加购' : action === 'candidate' ? '确认批量加入候选' : '确认清空购物车';
+  els.batchScope.textContent = action === 'clear'
+    ? `整个购物车 · ${rows.length} 款 · ${current.qty} 件`
+    : `全部筛选结果 · ${rows.length} 款（包含尚未滚动到的商品）`;
+  const metrics = [
+    ['操作范围',`${rows.length} 款`],
+    [action === 'clear' ? '移除件数' : '新增款数',action === 'clear' ? `${current.qty} 件` : `${newRows.length} 款`],
+    ['操作前合计',fmtMoney(current.total)],
+    ['操作后合计',fmtMoney(totalAfter)],
+    ['预算上限',fmtMoney(state.budget)],
+    [remainingAfter < 0 ? '操作后超出预算' : '操作后剩余',fmtMoney(Math.abs(remainingAfter))]
+  ];
+  els.batchMetrics.innerHTML = metrics.map(([label,value],index)=>`<div class="batch-metric ${index === 5 && remainingAfter < 0 ? 'negative' : ''}"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join('');
+  const notes = action === 'cart' ? ['未加购的商品各加入 1 件，已在购物车的商品保留原数量。']
+    : action === 'candidate' ? ['将当前筛选结果放入候选，已有候选保持不变，购物车数量不变。']
+    : ['将移除购物车中的全部商品，候选清单与筛选条件保持不变。'];
+  const noStock = rows.filter(row=>row.stock === 0).length;
+  if(action === 'cart' && noStock) notes.push(`导入清单中有 ${noStock} 款库存为 0。`);
+  if(rows.length > 12) notes.push(`下表列出前 12 款，操作范围仍为全部 ${rows.length} 款。`);
+  els.batchNote.textContent = notes.join(' ');
+  els.batchPreview.innerHTML = `<table class="order-preview-table"><thead><tr><th>商品</th><th>品牌</th><th>单价</th></tr></thead><tbody>${rows.slice(0,12).map(row=>`<tr><td>${escapeHtml(row.name)}</td><td>${escapeHtml(row.brand)}</td><td>${escapeHtml(fmtMoney(row.price))}</td></tr>`).join('')}</tbody></table>`;
+  els.confirmBatchBtn.textContent = action === 'cart' ? `确认加购 ${rows.length} 款` : action === 'candidate' ? `确认候选 ${rows.length} 款` : '确认清空';
+  els.batchModal.classList.add('open');
+  els.batchModal.setAttribute('aria-hidden','false');
+  els.cancelBatchBtn.focus({preventScroll:true});
+}
+function confirmBatchAction(){
+  const request = pendingBatchAction;
+  if(!request) return;
+  if(request.rows.some(row=>getRowById(row.id) !== row)){
+    closeBatchAction();
+    setStatus('商品清单已变化，请重新选择批量操作范围。','warn');
+    return;
+  }
+  if(request.budget !== state.budget || request.selections !== JSON.stringify(state.selections) || request.candidates !== JSON.stringify(state.candidates)){
+    openBatchAction(request.action);
+    els.batchNote.textContent = `选购状态已变化，已重新计算，请核对后确认。 ${els.batchNote.textContent}`;
+    return;
+  }
+  pushHistory();
+  if(request.action === 'cart') request.rows.forEach(row=>{
+    const current = getSelection(row.id);
+    state.selections[row.id] = {selected:true,qty:current.selected ? Math.max(1,Number(current.qty)||1) : 1};
+  });
+  else if(request.action === 'candidate') request.rows.forEach(row=>{ state.candidates[row.id] = true; });
+  else state.selections = {};
+  closeBatchAction();
+  applyFilters();
+  const actionText = request.action === 'cart' ? '加入购物车' : '放入候选';
+  setStatus(request.action === 'clear' ? '购物车已经清空。' : `已将本次筛选的 ${request.rows.length} 款商品${actionText}。`,'good');
 }
 function splitNameSegments(name){
   const t = cleanString(name);
@@ -5408,12 +5679,15 @@ function refreshAfterSelectionChange(anchorId=''){
   triggerFeedbackPulse(anchorId);
 }
 function quickAddByCard(id){
+  const row = getRowById(id);
+  if(!row) return;
+  const previous = state.selections[id] ? {...state.selections[id]} : null;
   pushHistory();
   const curr = getSelection(id);
   const base = curr.selected ? Math.max(1, Number(curr.qty)||1) : 0;
   setQty(id, base + 1);
-  setStatus('已加入购物车，并帮你 +1。','good');
   refreshAfterSelectionChange(id);
+  showAddFeedback(row, previous);
 }
 function addToCandidate(id){
   pushHistory();
@@ -5597,6 +5871,7 @@ function renderCards(highlightId='', onDone=null){
       requestAnimationFrame(()=>{
         els.cards.classList.remove('is-soft-updating');
         els.cards.style.minHeight = '';
+        placeAddFeedback();
         if(typeof onDone === 'function') onDone();
       });
     });
@@ -6025,6 +6300,7 @@ function renderBudgetPlans(){
   }).join('');
 }
 function openBudgetPlans(){
+  hideAddFeedback();
   if(!state.rows.length){ setStatus('先导入商品清单，再生成预算方案。','warn'); return; }
   if(selectedSummary().remaining <= 0){ setStatus('当前已经没有剩余预算，可以先从购物车移除一款。','warn'); return; }
   populateBudgetPlanFilters();
@@ -6083,6 +6359,7 @@ function switchLuckTab(tab){
   els.luckModal.querySelectorAll('[data-luck-panel]').forEach(panel=>{panel.hidden=panel.dataset.luckPanel!==next;});
 }
 function openLuckModal(){
+  hideAddFeedback();
   if(!state.rows.length){setStatus('先导入商品清单，再来试试手气。','warn');return;}
   closeDrawers();
   const remaining = Math.max(1,Math.floor(selectedSummary().remaining));
@@ -6291,6 +6568,7 @@ function syncEditionLabel(){
   if(els.officialOnlineLink) els.officialOnlineLink.hidden = !localCopy;
 }
 function openWhatsNew(){
+  hideAddFeedback();
   if(!els.whatsNewModal) return;
   els.whatsNewModal.classList.add('open');
   els.whatsNewModal.setAttribute('aria-hidden','false');
@@ -6329,12 +6607,12 @@ function buildTourSteps(){
     {
       target:()=>document.querySelector('.main-search-box'),
       title:'用关键词快速搜索',
-      text:'支持同时输入多个关键词，也能用减号排除内容，例如“徽章 不鸭 -贴纸”。'
+      text:'支持多个关键词和减号排除，例如“徽章 不鸭 -贴纸”。当前条件会显示为下方标签，点标签可单独移除，也能一键清除筛选。'
     },
     {
       target:()=>els.cards?.querySelector('.card') || els.statusBox,
       title:'挑选商品',
-      text:'导入后，商品会显示在这里。点卡片空白处直接加购，也可以先放候选、加入对比或调整数量。'
+      text:'点卡片空白处或加号即可加购，商品附近会显示当前数量并提供撤销入口。也可以先放候选、加入对比或调整数量。'
     },
     {
       target:()=>els.openBudgetPlansBtn,
@@ -6453,6 +6731,7 @@ function showTourStep(nextIndex){
   try{ els.tourNextBtn.focus({preventScroll:true}); }catch(e){ els.tourNextBtn.focus(); }
 }
 function startTour(){
+  hideAddFeedback();
   if(!els.tourOverlay) return;
   const requestedFocus = document.activeElement;
   const startedFromUpdate = Boolean(els.whatsNewModal?.classList.contains('open'));
@@ -6547,6 +6826,7 @@ function renderRecommendations(){
   els.recommendList.innerHTML = blocks.join('');
 }
 function openCompareModal(){
+  hideAddFeedback();
   renderComparePanel();
   els.compareModal.classList.add('open');
 }
@@ -6554,6 +6834,7 @@ function closeCompareModal(){
   els.compareModal.classList.remove('open');
 }
 function startCandidateDuel(){
+  hideAddFeedback();
   const rows = candidateRows();
   if(rows.length < 2){
     setStatus('候选清单至少放 2 款，才能开始二选一。','warn');
@@ -6772,6 +7053,8 @@ function renderSummaryAndExport(){
   els.selectedTotal.textContent = fmtMoney(s.total);
   els.budgetShow.textContent = fmtMoney(state.budget);
   els.remainingShow.textContent = fmtMoney(s.remaining);
+  els.remainingShow.dataset.negative = String(s.remaining < 0);
+  els.clearSelectionTopBtn.disabled = s.kinds === 0;
   buildOrderOutput();
   updateBudgetFloat();
 }
@@ -6957,6 +7240,7 @@ function executeDownloadOrderXLSX(){
   setStatus('正式 Excel 订购单已经下载。','good');
 }
 function openOrderPreview(action){
+  hideAddFeedback();
   const rows = buildOrderRows();
   if(!rows.length){ setStatus('购物车还空着，暂时没有可以导出的内容。','warn'); return; }
   pendingOrderAction = action;
@@ -7004,6 +7288,7 @@ async function confirmOrderPreview(){
   else if(action === 'copy') await executeCopyOrderToClipboard();
 }
 function parseWorkbook(file){
+  hideAddFeedback();
   if(!file) return;
   if(typeof window.XLSX === 'undefined'){
     setStatus('Excel 读取组件没有加载成功，请刷新页面后再试。','bad');
@@ -7068,6 +7353,7 @@ function applyMappingFromSelectors(){
   openImportCheck(status);
 }
 function refreshAll(preserveScroll=false, anchorId=''){
+  const restoreToken = ++scrollRestoreToken;
   const restoreY = preserveScroll ? (window.scrollY || window.pageYOffset || 0) : null;
   let anchorTopBefore = null;
   if(preserveScroll && anchorId){
@@ -7075,6 +7361,9 @@ function refreshAll(preserveScroll=false, anchorId=''){
     if(anchorBefore) anchorTopBefore = anchorBefore.getBoundingClientRect().top;
   }
   renderSummaryAndExport();
+  renderActiveFilters();
+  els.selectVisibleBtn.disabled = !state.visibleRows.length;
+  els.candidateVisibleBtn.disabled = !state.visibleRows.length;
   renderCards(anchorId, ()=>{
     if(preserveScroll || anchorId) triggerFeedbackPulse(anchorId);
   });
@@ -7088,6 +7377,7 @@ function refreshAll(preserveScroll=false, anchorId=''){
     const restoreBase = ()=> window.scrollTo(0, restoreY);
     let tries = 0;
     const restoreWithAnchor = ()=>{
+      if(restoreToken !== scrollRestoreToken || tourActive) return;
       restoreBase();
       if(anchorId && anchorTopBefore != null){
         const anchorAfter = document.querySelector(`.card[data-id="${CSS.escape(anchorId)}"]`) || document.querySelector(`[data-id="${CSS.escape(anchorId)}"]`);
@@ -7177,19 +7467,10 @@ function clearTypeFilters(){
   applyFilters();
 }
 function toggleVisibleToCart(){
-  if(!state.visibleRows.length){ setStatus('当前没有可见商品可以操作。','warn'); return; }
-  pushHistory();
-  state.visibleRows.forEach(r => setQty(r.id, Math.max(1, Number(getSelection(r.id).qty)||1)));
-  refreshAll(true);
-  setStatus('当前可见商品都已加入购物车。','good');
+  openBatchAction('cart');
 }
 function toggleVisibleToCandidate(){
-  if(!state.visibleRows.length){ setStatus('当前没有可见商品可以操作。','warn'); return; }
-  pushHistory();
-  state.visibleRows.forEach(r => { state.candidates[r.id] = true; });
-  persistState();
-  refreshAll(true);
-  setStatus('当前可见商品都已加入候选。','good');
+  openBatchAction('candidate');
 }
 function moveAllCandidatesToCart(){
   const rows = candidateRows();
@@ -7203,6 +7484,7 @@ function moveAllCandidatesToCart(){
   setStatus('候选清单里的商品已经全部加入购物车。','good');
 }
 function openLightboxById(id){
+  hideAddFeedback();
   const index = state.visibleRows.findIndex(r => r.id === id);
   const idx = index >= 0 ? index : state.rows.findIndex(r => r.id === id);
   if(idx < 0) return;
@@ -7366,6 +7648,7 @@ function makeBudgetFloatDraggable(){
   });
 }
 function openDrawer(which){
+  hideAddFeedback();
   els.drawerBackdrop.classList.add('show');
   if(which === 'cart') els.cartDrawer.classList.add('open');
   if(which === 'cand') els.candDrawer.classList.add('open');
@@ -7434,6 +7717,23 @@ function bindDelegatedSideActions(container){
   });
 }
 function attachEvents(){
+  ['pointerdown','touchstart','wheel','keydown'].forEach(type=>{
+    document.addEventListener(type,()=>{ scrollRestoreToken += 1; },{capture:true,passive:true});
+  });
+  els.activeFilterTags.addEventListener('click',event=>{
+    const tag = event.target.closest('[data-filter-kind]');
+    if(tag) removeActiveFilter(tag.dataset.filterKind,tag.dataset.filterValue);
+  });
+  els.clearActiveFiltersBtn.addEventListener('click',resetFilters);
+  els.closeBatchBtn.addEventListener('click',closeBatchAction);
+  els.cancelBatchBtn.addEventListener('click',closeBatchAction);
+  els.confirmBatchBtn.addEventListener('click',confirmBatchAction);
+  els.batchModal.addEventListener('click',event=>{ if(event.target === els.batchModal) closeBatchAction(); });
+  els.undoAddFeedbackBtn.addEventListener('click',undoFeedbackAddition);
+  els.closeAddFeedbackBtn.addEventListener('click',hideAddFeedback);
+  document.addEventListener('click',event=>{ if(!els.batchMenu.contains(event.target)) els.batchMenu.open = false; });
+  document.addEventListener('scroll',placeAddFeedback,true);
+  window.addEventListener('resize',placeAddFeedback);
   els.fileInput.addEventListener('change', (e)=> parseWorkbook(e.target.files && e.target.files[0]));
   if(els.officialVersionBtn) els.officialVersionBtn.addEventListener('click', openWhatsNew);
   if(els.openWhatsNewBtn) els.openWhatsNewBtn.addEventListener('click', openWhatsNew);
@@ -7504,7 +7804,8 @@ function attachEvents(){
   els.applyMappingBtn.addEventListener('click', applyMappingFromSelectors);
   if(els.resetFiltersBtn) els.resetFiltersBtn.addEventListener('click', resetFilters);
   if(els.resetLayoutBtn) els.resetLayoutBtn.addEventListener('click', resetColumnLayout);
-  [els.clearSelectionBtn, els.clearSelectionBtn3, els.clearSelectionTopBtn, els.cartDrawerClearBtn].forEach(b => b && b.addEventListener('click', clearSelections));
+  [els.clearSelectionBtn, els.clearSelectionBtn3, els.cartDrawerClearBtn].forEach(b => b && b.addEventListener('click', clearSelections));
+  els.clearSelectionTopBtn.addEventListener('click',()=>openBatchAction('clear'));
   [els.undoBtn, els.redoBtn, els.cartUndoBtn, els.cartDrawerUndoBtn].forEach((b, idx) => {
     if(!b) return;
     b.addEventListener('click', idx===1 ? redoAction : undoAction);
@@ -7569,6 +7870,7 @@ function attachEvents(){
   els.cards.addEventListener('change', (e)=>{
     const t = e.target;
     if(t.classList.contains('select-toggle')){
+      if(t.checked){ quickAddByCard(t.dataset.id); return; }
       pushHistory();
       const id = t.dataset.id;
       setSelected(id, t.checked);
@@ -7576,10 +7878,13 @@ function attachEvents(){
       return;
     }
     if(t.classList.contains('qty-input')){
-      pushHistory();
       const id = t.dataset.id;
+      const row = getRowById(id);
+      const previous = state.selections[id] ? {...state.selections[id]} : null;
+      pushHistory();
       setQty(id, t.value);
       refreshAfterSelectionChange(id);
+      if(row && Number(getSelection(id).qty) > Number(previous?.qty || 0)) showAddFeedback(row,previous);
       return;
     }
   });
@@ -7591,12 +7896,7 @@ function attachEvents(){
       return;
     }
     if(t.classList.contains('qty-plus')){
-      pushHistory();
-      const id = t.dataset.id;
-      const sel = getSelection(id);
-      const curr = sel.selected ? Math.max(1, Number(sel.qty)||1) : 0;
-      setQty(id, curr + 1);
-      refreshAfterSelectionChange(id);
+      quickAddByCard(t.dataset.id);
       return;
     }
     if(t.classList.contains('qty-minus')){
@@ -7676,6 +7976,22 @@ function attachEvents(){
   });
   els.lightbox.addEventListener('click', (e)=>{ if(e.target === els.lightbox) closeLightbox(); });
   document.addEventListener('keydown', (e)=>{
+    if(els.batchModal.classList.contains('open')){
+      if(e.key === 'Escape'){ e.preventDefault(); closeBatchAction(); return; }
+      if(e.key === 'Tab'){
+        const buttons = [...els.batchModal.querySelectorAll('button')].filter(button=>!button.disabled);
+        const current = buttons.indexOf(document.activeElement);
+        const next = e.shiftKey ? (current <= 0 ? buttons.length-1 : current-1) : (current+1)%buttons.length;
+        e.preventDefault();
+        buttons[next]?.focus();
+      }
+      return;
+    }
+    if(e.key === 'Escape' && els.batchMenu.open){
+      els.batchMenu.open = false;
+      els.batchMenuSummary.focus({preventScroll:true});
+      return;
+    }
     if(tourActive){
       if(e.key === 'Escape'){ e.preventDefault(); finishTour(); return; }
       if(e.key === 'ArrowLeft'){ e.preventDefault(); moveTour(-1); return; }
@@ -7763,6 +8079,9 @@ async function init(){
   renderFilterLists();
   renderSummaryAndExport();
   renderSideLists();
+  renderActiveFilters();
+  els.selectVisibleBtn.disabled = !state.visibleRows.length;
+  els.candidateVisibleBtn.disabled = !state.visibleRows.length;
   renderRecommendations();
   renderComparePanel();
   syncMobileQuickControls();
